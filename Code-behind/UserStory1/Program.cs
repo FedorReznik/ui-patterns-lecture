@@ -16,9 +16,9 @@ namespace UserStory1
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             
-            var @fixed = 1;
+            var @fixed = 0;
             
-            Application.Run(@fixed == 1 ? (Form)new MainFixed() : new Main()); 
+            Application.Run(@fixed == 0 ? (Form)new MainFixed() : new Main()); 
         }
     }
 }
