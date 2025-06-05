@@ -2,7 +2,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Windows.Forms;
 
-namespace UserStory1
+namespace CodeBehind
 {
     [SuppressMessage("ReSharper", "ConditionIsAlwaysTrueOrFalse")]
     static class Program

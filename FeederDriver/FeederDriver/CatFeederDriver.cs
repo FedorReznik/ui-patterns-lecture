@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
@@ -6,18 +7,25 @@ using JetBrains.Annotations;
 namespace FeederDriver
 {
     [PublicAPI]
-    public class FeederDriverImpl : IFeederDriver1
+    public class CatFeederDriver : ICatFeederDriver
     {
         private int _concurrencyLevel;
         
-        public async Task Feed()
+        public async Task Feed(CancellationToken cancellationToken)
         {
             var detectedLevelOfConcurrency = Interlocked.Increment(ref _concurrencyLevel);
             
             if(detectedLevelOfConcurrency > 1)
                 throw new InvalidOperationException("Cannot feed concurrently!");
-            
-            await Task.Delay(TimeSpan.FromSeconds(5));
+
+            try
+            {
+                await Task.Delay(TimeSpan.FromSeconds(10), cancellationToken);
+            }
+            catch (TaskCanceledException)
+            {
+                Debug.Print("Feeding is cancelled");
+            }
             
             Interlocked.Exchange(ref _concurrencyLevel, 0);
         }

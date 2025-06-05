@@ -1,16 +1,17 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using FeederDriver;
 using MoreLinq.Extensions;
 
-namespace UserStory1
+namespace CodeBehind
 {
     [SuppressMessage("ReSharper", "LocalizableElement")]
     public partial class Main : Form
     {
-        private readonly IFeederDriver1 _feederDriver = new FeederDriverImpl();
+        private readonly ICatFeederDriver _catFeederDriver = new CatFeederDriver();
         private readonly TaskScheduler _scheduler;
         
         public Main()
@@ -22,7 +23,7 @@ namespace UserStory1
 
         private void btnFeedCatOnClick(object sender, EventArgs e)
         {
-            _feederDriver.Feed()
+            _catFeederDriver.Feed(CancellationToken.None)
                 .ContinueWith(t =>
                     {
                         try
