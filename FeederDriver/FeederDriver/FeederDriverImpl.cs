@@ -6,7 +6,7 @@ using JetBrains.Annotations;
 namespace FeederDriver
 {
     [PublicAPI]
-    public class FeederDriver : IFeederDriver1
+    public class FeederDriverImpl : IFeederDriver1
     {
         private int _concurrencyLevel;
         

@@ -34,6 +34,9 @@
         <WarningLevel>4</WarningLevel>
     </PropertyGroup>
     <ItemGroup>
+        <Reference Include="MoreLinq, Version=4.4.0.0, Culture=neutral, PublicKeyToken=384d532d7e88985d, processorArchitecture=MSIL">
+          <HintPath>..\packages\morelinq.4.4.0\lib\netstandard2.0\MoreLinq.dll</HintPath>
+        </Reference>
         <Reference Include="System"/>
         <Reference Include="System.Core"/>
         <Reference Include="System.Xml.Linq"/>
@@ -55,6 +58,9 @@
         </Compile>
         <Compile Include="Program.cs"/>
         <Compile Include="Properties\AssemblyInfo.cs"/>
+        <EmbeddedResource Include="Main.resx">
+          <DependentUpon>Main.cs</DependentUpon>
+        </EmbeddedResource>
         <EmbeddedResource Include="Properties\Resources.resx">
             <Generator>ResXFileCodeGenerator</Generator>
             <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -64,6 +70,7 @@
             <AutoGen>True</AutoGen>
             <DependentUpon>Resources.resx</DependentUpon>
         </Compile>
+        <None Include="packages.config" />
         <None Include="Properties\Settings.settings">
             <Generator>SettingsSingleFileGenerator</Generator>
             <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -76,6 +83,12 @@
     </ItemGroup>
     <ItemGroup>
         <None Include="App.config"/>
+    </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\..\FeederDriver\FeederDriver\FeederDriver.csproj">
+        <Project>{beb9c1e2-7155-4c87-a719-58381d7a566b}</Project>
+        <Name>FeederDriver</Name>
+      </ProjectReference>
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets"/>
 </Project>
