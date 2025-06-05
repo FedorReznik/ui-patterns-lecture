@@ -28,15 +28,26 @@ namespace UserStory1
                         try
                         {
                             t.Wait();
+                            NotifySuccess();
                         }
                         catch (AggregateException ae)
                         {
-                            ae.Flatten()
-                                .InnerExceptions
-                                .ForEach(ex => MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error));
+                            ProcessError(ae);
                         }
                     }, 
                     _scheduler);
+        }
+
+        private void NotifySuccess()
+        {
+            MessageBox.Show(this, "The cat is successfully fed!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private static void ProcessError(AggregateException ae)
+        {
+            ae.Flatten()
+                .InnerExceptions
+                .ForEach(ex => MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error));
         }
     }
 }
