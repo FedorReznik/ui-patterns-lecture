@@ -1,8 +1,10 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Windows.Forms;
 
 namespace UserStory1
 {
+    [SuppressMessage("ReSharper", "ConditionIsAlwaysTrueOrFalse")]
     static class Program
     {
         /// <summary>
@@ -13,7 +15,10 @@ namespace UserStory1
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Main());
+            
+            var @fixed = 1;
+            
+            Application.Run(@fixed == 1 ? (Form)new MainFixed() : new Main()); 
         }
     }
 }
