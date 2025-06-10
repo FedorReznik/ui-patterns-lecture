@@ -12,7 +12,7 @@ namespace MVC.Routing.Engine
         UserControl Render();
     }
 
-    public interface IView<in TController> : IView 
+    public interface IView<TController> : IView 
         where TController : IController
     {
     }
