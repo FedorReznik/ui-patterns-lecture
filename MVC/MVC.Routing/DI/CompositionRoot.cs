@@ -23,11 +23,23 @@ namespace MVC.Routing.DI
             builder.RegisterType<CatFeederController>()
                 .As<ICatFeederController>()
                 .Keyed<IController>(CatFeederRoutes.CatFeederRoute);
+            builder.RegisterType<FailedFeedingController>()
+                .As<IFailedFeedingController>()
+                .Keyed<IController>(CatFeederRoutes.CatFeedingFailedRoute);
+            builder.RegisterType<SuccessfulFeedingController>()
+                .As<ISuccessfulFeedingController>()
+                .Keyed<IController>(CatFeederRoutes.CatFedRoute);
             
             // register views
             builder.RegisterType<CatFeederView>()
                 .As<ICatFeederView>()
-                .Keyed<IView>(CatFeederRoutes.CatFeederRoute).AsImplementedInterfaces();
+                .Keyed<IView>(CatFeederRoutes.CatFeederRoute);
+            builder.RegisterType<FailedFeedingView>()
+                .As<IFailedFeedingView>()
+                .Keyed<IView>(CatFeederRoutes.CatFeedingFailedRoute);
+            builder.RegisterType<SuccessfulFeedingView>()
+                .As<ISuccessfulFeedingView>()
+                .Keyed<IView>(CatFeederRoutes.CatFedRoute);
             
             // register models
             builder.RegisterType<CatFeederService>().As<ICatFeederService>().SingleInstance();

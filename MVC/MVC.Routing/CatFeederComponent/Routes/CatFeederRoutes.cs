@@ -4,6 +4,6 @@
     {
         public static string CatFeederRoute => "cat-feeder";
         public static string CatFedRoute => "cat-fed";
-        public static string CatFeedingErrorRoute => "cat-feeding-error";
+        public static string CatFeedingFailedRoute => "cat-feeding-error";
     }
 }

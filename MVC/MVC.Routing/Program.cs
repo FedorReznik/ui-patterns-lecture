@@ -26,7 +26,7 @@ namespace MVC.Routing
             hostOnInitialized = () =>
             {
                 var router = container.Resolve<IRouter>();
-                router.NavigateTo(CatFeederRoutes.CatFeederRoute);
+                router.NavigateTo<IController>(CatFeederRoutes.CatFeederRoute);
                 host.Initialized -= hostOnInitialized;
             };
             host.Initialized += hostOnInitialized;

@@ -7,7 +7,7 @@ namespace MVC.Routing.Engine
 {
     public interface IRouter
     {
-        Task NavigateTo(string url);
+        Task<TController> NavigateTo<TController>(string url);
     }
 
     public sealed class Router : IRouter
@@ -29,7 +29,7 @@ namespace MVC.Routing.Engine
             _uiExecutor = uiExecutor ?? throw new ArgumentNullException(nameof(uiExecutor));
         }
 
-        public async Task NavigateTo(string url)
+        public async Task<TController> NavigateTo<TController>(string url)
         {
             if(!_controllerFactoriesMap.TryGetValue(url, out var controllerFactory))
                 throw new InvalidOperationException($"Url '{url}' does not mapped to any controller");
@@ -44,6 +44,8 @@ namespace MVC.Routing.Engine
             view.AttachController(controller);
             
             _navigationHost.ShowView(view.Render());
+            
+            return (TController)controller;
         }
     }
 }

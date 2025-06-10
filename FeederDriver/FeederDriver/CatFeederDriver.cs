@@ -20,7 +20,7 @@ namespace FeederDriver
 
             try
             {
-                await Task.Delay(TimeSpan.FromSeconds(10), cancellationToken);
+                await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken);
             }
             catch (TaskCanceledException)
             {

@@ -38,13 +38,15 @@ namespace MVC.Routing.CatFeederComponent.Views
             // btnContinue
             // 
             this.btnContinue.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.btnContinue.Location = new System.Drawing.Point(0, 291);
+            this.btnContinue.Location = new System.Drawing.Point(0, 448);
             this.btnContinue.Margin = new System.Windows.Forms.Padding(0);
             this.btnContinue.Name = "btnContinue";
-            this.btnContinue.Size = new System.Drawing.Size(450, 60);
+            this.btnContinue.Size = new System.Drawing.Size(675, 92);
             this.btnContinue.TabIndex = 0;
             this.btnContinue.Text = "Continue";
             this.btnContinue.UseVisualStyleBackColor = true;
+            this.btnContinue.Click += new System.EventHandler(this.btnContinue_Click);
+            this.btnContinue.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             // 
             // lblError
             // 
@@ -52,18 +54,20 @@ namespace MVC.Routing.CatFeederComponent.Views
             this.lblError.Location = new System.Drawing.Point(0, 0);
             this.lblError.Margin = new System.Windows.Forms.Padding(0);
             this.lblError.Name = "lblError";
-            this.lblError.Size = new System.Drawing.Size(450, 291);
+            this.lblError.Size = new System.Drawing.Size(675, 448);
             this.lblError.TabIndex = 1;
             this.lblError.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.lblError.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             // 
             // FailedFeedingView
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.lblError);
             this.Controls.Add(this.btnContinue);
+            this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.Name = "FailedFeedingView";
-            this.Size = new System.Drawing.Size(450, 351);
+            this.Size = new System.Drawing.Size(675, 540);
             this.ResumeLayout(false);
         }
 

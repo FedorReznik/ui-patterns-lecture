@@ -16,9 +16,9 @@ namespace MVC.Routing.Engine
         where TController : IController
     {
     }
-
-    [SuppressMessage("ReSharper", "PublicConstructorInAbstractClass")]
-    public abstract class ViewBase<TController> : UserControl, IView<TController> 
+    
+    [SuppressMessage("ReSharper", "MemberCanBeProtected.Global")]
+    public class ViewBase<TController> : UserControl, IView<TController> 
         where TController : IController
     {
         // Required to be public for WinForms designer to work

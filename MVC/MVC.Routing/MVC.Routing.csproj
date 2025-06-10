@@ -78,7 +78,11 @@
     </ItemGroup>
     <ItemGroup>
         <Compile Include="CatFeederComponent\Controllers\CatFeederController.cs" />
+        <Compile Include="CatFeederComponent\Controllers\FailedFeedingController.cs" />
         <Compile Include="CatFeederComponent\Controllers\ICatFeederController.cs" />
+        <Compile Include="CatFeederComponent\Controllers\IFailedFeedingController.cs" />
+        <Compile Include="CatFeederComponent\Controllers\ISuccessfulFeedingController.cs" />
+        <Compile Include="CatFeederComponent\Controllers\SuccessfulFeedingController.cs" />
         <Compile Include="CatFeederComponent\Models\CatFeederService.cs" />
         <Compile Include="CatFeederComponent\Models\FeedingResult.cs" />
         <Compile Include="CatFeederComponent\Models\ICatFeederService.cs" />
@@ -96,6 +100,8 @@
           <DependentUpon>FailedFeedingView.cs</DependentUpon>
         </Compile>
         <Compile Include="CatFeederComponent\Views\ICatFeederView.cs" />
+        <Compile Include="CatFeederComponent\Views\IFailedFeedingView.cs" />
+        <Compile Include="CatFeederComponent\Views\ISuccessfulFeedingView.cs" />
         <Compile Include="CatFeederComponent\Views\SuccessfulFeedingView.cs">
           <SubType>UserControl</SubType>
         </Compile>
