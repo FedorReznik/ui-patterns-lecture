@@ -17,7 +17,7 @@ namespace MVC.Routing.Engine
 
     public class UIExecutor : IUIExecutor, IUIContextHolder
     {
-        private SynchronizationContext _uiContext;
+        [CanBeNull] private SynchronizationContext _uiContext;
 
         public Task<T> Execute<T>(Func<T> producer)
         {
