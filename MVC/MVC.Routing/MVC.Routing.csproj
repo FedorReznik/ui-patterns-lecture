@@ -82,6 +82,7 @@
         <Compile Include="CatFeederComponent\Models\CatFeederService.cs" />
         <Compile Include="CatFeederComponent\Models\FeedingResult.cs" />
         <Compile Include="CatFeederComponent\Models\ICatFeederService.cs" />
+        <Compile Include="CatFeederComponent\Routes\CatFeederRoutes.cs" />
         <Compile Include="CatFeederComponent\Views\CatFeederView.cs">
           <SubType>UserControl</SubType>
         </Compile>
@@ -104,6 +105,7 @@
         <Compile Include="DI\CompositionRoot.cs" />
         <Compile Include="Engine\IController.cs" />
         <Compile Include="Engine\INavigationHost.cs" />
+        <Compile Include="Engine\IRouter.cs" />
         <Compile Include="Engine\IUIExecutor.cs" />
         <Compile Include="Engine\IView.cs" />
         <Compile Include="Engine\Main.cs">

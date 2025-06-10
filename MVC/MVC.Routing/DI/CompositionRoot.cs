@@ -2,6 +2,8 @@
 using FeederDriver;
 using MVC.Routing.CatFeederComponent.Controllers;
 using MVC.Routing.CatFeederComponent.Models;
+using MVC.Routing.CatFeederComponent.Routes;
+using MVC.Routing.CatFeederComponent.Views;
 using MVC.Routing.Engine;
 
 namespace MVC.Routing.DI
@@ -15,11 +17,17 @@ namespace MVC.Routing.DI
             // register engine
             builder.RegisterType<UIExecutor>().AsImplementedInterfaces().SingleInstance();
             builder.RegisterType<Main>().As<INavigationHost>().SingleInstance();
+            builder.RegisterType<Router>().As<IRouter>().SingleInstance();
             
             // register controllers
-            builder.RegisterType<CatFeederController>().As<ICatFeederController>();
+            builder.RegisterType<CatFeederController>()
+                .As<ICatFeederController>()
+                .Keyed<IController>(CatFeederRoutes.CatFeederRoute);
             
             // register views
+            builder.RegisterType<CatFeederView>()
+                .As<ICatFeederView>()
+                .Keyed<IView>(CatFeederRoutes.CatFeederRoute).AsImplementedInterfaces();
             
             // register models
             builder.RegisterType<CatFeederService>().As<ICatFeederService>().SingleInstance();

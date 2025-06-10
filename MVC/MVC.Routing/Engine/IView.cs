@@ -9,6 +9,7 @@ namespace MVC.Routing.Engine
     public interface IView
     {
         void AttachController(IController controller);
+        UserControl Render();
     }
 
     public interface IView<in TController> : IView 
@@ -40,6 +41,11 @@ namespace MVC.Routing.Engine
             var typedController = (TController)controller;
             
             Controller = typedController;
+        }
+
+        public UserControl Render()
+        {
+            return this;
         }
     }
 }

@@ -26,6 +26,13 @@ namespace MVC.Routing.Engine
             this.Guard(uiMutation);
         }
 
+        public event Action Initialized = () => {};
+
         public Form Host => this;
+
+        private void Main_Load(object sender, EventArgs e)
+        {
+            Initialized();
+        }
     }
 }
