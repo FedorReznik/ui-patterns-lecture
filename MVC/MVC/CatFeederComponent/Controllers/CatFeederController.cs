@@ -30,11 +30,7 @@ namespace MVC.CatFeederComponent.Controllers
                 {
                     var feedingResult = t.Result;
                     _view.UnBlock();
-                    
-                    if (feedingResult.Successful)
-                        _view.NotifyFeedingCompleted(feedingResult.Message);
-                    else
-                        _view.NotifyError(feedingResult.Message);
+                    _view.ProcessFeedingResult(feedingResult);
                 });
         }
         
