@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 using MVC.Routing.CatFeederComponent.Models;
 using MVC.Routing.CatFeederComponent.Views;
@@ -17,7 +18,13 @@ namespace MVC.Routing.CatFeederComponent.Controllers
 
         public void Feed()
         {
-            throw new NotImplementedException();
+            View?.Block();
+            Task.Run(async () =>
+            {
+                var result = await _catFeederService.Feed();
+                View?.UnBlock();
+                // TODO: navigate
+            });
         }
         
         public override void Dispose()

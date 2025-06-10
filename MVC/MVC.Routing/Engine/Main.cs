@@ -10,7 +10,7 @@ namespace MVC.Routing.Engine
             InitializeComponent();
         }
         
-        public void NavigateTo(UserControl view)
+        public void ShowView(UserControl view)
         {
             // ReSharper disable once ConvertToLocalFunction
             Action uiMutation = () =>

@@ -4,7 +4,7 @@ namespace MVC.Routing.Engine
 {
     public interface INavigationHost
     {
-        void NavigateTo(UserControl view);
+        void ShowView(UserControl view);
         
         Form Host { get; }
     }

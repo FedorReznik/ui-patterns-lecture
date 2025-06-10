@@ -104,6 +104,7 @@
         <Compile Include="DI\CompositionRoot.cs" />
         <Compile Include="Engine\IController.cs" />
         <Compile Include="Engine\INavigationHost.cs" />
+        <Compile Include="Engine\IUIExecutor.cs" />
         <Compile Include="Engine\IView.cs" />
         <Compile Include="Engine\Main.cs">
           <SubType>Form</SubType>

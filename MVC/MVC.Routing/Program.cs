@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Windows.Forms;
 using Autofac;
 using MVC.Routing.DI;
@@ -17,7 +18,7 @@ namespace MVC.Routing
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             
-            var container = CompositionRoot.Compose();
+            var container = CompositionRoot.Compose(SynchronizationContext.Current);
             var host = container.Resolve<INavigationHost>();
             
             Application.Run(host.Host);
