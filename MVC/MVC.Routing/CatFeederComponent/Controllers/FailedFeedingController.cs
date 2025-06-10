@@ -17,7 +17,7 @@ namespace MVC.Routing.CatFeederComponent.Controllers
 
         public void Continue()
         {
-            _router.NavigateTo<IController>(CatFeederRoutes.CatFeederRoute);
+            _router.NavigateTo(CatFeederRoutes.CatFeederRoute);
         }
 
         public void Reason(string reason)

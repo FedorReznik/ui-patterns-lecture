@@ -8,6 +8,8 @@ namespace MVC.Routing.Engine
     public interface IRouter
     {
         Task<TController> NavigateTo<TController>(string url);
+        
+        Task NavigateTo(string url);
     }
 
     public sealed class Router : IRouter
@@ -46,6 +48,11 @@ namespace MVC.Routing.Engine
             _navigationHost.ShowView(view.Render());
             
             return (TController)controller;
+        }
+
+        public async Task NavigateTo(string url)
+        {
+            await NavigateTo<IController>(url);
         }
     }
 }
