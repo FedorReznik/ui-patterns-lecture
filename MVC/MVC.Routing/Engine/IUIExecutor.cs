@@ -10,20 +10,27 @@ namespace MVC.Routing.Engine
         Task<T> Execute<T>(Func<T> producer);
     }
 
-    public class UIExecutor : IUIExecutor
+    public interface IUIContextHolder
     {
-        private readonly SynchronizationContext _uiContext;
+        void SetContext(SynchronizationContext context);
+    }
 
-        public UIExecutor([NotNull] SynchronizationContext uiContext)
-        {
-            _uiContext = uiContext ?? throw new ArgumentNullException(nameof(uiContext));
-        }
+    public class UIExecutor : IUIExecutor, IUIContextHolder
+    {
+        private SynchronizationContext _uiContext;
 
         public Task<T> Execute<T>(Func<T> producer)
         {
             var source = new TaskCompletionSource<T>();
             _uiContext.Post(_ => source.TrySetResult(producer()), null);
             return source.Task;
+        }
+
+        public void SetContext([NotNull] SynchronizationContext context)
+        {
+            if(_uiContext != null) throw new InvalidOperationException("UIContext is already set");
+            
+            _uiContext = context ?? throw new ArgumentNullException(nameof(context));
         }
     }
 }

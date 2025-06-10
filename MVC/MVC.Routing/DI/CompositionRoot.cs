@@ -1,5 +1,4 @@
-﻿using System.Threading;
-using Autofac;
+﻿using Autofac;
 using FeederDriver;
 using MVC.Routing.CatFeederComponent.Controllers;
 using MVC.Routing.CatFeederComponent.Models;
@@ -9,12 +8,12 @@ namespace MVC.Routing.DI
 {
     public static class CompositionRoot
     {
-        public static IContainer Compose(SynchronizationContext uiContext)
+        public static IContainer Compose()
         {
             var builder = new ContainerBuilder();
             
             // register engine
-            builder.RegisterInstance(new UIExecutor(uiContext)).As<IUIExecutor>();
+            builder.RegisterType<UIExecutor>().AsImplementedInterfaces().SingleInstance();
             builder.RegisterType<Main>().As<INavigationHost>().SingleInstance();
             
             // register controllers

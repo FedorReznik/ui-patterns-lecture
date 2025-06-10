@@ -1,13 +1,16 @@
 ﻿using System;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace MVC.Routing.Engine
 {
     public partial class Main : Form, INavigationHost
     {
-        public Main()
+        public Main(IUIContextHolder uiContextHolder)
         {
             InitializeComponent();
+            
+            uiContextHolder.SetContext(SynchronizationContext.Current);
         }
         
         public void ShowView(UserControl view)
