@@ -19,8 +19,9 @@ namespace MVC.Routing
             Application.SetCompatibleTextRenderingDefault(false);
 
             var container = CompositionRoot.Compose();
-            var host = container.Resolve<INavigationHost>();
             
+            // Root route navigation. Such a complex code forced by the fact that in WinForms one cannot access STA thread(context) before Application.Run is called.
+            var host = container.Resolve<INavigationHost>();
             Action hostOnInitialized = null;
             hostOnInitialized = () =>
             {
@@ -28,7 +29,6 @@ namespace MVC.Routing
                 router.NavigateTo(CatFeederRoutes.CatFeederRoute);
                 host.Initialized -= hostOnInitialized;
             };
-            
             host.Initialized += hostOnInitialized;
             
             Application.Run(host.Host);
