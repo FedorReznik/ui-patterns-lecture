@@ -1,5 +1,7 @@
 ﻿using Autofac;
+using FeederDriver;
 using MVC.CatFeederComponent.Controllers;
+using MVC.CatFeederComponent.Models;
 using MVC.CatFeederComponent.Views;
 
 namespace MVC.DI
@@ -15,6 +17,12 @@ namespace MVC.DI
             
             // register views
             builder.RegisterType<CatFeederView>().As<ICatFeederView>();
+            
+            // register models
+            builder.RegisterType<CatFeederService>().As<ICatFeederService>().SingleInstance();
+            
+            // register drivers
+            builder.RegisterType<CatFeederDriver>().As<ICatFeederDriver>().SingleInstance();
             
             return builder.Build();
         }

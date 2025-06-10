@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Windows.Forms;
+using JetBrains.Annotations;
 using MVC.CatFeederComponent.Controllers;
 using MVC.Engine;
 
 namespace MVC.CatFeederComponent.Views
 {
+    [SuppressMessage("ReSharper", "LocalizableElement")]
     public partial class CatFeederView : UserControl, ICatFeederView
     {
         private ICatFeederController _controller;
@@ -20,7 +23,19 @@ namespace MVC.CatFeederComponent.Views
         {
             _controller?.Feed();
         }
-        
+
+        public void NotifyFeedingCompleted(string message)
+        {
+            this.Guard(() => 
+                MessageBox.Show(this, message, "Success", MessageBoxButtons.OK, MessageBoxIcon.Information));
+        }
+
+        public void NotifyError(string error)
+        {
+            this.Guard(() => 
+                MessageBox.Show(error, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error));
+        }
+
         public void Block()
         {
             this.Guard(() => btnFeedCat.Enabled = false);
@@ -31,12 +46,12 @@ namespace MVC.CatFeederComponent.Views
             this.Guard(() => btnFeedCat.Enabled = true);
         }
 
-        public void AttachController(ICatFeederController controller)
+        public void AttachController([NotNull] ICatFeederController controller)
         {
             if(_controller != null)
                 throw new InvalidOperationException($"Controller is already attached for {nameof(CatFeederView)}");
             
-            _controller = controller;
+            _controller = controller ?? throw new ArgumentNullException(nameof(controller));
         }
 
         public UserControl Render()

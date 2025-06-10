@@ -36,6 +36,9 @@
         <Reference Include="Autofac, Version=8.3.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
           <HintPath>..\packages\Autofac.8.3.0\lib\netstandard2.0\Autofac.dll</HintPath>
         </Reference>
+        <Reference Include="JetBrains.Annotations, Version=4242.42.42.42, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+          <HintPath>..\packages\JetBrains.Annotations.2024.3.0\lib\net20\JetBrains.Annotations.dll</HintPath>
+        </Reference>
         <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=8.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
           <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.8.0.0\lib\net462\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
         </Reference>
@@ -74,6 +77,9 @@
     <ItemGroup>
         <Compile Include="CatFeederComponent\Controllers\CatFeederController.cs" />
         <Compile Include="CatFeederComponent\Controllers\ICatFeederController.cs" />
+        <Compile Include="CatFeederComponent\Models\CatFeederService.cs" />
+        <Compile Include="CatFeederComponent\Models\FeedingResult.cs" />
+        <Compile Include="CatFeederComponent\Models\ICatFeederService.cs" />
         <Compile Include="CatFeederComponent\Views\CatFeederView.cs">
           <SubType>UserControl</SubType>
         </Compile>
@@ -123,7 +129,10 @@
         <None Include="App.config"/>
     </ItemGroup>
     <ItemGroup>
-      <Folder Include="CatFeederComponent\Models\" />
+      <ProjectReference Include="..\..\FeederDriver\FeederDriver\FeederDriver.csproj">
+        <Project>{8166e803-1801-48c6-9d68-f295efbcb87e}</Project>
+        <Name>FeederDriver</Name>
+      </ProjectReference>
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets"/>
 </Project>

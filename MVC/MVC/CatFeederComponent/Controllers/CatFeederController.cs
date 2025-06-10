@@ -1,5 +1,7 @@
 using System;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
+using MVC.CatFeederComponent.Models;
 using MVC.CatFeederComponent.Views;
 using MVC.Engine;
 
@@ -7,33 +9,43 @@ namespace MVC.CatFeederComponent.Controllers
 {
     public class CatFeederController : ICatFeederController
     {
+        private readonly ICatFeederService _catFeederService;
         private readonly ICatFeederView _view;
 
-        public CatFeederController(ICatFeederView view)
+        public CatFeederController(
+            [NotNull] ICatFeederService catFeederService,
+            [NotNull] ICatFeederView view)
         {
-            _view = view;
+            _catFeederService = catFeederService ?? throw new ArgumentNullException(nameof(catFeederService));
+            _view = view ?? throw new ArgumentNullException(nameof(view));
+            
             _view.AttachController(this);
-        }
-
-        public IView View()
-        {
-            return _view;
         }
 
         public void Feed()
         {
             _view.Block();
-            Task.Run(async () => await Task.Delay(TimeSpan.FromSeconds(5)))
+            Task.Run(async () => await _catFeederService.Feed())
                 .ContinueWith(t =>
                 {
-                    t.Wait();
+                    var feedingResult = t.Result;
                     _view.UnBlock();
+                    
+                    if (feedingResult.Successful)
+                        _view.NotifyFeedingCompleted(feedingResult.Message);
+                    else
+                        _view.NotifyError(feedingResult.Message);
                 });
+        }
+        
+        public IView View()
+        {
+            return _view;
         }
 
         public void Dispose()
         {
-            // TODO: [FR] dispose model services.
+            _catFeederService.Dispose();
         }
     }
 }
