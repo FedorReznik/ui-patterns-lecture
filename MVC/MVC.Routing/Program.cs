@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Windows.Forms;
+using Autofac;
+using MVC.Routing.DI;
+using MVC.Routing.Engine;
 
 namespace MVC.Routing
 {
@@ -13,7 +16,11 @@ namespace MVC.Routing
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Main());
+            
+            var container = CompositionRoot.Compose();
+            var host = container.Resolve<INavigationHost>();
+            
+            Application.Run(host.Host);
         }
     }
 }

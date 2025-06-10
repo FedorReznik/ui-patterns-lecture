@@ -1,4 +1,4 @@
-﻿namespace MVC.Routing
+﻿namespace MVC.Routing.Engine
 {
     partial class Main
     {
@@ -38,6 +38,7 @@
             this.ClientSize = new System.Drawing.Size(597, 366);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.Name = "Main";
+            this.Padding = new System.Windows.Forms.Padding(8);
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Feeder App 2.5";
             this.ResumeLayout(false);
