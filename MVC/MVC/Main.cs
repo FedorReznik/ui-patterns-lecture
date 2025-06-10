@@ -1,5 +1,7 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Windows.Forms;
+using MVC.Engine;
 
 namespace MVC
 {
@@ -19,15 +21,8 @@ namespace MVC
                 view.Dock = DockStyle.Fill;
                 Controls.Add(view);
             };
-            Guard(uiMutation);
-        }
-
-        private void Guard(Action uiMutation)
-        {
-            if (InvokeRequired)
-                BeginInvoke(uiMutation);
-            else
-                uiMutation();
+            
+            this.Guard(uiMutation);
         }
     }
 }
