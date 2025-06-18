@@ -60,6 +60,7 @@ namespace MVP.CatFeederComponent.Presenters
         {
             _catFeederService.Dispose();
             
+            _isBusy.OnCompleted();
             _successfulFeeding.OnCompleted();
             _failedFeeding.OnCompleted();
         }

@@ -8,6 +8,7 @@ namespace MVP.CatFeederComponent.Views
     public partial class CatFeederView : ViewBase, IView<ICatFeederPresenter>
     {
         private readonly IRouter _router;
+        
         private IDisposable _isBusySubscription;
         private IDisposable _failedFeedingSubscription;
         private IDisposable _successfulFeedingSubscription;
