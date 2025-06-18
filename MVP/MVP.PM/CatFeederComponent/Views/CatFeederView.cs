@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Windows.Forms;
 using MVP.Engine;
 
 namespace MVP.CatFeederComponent.Views
