@@ -22,6 +22,7 @@
         <DefineConstants>DEBUG;TRACE</DefineConstants>
         <ErrorReport>prompt</ErrorReport>
         <WarningLevel>4</WarningLevel>
+        <Prefer32bit>false</Prefer32bit>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
         <PlatformTarget>AnyCPU</PlatformTarget>
@@ -31,6 +32,7 @@
         <DefineConstants>TRACE</DefineConstants>
         <ErrorReport>prompt</ErrorReport>
         <WarningLevel>4</WarningLevel>
+        <Prefer32bit>false</Prefer32bit>
     </PropertyGroup>
     <ItemGroup>
         <Reference Include="Autofac, Version=8.3.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
@@ -94,6 +96,18 @@
         </Compile>
         <Compile Include="CatFeederComponent\Views\CatFeederView.Designer.cs">
           <DependentUpon>CatFeederView.cs</DependentUpon>
+        </Compile>
+        <Compile Include="CatFeederComponent\Views\FailedFeedingView.cs">
+          <SubType>UserControl</SubType>
+        </Compile>
+        <Compile Include="CatFeederComponent\Views\FailedFeedingView.Designer.cs">
+          <DependentUpon>FailedFeedingView.cs</DependentUpon>
+        </Compile>
+        <Compile Include="CatFeederComponent\Views\SuccessfulFeedingView.cs">
+          <SubType>UserControl</SubType>
+        </Compile>
+        <Compile Include="CatFeederComponent\Views\SuccessfulFeedingView.Designer.cs">
+          <DependentUpon>SuccessfulFeedingView.cs</DependentUpon>
         </Compile>
         <Compile Include="DI\CompositionRoot.cs" />
         <Compile Include="Engine\INavigationHost.cs" />

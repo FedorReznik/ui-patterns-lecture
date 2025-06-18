@@ -26,6 +26,10 @@ namespace MVP.DI
             // register views
             builder.RegisterType<CatFeederView>()
                 .Keyed<IView>(typeof(ICatFeederPresenter));
+            builder.RegisterType<SuccessfulFeedingView>()
+                .Keyed<IView>(typeof(ISuccessfulFeedingPresenter));
+            builder.RegisterType<FailedFeedingView>()
+                .Keyed<IView>(typeof(IFailedFeedingPresenter));
             
             // register models
             builder.RegisterType<CatFeederService>().As<ICatFeederService>().SingleInstance();

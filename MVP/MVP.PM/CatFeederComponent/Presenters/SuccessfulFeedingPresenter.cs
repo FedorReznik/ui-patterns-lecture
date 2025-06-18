@@ -1,10 +1,20 @@
+using System;
+using JetBrains.Annotations;
+
 namespace MVP.CatFeederComponent.Presenters
 {
     public class SuccessfulFeedingPresenter : ISuccessfulFeedingPresenter
     {
-        public void Continue()
+        private readonly Func<ICatFeederPresenter> _catFeederPresenterFactory;
+
+        public SuccessfulFeedingPresenter([NotNull] Func<ICatFeederPresenter> catFeederPresenterFactory)
         {
-            throw new System.NotImplementedException();
+            _catFeederPresenterFactory = catFeederPresenterFactory ?? throw new ArgumentNullException(nameof(catFeederPresenterFactory));
+        }
+
+        public ICatFeederPresenter Continue()
+        {
+            return _catFeederPresenterFactory();
         }
 
         public string Message { get; set; }

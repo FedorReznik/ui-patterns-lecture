@@ -4,7 +4,7 @@ namespace MVP.CatFeederComponent.Presenters
 {
     public interface IFailedFeedingPresenter : IPresenter
     {
-        void Continue();
+        ICatFeederPresenter Continue();
         
         string Reason { get; set; }
     }
