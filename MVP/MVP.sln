@@ -6,6 +6,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Driver", "Driver", "{E7FA2E
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FeederDriver", "..\FeederDriver\FeederDriver\FeederDriver.csproj", "{296FC364-349C-4CE6-ACA0-FF13C0811F4C}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Subsystem Boundary", "Subsystem Boundary", "{D6E42865-87B4-40C2-A70D-943F1EA1223F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PM", "PM", "{E086AB5A-477E-4A36-9E6B-36147DB457F7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,5 +27,6 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{296FC364-349C-4CE6-ACA0-FF13C0811F4C} = {E7FA2E7B-2097-4126-8713-DDD717FBCB9B}
+		{0A5FAF63-2165-49A4-A0A2-429176084940} = {E086AB5A-477E-4A36-9E6B-36147DB457F7}
 	EndGlobalSection
 EndGlobal
