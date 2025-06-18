@@ -8,7 +8,9 @@ namespace MVC.Routing.Engine
 {
     public interface IView
     {
-        void AttachController(IController controller);
+        void AttachController([NotNull] IController controller);
+        
+        [NotNull]
         UserControl Render();
     }
 

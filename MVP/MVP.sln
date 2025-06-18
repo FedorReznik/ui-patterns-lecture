@@ -2,6 +2,10 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MVP.PM", "MVP.PM\MVP.PM.csproj", "{0A5FAF63-2165-49A4-A0A2-429176084940}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Driver", "Driver", "{E7FA2E7B-2097-4126-8713-DDD717FBCB9B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FeederDriver", "..\FeederDriver\FeederDriver\FeederDriver.csproj", "{296FC364-349C-4CE6-ACA0-FF13C0811F4C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +16,12 @@ Global
 		{0A5FAF63-2165-49A4-A0A2-429176084940}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0A5FAF63-2165-49A4-A0A2-429176084940}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0A5FAF63-2165-49A4-A0A2-429176084940}.Release|Any CPU.Build.0 = Release|Any CPU
+		{296FC364-349C-4CE6-ACA0-FF13C0811F4C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{296FC364-349C-4CE6-ACA0-FF13C0811F4C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{296FC364-349C-4CE6-ACA0-FF13C0811F4C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{296FC364-349C-4CE6-ACA0-FF13C0811F4C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{296FC364-349C-4CE6-ACA0-FF13C0811F4C} = {E7FA2E7B-2097-4126-8713-DDD717FBCB9B}
 	EndGlobalSection
 EndGlobal

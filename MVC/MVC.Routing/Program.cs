@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Windows.Forms;
 using Autofac;
 using MVC.Routing.CatFeederComponent.Routes;
@@ -7,6 +8,7 @@ using MVC.Routing.Engine;
 
 namespace MVC.Routing
 {
+    [SuppressMessage("ReSharper", "AsyncVoidLambda")]
     static class Program
     {
         /// <summary>
@@ -20,13 +22,12 @@ namespace MVC.Routing
 
             var container = CompositionRoot.Compose();
             
-            // Root route navigation. Such a complex code forced by the fact that in WinForms one cannot access STA thread(context) before Application.Run is called.
             var host = container.Resolve<INavigationHost>();
             Action hostOnInitialized = null;
-            hostOnInitialized = () =>
+            hostOnInitialized = async () =>
             {
                 var router = container.Resolve<IRouter>();
-                router.NavigateTo<IController>(CatFeederRoutes.CatFeederRoute);
+                await router.NavigateTo(CatFeederRoutes.CatFeederRoute);
                 host.Initialized -= hostOnInitialized;
             };
             host.Initialized += hostOnInitialized;

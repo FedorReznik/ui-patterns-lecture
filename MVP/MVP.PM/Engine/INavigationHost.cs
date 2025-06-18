@@ -2,7 +2,7 @@
 using System.Windows.Forms;
 using JetBrains.Annotations;
 
-namespace MVC.Routing.Engine
+namespace MVP.Engine
 {
     public interface INavigationHost
     {
