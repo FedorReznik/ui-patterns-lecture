@@ -8,5 +8,9 @@ namespace MVP.CatFeederComponent.Presenters
         void Feed();
         
         IObservable<bool> IsBusy { get; }
+        
+        IObservable<ISuccessfulFeedingPresenter> SuccessfulFeeding { get; }
+        
+        IObservable<IFailedFeedingPresenter> FailedFeeding { get; }
     }
 }

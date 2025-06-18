@@ -84,7 +84,11 @@
         <Compile Include="CatFeederComponent\Models\FeedingResult.cs" />
         <Compile Include="CatFeederComponent\Models\ICatFeederService.cs" />
         <Compile Include="CatFeederComponent\Presenters\CatFeederPresenter.cs" />
+        <Compile Include="CatFeederComponent\Presenters\FailedFeedingPresenter.cs" />
         <Compile Include="CatFeederComponent\Presenters\ICatFeederPresenter.cs" />
+        <Compile Include="CatFeederComponent\Presenters\IFailedFeedingPresenter.cs" />
+        <Compile Include="CatFeederComponent\Presenters\ISuccessfulFeedingPresenter.cs" />
+        <Compile Include="CatFeederComponent\Presenters\SuccessfulFeedingPresenter.cs" />
         <Compile Include="CatFeederComponent\Views\CatFeederView.cs">
           <SubType>UserControl</SubType>
         </Compile>

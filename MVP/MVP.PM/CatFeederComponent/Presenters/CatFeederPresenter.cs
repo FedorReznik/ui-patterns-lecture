@@ -10,13 +10,22 @@ namespace MVP.CatFeederComponent.Presenters
     {
         [NotNull] 
         private readonly ICatFeederService _catFeederService;
-        
+
+        private readonly Func<ISuccessfulFeedingPresenter> _successfulFeedingPresenterFactory;
+        private readonly Func<IFailedFeedingPresenter> _failedFeedingPresenterFactory;
+
         private readonly ReplaySubject<bool> _isBusy = new ReplaySubject<bool>(1);
+        private readonly Subject<ISuccessfulFeedingPresenter> _successfulFeeding = new Subject<ISuccessfulFeedingPresenter>();
+        private readonly Subject<IFailedFeedingPresenter> _failedFeeding = new Subject<IFailedFeedingPresenter>();
 
         public CatFeederPresenter(
-            [NotNull] ICatFeederService catFeederService)
+            [NotNull] ICatFeederService catFeederService,
+            [NotNull] Func<ISuccessfulFeedingPresenter> successfulFeedingPresenterFactory,
+            [NotNull] Func<IFailedFeedingPresenter> failedFeedingPresenterFactory)
         {
             _catFeederService = catFeederService ?? throw new ArgumentNullException(nameof(catFeederService));
+            _successfulFeedingPresenterFactory = successfulFeedingPresenterFactory ?? throw new ArgumentNullException(nameof(successfulFeedingPresenterFactory));
+            _failedFeedingPresenterFactory = failedFeedingPresenterFactory ?? throw new ArgumentNullException(nameof(failedFeedingPresenterFactory));
         }
 
         public void Feed()
@@ -28,24 +37,31 @@ namespace MVP.CatFeederComponent.Presenters
                 _isBusy.OnNext(false);
                 if (result.Successful)
                 {
-                    // TODO: impl
-                    /*var successfulController = await _router.NavigateTo<ISuccessfulFeedingController>(CatFeederRoutes.CatFedRoute);
-                    successfulController.Message(result.Message);*/
+                    var successfulFeedingPresenter = _successfulFeedingPresenterFactory();
+                    successfulFeedingPresenter.Message = result.Message;
+                    _successfulFeeding.OnNext(successfulFeedingPresenter);
                 }
                 else
                 {
-                    // TODO: impl
-                    /*var failedFeedingController = await _router.NavigateTo<IFailedFeedingController>(CatFeederRoutes.CatFeedingFailedRoute);
-                    failedFeedingController.Reason(result.Message);*/
+                    var failedFeedingPresenter = _failedFeedingPresenterFactory();
+                    failedFeedingPresenter.Reason = result.Message;
+                    _failedFeeding.OnNext(failedFeedingPresenter);
                 }
             });
         }
 
         public IObservable<bool> IsBusy => _isBusy;
 
+        public IObservable<ISuccessfulFeedingPresenter> SuccessfulFeeding => _successfulFeeding;
+
+        public IObservable<IFailedFeedingPresenter> FailedFeeding => _failedFeeding;
+
         public void Dispose()
         {
             _catFeederService.Dispose();
+            
+            _successfulFeeding.OnCompleted();
+            _failedFeeding.OnCompleted();
         }
     }
 }

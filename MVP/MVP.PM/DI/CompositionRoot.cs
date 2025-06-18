@@ -20,6 +20,8 @@ namespace MVP.DI
             
             // register presenters
             builder.RegisterType<CatFeederPresenter>().As<ICatFeederPresenter>();
+            builder.RegisterType<SuccessfulFeedingPresenter>().As<ISuccessfulFeedingPresenter>();
+            builder.RegisterType<FailedFeedingPresenter>().As<IFailedFeedingPresenter>();
             
             // register views
             builder.RegisterType<CatFeederView>()
