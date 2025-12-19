@@ -1,4 +1,4 @@
-# The history of UI architecture design approaches: from code-behind to MVVM.
+# The history of UI architecture design approaches: from Code-behind to MVVM.
 
 By Fedor Reznik
 
