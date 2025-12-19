@@ -37,7 +37,7 @@ namespace MVC.Routing.Engine
                 throw new InvalidOperationException($"Url '{url}' does not mapped to any controller");
             
             if(!_viewFactoriesMap.TryGetValue(url, out var viewFactory))
-                throw new InvalidOperationException($"View '{url}' does not mapped to any view");
+                throw new InvalidOperationException($"Url '{url}' does not mapped to any view");
 
             var controller = controllerFactory();
             var view = await _uiExecutor.Execute(() => viewFactory());

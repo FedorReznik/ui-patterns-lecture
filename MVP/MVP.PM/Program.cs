@@ -2,11 +2,11 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Windows.Forms;
 using Autofac;
-using MVC.Routing.CatFeederComponent.Routes;
-using MVC.Routing.DI;
-using MVC.Routing.Engine;
+using MVP.CatFeederComponent.Presenters;
+using MVP.DI;
+using MVP.Engine;
 
-namespace MVC.Routing
+namespace MVP
 {
     [SuppressMessage("ReSharper", "AsyncVoidLambda")]
     static class Program
@@ -19,7 +19,6 @@ namespace MVC.Routing
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-
             var container = CompositionRoot.Compose();
             
             var host = container.Resolve<INavigationHost>();
@@ -27,7 +26,7 @@ namespace MVC.Routing
             hostOnInitialized = async () =>
             {
                 var router = container.Resolve<IRouter>();
-                await router.NavigateTo(CatFeederRoutes.CatFeederRoute);
+                await router.NavigateTo(container.Resolve<ICatFeederPresenter>());
                 host.Initialized -= hostOnInitialized;
             };
             host.Initialized += hostOnInitialized;

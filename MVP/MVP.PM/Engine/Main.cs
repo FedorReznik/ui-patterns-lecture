@@ -1,16 +1,13 @@
 ﻿using System;
 using System.Threading;
 using System.Windows.Forms;
-using JetBrains.Annotations;
 
-namespace MVC.Routing.Engine
+namespace MVP.Engine
 {
     public partial class Main : Form, INavigationHost
     {
-        public Main([NotNull] IUIContextHolder uiContextHolder)
+        public Main(IUIContextHolder uiContextHolder)
         {
-            if (uiContextHolder == null) throw new ArgumentNullException(nameof(uiContextHolder));
-            
             InitializeComponent();
             
             uiContextHolder.SetContext(SynchronizationContext.Current);
