@@ -22,6 +22,10 @@ And the status of feeding should be provided by modal dialog with success/fail m
 
 ## 2. Back in the days. Code-behind
 
+### 2.1 Code-behind "pattern" definition
+
+&nbsp;&nbsp;&nbsp;&nbsp;Let's imagine that everything is happening around 2005 and our team has proven expertise in Windows Forms, as well as code-behind approach seems quick and easy to implement: just open the form designer in your IDE, put some controls on it, wire the event handlers with mouse click, put the code into handlers and you are done. So you can hardly call this a pattern, the better word would be a process.
+
 ## 3. Moving to patterns
 
 ## 4. MVC
