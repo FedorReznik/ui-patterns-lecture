@@ -16,7 +16,7 @@ By Fedor Reznik
 
 ### 1.3. First User Story
 
-&nbsp;&nbsp;&nbsp;&nbsp;To quickly conquer the market we as the company must provide the simplest yet use-full application: it should contain only "Feed the cat" button and should provide feedback if the feeding has been successful. Do our UX team came-out with the following design:
+&nbsp;&nbsp;&nbsp;&nbsp;To quickly conquer the market we as the company must provide the simplest yet use-full desktop application: it should contain only "Feed the cat" button and should provide feedback if the feeding has been successful. Do our UX team came-out with the following design:
 <img src="Images/CatFeederAppUX.png"/> 
 And the status of feeding should be provided by modal dialog with success/fail message and OK button to close it.
 
@@ -25,6 +25,58 @@ And the status of feeding should be provided by modal dialog with success/fail m
 ### 2.1 Code-behind "pattern" definition
 
 &nbsp;&nbsp;&nbsp;&nbsp;Let's imagine that everything is happening around 2005 and our team has proven expertise in Windows Forms, as well as code-behind approach seems quick and easy to implement: just open the form designer in your IDE, put some controls on it, wire the event handlers with mouse click, put the code into handlers and you are done. So you can hardly call this a pattern, the better word would be a process.
+
+### 2.2 The implementation
+
+&nbsp;&nbsp;&nbsp;&nbsp;The best part of this approach is that there is almost nothing to discuss, so the basic implementation can look like this (you can find the complete solution [here](https://github.com/FedorReznik/ui-patterns-lecture/tree/main/Code-behind), see Main.cs file):
+```C#
+public partial class Main : Form
+{
+    private readonly ICatFeederDriver _catFeederDriver = new CatFeederDriver();
+    private readonly TaskScheduler _scheduler;
+    
+    public Main()
+    {
+        InitializeComponent();
+        
+        _scheduler = TaskScheduler.FromCurrentSynchronizationContext();
+    }
+
+    private void btnFeedCatOnClick(object sender, EventArgs e)
+    {
+        _catFeederDriver.Feed(CancellationToken.None)
+            .ContinueWith(t =>
+                {
+                    try
+                    {
+                        t.Wait();
+                        NotifySuccess();
+                    }
+                    catch (AggregateException ae)
+                    {
+                        ProcessError(ae);
+                    }
+                }, 
+                _scheduler);
+    }
+
+    private void NotifySuccess()
+    {
+        MessageBox.Show(this, "The cat is successfully fed!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+    }
+
+    private static void ProcessError(AggregateException ae)
+    {
+        ae
+            .Flatten()
+            .InnerExceptions
+            .ForEach(ex => MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error));
+    }
+}
+```
+As you can see we are instantiating the `CatFeederDriver` and calling `Feed` method in button click event handler - `btnFeedCatOnClick`, then we are calling notification methods in continuation on UI-thread, avoiding `async void` signature and adhering to STA nature of desktop apps. Simple. Effective. Quick. Or...?
+
+### 2.3 Here comes the issues
 
 ## 3. Moving to patterns
 
