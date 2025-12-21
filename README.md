@@ -16,7 +16,7 @@ By Fedor Reznik
 
 ### 1.3. First User Story
 
-&nbsp;&nbsp;&nbsp;&nbsp;To quickly conquer the market we as the company must provide the simplest yet use-full desktop application: it should contain only "Feed the cat" button and should provide feedback if the feeding has been successful. Do our UX team came-out with the following design:
+&nbsp;&nbsp;&nbsp;&nbsp;To quickly conquer the market we as the company must provide the simplest yet use-full desktop application: it should contain only "Feed the cat" button and should provide feedback if the feeding has been successful. So our UX team came-out with the following design:
 <img src="Images/CatFeederAppUX.png"/> 
 And the status of feeding should be provided by modal dialog with success/fail message and OK button to close it.
 
