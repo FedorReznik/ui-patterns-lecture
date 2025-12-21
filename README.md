@@ -92,7 +92,7 @@ public partial class Main : Form
 ### 2.3 Here comes the issues
 
 &nbsp;&nbsp;&nbsp;&nbsp;Let's take a closer look on our code and try to answer is it easy to test? Unfortunately it is not, cause to implement a test we need to instantiate our form in the correct environment e.g. in STA. More over we cannot separately test the logic - basically only end to end testing is possible. Now even if we want to create e2e test we will ought to use either some reflection to call private `btnFeedCatOnClick` method or use some kind of UI-automation tools, which are notorious for their instability. So the only reasonable solution is to have manual QA team which will test it.
-&nbsp;&nbsp;&nbsp;&nbsp;TOD: describe two issues
+&nbsp;&nbsp;&nbsp;&nbsp;TODo: describe two issues
 
 ## 3. Moving to patterns
 
