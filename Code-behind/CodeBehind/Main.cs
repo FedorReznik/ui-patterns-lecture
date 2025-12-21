@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -54,11 +55,12 @@ namespace CodeBehind
                 MessageBoxIcon.Information);
         }
 
-        private static void ProcessError(AggregateException ae)
+        private void ProcessError(AggregateException ae)
         {
             ae.Flatten()
                 .InnerExceptions
                 .ForEach(ex => MessageBox.Show(
+                        this,
                         ex.Message,
                         "Error",
                         MessageBoxButtons.OK,
