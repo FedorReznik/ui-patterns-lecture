@@ -56,15 +56,24 @@ namespace CodeBehind
 
         private void NotifySuccess()
         {
-            MessageBox.Show(this, "The cat is successfully fed!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show(
+                this,
+                "The cat is successfully fed!", "Success",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information);
         }
 
-        private static void ProcessError(AggregateException ae)
+        private void ProcessError(AggregateException ae)
         {
             ae.Flatten()
                 .InnerExceptions
                 .Where(ex => !(ex is OperationCanceledException))
-                .ForEach(ex => MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error));
+                .ForEach(ex => MessageBox.Show(
+                    this,
+                    ex.Message,
+                    "Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error));
         }
 
         protected override void OnClosing(CancelEventArgs e)
