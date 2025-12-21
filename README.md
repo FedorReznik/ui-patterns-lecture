@@ -87,9 +87,12 @@ public partial class Main : Form
     }
 }
 ```
-As you can see we are instantiating the `CatFeederDriver` and calling `Feed` method in button click event handler - `btnFeedCatOnClick`, then we are calling notification methods in continuation on UI-thread, avoiding `async void` signature and adhering to STA nature of desktop apps. Simple. Effective. Quick. Or...?
+&nbsp;&nbsp;&nbsp;&nbsp;As you can see we are instantiating the `CatFeederDriver` and calling `Feed` method in button click event handler - `btnFeedCatOnClick`, then we are calling notification methods in continuation on UI-thread, avoiding `async void` signature and adhering to STA nature of desktop apps. Simple. Effective. Quick. Or...?
 
 ### 2.3 Here comes the issues
+
+&nbsp;&nbsp;&nbsp;&nbsp;Let's take a closer look on our code and try to answer is it easy to test? Unfortunately it is not, cause to right a test we need to instantiate our form in the correct environment e.g. in STA adapter. More over we cannot separately test the logic - basically only end to end testing is possible. Now even if we want to create e2e test we will ought to use either some reflection to call private `btnFeedCatOnClick` method or use some kind of UI-automation tools, which are notorious for their instability. So the only reasonable solution is to have manual QA team which will test it.
+&nbsp;&nbsp;&nbsp;&nbsp;TOD: describe two issues
 
 ## 3. Moving to patterns
 
@@ -99,4 +102,8 @@ As you can see we are instantiating the `CatFeederDriver` and calling `Feed` met
 
 ## 6. MVVM
 
-## 7. Modern state
+## 7. Conclusion
+
+### 7.1 Modern state
+
+### 7.2 Which approach to select?
