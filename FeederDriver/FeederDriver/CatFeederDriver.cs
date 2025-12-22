@@ -15,6 +15,7 @@ namespace FeederDriver
         {
             var detectedLevelOfConcurrency = Interlocked.Increment(ref _concurrencyLevel);
             
+            // Feeder cannot execute feeding concurrently
             if(detectedLevelOfConcurrency > 1)
                 throw new InvalidOperationException("Cannot feed concurrently!");
 
@@ -24,6 +25,8 @@ namespace FeederDriver
             }
             catch (TaskCanceledException)
             {
+                // NOTE: As this sample code is artificial we are trying to model the absence of memory leak during shut down
+                // by expecting the log entry in case the task was canceled
                 using (var file = new FileStream("feeder.log", FileMode.Append))
                 using (var writer = new StreamWriter(file))
                 {
