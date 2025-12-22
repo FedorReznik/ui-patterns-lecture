@@ -28,7 +28,7 @@ And the status of feeding should be provided by modal dialog with success/fail m
 
 ### 2.2 The implementation
 
-&nbsp;&nbsp;&nbsp;&nbsp;The best part of this approach is that there is almost nothing to discuss, so the basic implementation can look like this (you can find the complete solution [here](./Code-behind/Code-behind.sln)), see [Main.cs](./Code-behind/CodeBehind/Main.cs) file:
+&nbsp;&nbsp;&nbsp;&nbsp;The best part of this approach is that there is almost nothing to discuss, so the basic implementation can look like this (you can find the complete solution [here](./Code-behind/)), see [Main.cs](./Code-behind/CodeBehind/Main.cs) file:
 ```C#
 public partial class Main : Form
 {
