@@ -31,16 +31,16 @@ namespace CodeBehind
                         try
                         {
                             t.Wait();
-                            // 3.1 Handling successful case 
+                            // 3. Handling successful case 
                             NotifySuccess();
                         }
                         catch (AggregateException ae)
                         {
-                            // 3.2 Handling error case
+                            // 4. Handling error case
                             ProcessError(ae);
                         }
                     }, 
-                    // 4. Doing so on UI thread, respecting the STA nature of Windows Forms
+                    // 5. Doing so on UI thread, respecting the STA nature of Windows Forms
                     _uiScheduler);
         }
 

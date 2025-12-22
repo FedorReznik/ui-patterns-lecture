@@ -13,9 +13,9 @@ namespace CodeBehind
     [SuppressMessage("ReSharper", "LocalizableElement")]
     public partial class MainFixed : Form
     {
-        // 1.1 Instantiating the driver. 
+        // 1. Instantiating the driver. 
         private readonly ICatFeederDriver _catFeederDriver = new CatFeederDriver();
-        // 1.2 Instantiating root token
+        // 2. Instantiating root token
         private readonly CancellationTokenSource _rootTokenSource = new CancellationTokenSource();
         
         private readonly TaskScheduler _scheduler;
@@ -29,15 +29,15 @@ namespace CodeBehind
 
         private void btnFeedCatOnClick(object sender, EventArgs e)
         {
-            // 2.1 Disabling feed button to avoid crash on concurrent feeding
+            // 3. Disabling feed button to avoid crash on concurrent feeding
             btnFeedCat.Enabled = false;
             
-            // 2.2 Initializing child lifetime for feeding operation
+            // 4. Initializing child lifetime for feeding operation
             var cancellationToken = CancellationTokenSource
                 .CreateLinkedTokenSource(_rootTokenSource.Token)
                 .Token;
             
-            // 2.3 Executing feeding
+            // 5. Executing feeding
             _catFeederDriver.Feed(cancellationToken)
                 .ContinueWith(t =>
                     {
@@ -48,21 +48,21 @@ namespace CodeBehind
                             if (cancellationToken.IsCancellationRequested)
                                 return;
 
-                            // 3.1 Handling successful case
+                            // 6. Handling successful case
                             NotifySuccess();
                         }
                         catch (AggregateException ae)
                         {
-                            // 3.2 Handling error case
+                            // 7. Handling error case
                             ProcessError(ae);
                         }
                         finally
                         {
-                            // 3.2 Enabling feed button
+                            // 8. Enabling feed button
                             btnFeedCat.Enabled = true;
                         }
                     }, 
-                    // 4. Doing so on UI thread, respecting the STA nature of Windows Forms
+                    // 9. Doing so on UI thread, respecting the STA nature of Windows Forms
                     _scheduler);
         }
 
@@ -90,7 +90,7 @@ namespace CodeBehind
 
         protected override void OnClosing(CancelEventArgs e)
         {
-            // 5. Cancelling root token on form closing
+            // 10. Cancelling root token on Form closing
             _rootTokenSource.Cancel();
             base.OnClosing(e);
         }

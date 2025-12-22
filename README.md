@@ -52,16 +52,16 @@ public partial class Main : Form
                     try
                     {
                         t.Wait();
-                        // 3.1 Handling successful case 
+                        // 3. Handling successful case 
                         NotifySuccess();
                     }
                     catch (AggregateException ae)
                     {
-                        // 3.2 Handling error case
+                        // 4. Handling error case
                         ProcessError(ae);
                     }
                 }, 
-                // 4. Doing so on UI thread, respecting the STA nature of Windows Forms
+                // 5. Doing so on UI thread, respecting the STA nature of Windows Forms
                 _uiScheduler);
     }
 
@@ -88,7 +88,14 @@ public partial class Main : Form
     }
 }
 ```
-&nbsp;&nbsp;&nbsp;&nbsp;As you can see we are instantiating the `CatFeederDriver` and calling `Feed` method in button click event handler - `btnFeedCatOnClick`, then we are calling notification methods in continuation on UI-thread, avoiding `async void` signature and adhering to STA nature of desktop apps. Simple. Effective. Quick. Or...?
+&nbsp;&nbsp;&nbsp;&nbsp;As you can see we are doing straightforward steps:
+1. Instantiating the `CatFeederDriver`
+2. Calling `Feed` method in button click event handler - `btnFeedCatOnClick`
+3. Handling successful feeding
+4. Handling error during feeding
+5. Notifications should be shown on UI thread to adhere STA nature of desktop apps, so we are using continuation also avoiding avoiding `async void` method signature
+
+Simple. Effective. Quick. Or...?
 
 ### 2.3 Here comes the issues
 
@@ -97,6 +104,107 @@ public partial class Main : Form
 &nbsp;&nbsp;&nbsp;&nbsp;And QA fortunately did find the issues:
 - First issue - driver throws exception if we are trying to call `Feed` while feeding in progress
 - Second issue - was much more harder to find: it appears, that closing the window w/o proper waiting for feeding to finish causes a memory leak in device. **Note:** This behavior is modeled via logging the correct feeding cancellation, see [CatFeederDriver.cs](./FeederDriver/FeederDriver/CatFeederDriver.cs) - just use your imagination.
+
+&nbsp;&nbsp;&nbsp;&nbsp;Of course our dev-team quickly fixes it, see [MainFixed.cs](./Code-behind/CodeBehind/MainFixed.cs) (Please also change `@fixed` variable to true in [Program.cs](./Code-behind/CodeBehind/Program.cs)):
+```C#
+public partial class MainFixed : Form
+{
+    // 1. Instantiating the driver. 
+    private readonly ICatFeederDriver _catFeederDriver = new CatFeederDriver();
+    // 2. Instantiating root token
+    private readonly CancellationTokenSource _rootTokenSource = new CancellationTokenSource();
+    
+    private readonly TaskScheduler _scheduler;
+    
+    public MainFixed()
+    {
+        InitializeComponent();
+        
+        _scheduler = TaskScheduler.FromCurrentSynchronizationContext();
+    }
+
+    private void btnFeedCatOnClick(object sender, EventArgs e)
+    {
+        // 3. Disabling feed button to avoid crash on concurrent feeding
+        btnFeedCat.Enabled = false;
+        
+        // 4. Initializing child lifetime for feeding operation
+        var cancellationToken = CancellationTokenSource
+            .CreateLinkedTokenSource(_rootTokenSource.Token)
+            .Token;
+        
+        // 5. Executing feeding
+        _catFeederDriver.Feed(cancellationToken)
+            .ContinueWith(t =>
+                {
+                    try
+                    {
+                        t.Wait(cancellationToken);
+
+                        if (cancellationToken.IsCancellationRequested)
+                            return;
+
+                        // 6. Handling successful case
+                        NotifySuccess();
+                    }
+                    catch (AggregateException ae)
+                    {
+                        // 7. Handling error case
+                        ProcessError(ae);
+                    }
+                    finally
+                    {
+                        // 8. Enabling feed button
+                        btnFeedCat.Enabled = true;
+                    }
+                }, 
+                // 9. Doing so on UI thread, respecting the STA nature of Windows Forms
+                _scheduler);
+    }
+
+    private void NotifySuccess()
+    {
+        MessageBox.Show(
+            this,
+            "The cat is successfully fed!", "Success",
+            MessageBoxButtons.OK,
+            MessageBoxIcon.Information);
+    }
+
+    private void ProcessError(AggregateException ae)
+    {
+        ae.Flatten()
+            .InnerExceptions
+            .Where(ex => !(ex is OperationCanceledException))
+            .ForEach(ex => MessageBox.Show(
+                this,
+                ex.Message,
+                "Error",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Error));
+    }
+
+    protected override void OnClosing(CancelEventArgs e)
+    {
+        // 10. Cancelling root token on Form closing
+        _rootTokenSource.Cancel();
+        base.OnClosing(e);
+    }
+}
+```
+&nbsp;&nbsp;&nbsp;&nbsp;Let's see what logical steps we are executing now:
+1. Instantiating the `CatFeederDriver`
+2. Instantiating root token which will be bound to Form lifetime
+3. Disabling feed button to avoid crash on concurrent feeding
+4. Initializing child lifetime for feeding operation
+5. Calling `Feed` method in button click event handler - `btnFeedCatOnClick`
+6. Handling successful feeding
+7. Handling error during feeding
+8. Enabling feed button
+9. All the UI changes are invoked on UI thread.
+10. Cancelling root token on Form closing
+
+&nbsp;&nbsp;&nbsp;&nbsp;Much more to keep in mind compared to the first implementation!
 
 ## 3. Moving to patterns
 
