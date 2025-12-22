@@ -17,7 +17,7 @@ namespace CodeBehind
             Application.SetCompatibleTextRenderingDefault(false);
             
             // Change to any true to run the version w/o "artificial" bug
-            var @fixed = false;
+            var @fixed = true;
             
             Application.Run(@fixed ? (Form)new MainFixed() : new Main()); 
         }

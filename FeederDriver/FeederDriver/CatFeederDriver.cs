@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Diagnostics;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
@@ -24,7 +24,11 @@ namespace FeederDriver
             }
             catch (TaskCanceledException)
             {
-                Debug.Print("Feeding is cancelled");
+                using (var file = new FileStream("feeder.log", FileMode.Append))
+                using (var writer = new StreamWriter(file))
+                {
+                    await writer.WriteLineAsync($"{DateTime.UtcNow:s}: Feeding cancelled gracefully - no memory leak");
+                }
             }
             
             Interlocked.Exchange(ref _concurrencyLevel, 0);

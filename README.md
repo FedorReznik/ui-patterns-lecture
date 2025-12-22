@@ -28,7 +28,7 @@ And the status of feeding should be provided by modal dialog with success/fail m
 
 ### 2.2 The implementation
 
-&nbsp;&nbsp;&nbsp;&nbsp;The best part of this approach is that there is almost nothing to discuss, so the basic implementation can look like this (you can find the complete solution [here](https://github.com/FedorReznik/ui-patterns-lecture/tree/main/Code-behind), see Main.cs file):
+&nbsp;&nbsp;&nbsp;&nbsp;The best part of this approach is that there is almost nothing to discuss, so the basic implementation can look like this (you can find the complete solution [here](./Code-behind/Code-behind.sln)), see [Main.cs](./Code-behind/CodeBehind/Main.cs) file:
 ```C#
 public partial class Main : Form
 {
@@ -92,9 +92,11 @@ public partial class Main : Form
 
 ### 2.3 Here comes the issues
 
-&nbsp;&nbsp;&nbsp;&nbsp;Let's take a closer look on our code and try to answer is it easy to test? Unfortunately it is not, cause to implement a test we need to instantiate our form in the correct environment e.g. in STA. More over we cannot separately test the logic - basically only end to end testing is possible. Now even if we want to create e2e test we will ought to use either some reflection to call private `btnFeedCatOnClick` method or use some kind of UI-automation tools, which are notorious for their instability. So the only reasonable solution is to have manual QA team which will test it.
+&nbsp;&nbsp;&nbsp;&nbsp;Let's take a closer look on our code and try to answer is it easy to test? Unfortunately it is not, because to implement a test we need to instantiate our form in the correct environment e.g. in STA. More over we cannot separately test the logic - basically only end to end testing is possible. Now even if we want to create e2e test we will ought to use either reflection to call private `btnFeedCatOnClick` method or use UI-automation tools, which are notorious for their instability. So the only reasonable solution is to have manual QA team which will test it.
 </br>
-&nbsp;&nbsp;&nbsp;&nbsp;TODO: describe two issues
+&nbsp;&nbsp;&nbsp;&nbsp;And QA fortunately did find the issues:
+- First issue - driver throws exception if we are trying to call `Feed` while feeding in progress
+- Second issue - was much more harder to find: it appears, that closing the window w/o proper waiting for feeding to finish causes a memory leak in device. **Note:** This behavior is modeled via logging the correct feeding cancellation, see [CatFeederDriver.cs](./FeederDriver/FeederDriver/CatFeederDriver.cs) - just use your imagination.
 
 ## 3. Moving to patterns
 
