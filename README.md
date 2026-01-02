@@ -267,6 +267,10 @@ In this case one can still maintain the good enough balance between code complex
 
 ### 4.4 Second User Story
 
+### 4.4 The Router
+
+### 4.5 The Assessment
+
 ## 5. MVP
 
 ## 6. MVVM
