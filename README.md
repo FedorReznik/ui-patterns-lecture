@@ -236,13 +236,15 @@ public partial class MainFixed : Form
 - Multiple-windows UI, e.g. when any new operation is done by opening new window instead of changing the content of the shown one
 - User interaction is focused around entering data and confirmation dialogs.
 
-In this case one can still maintain the good enough balance between code complexity and TTM. And it was actually working in early days when software was quite simple in terms of interaction, but still very useful, because it was automating daily routine. 
+In this case one can still maintain the good enough balance between code complexity and TTM. And it was actually working in early days - late 90s, early 00s. When software was quite simple in terms of interaction, but still very useful, because it was automating daily routine. 
 
 &nbsp;&nbsp;&nbsp;&nbsp;But soon everything was about to change...
 
 ## 3. Moving to patterns
 
 ### 3.1 The driving force of change
+
+
 
 ## 4. MVC
 
