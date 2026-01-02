@@ -206,14 +206,14 @@ public partial class MainFixed : Form
 
 &nbsp;&nbsp;&nbsp;&nbsp;Much more to keep in mind compared to the first implementation! In addition we have the following problems with code-behind approach:
 - Mix of UI and functional code - we can't separate work between "tech-guru" and "UI-guru"
-- Hardly auto-testable code, so one need to have a manual regression test-cycle
+- Hardly auto-testable code, so one need to have a manual regression test-cycle for each release
 - We also can't re-use this code in other parts of our project
 
 &nbsp;&nbsp;&nbsp;&nbsp;These and other problems can be formalized via NFRs: a non-functional requirements that specifies criteria that can be used to judge the operation of a system, rather than specific behaviors. They are contrasted with functional requirements that define specific behavior or functions. For this article we will select the following subset of NFRs:
 - Testability - the ability to implement the pyramid of tests: unit, integration, e2e
 - Extensibility - the ability to bring new features into the project without pain
 - Adaptability - the ability to withstand technology change. Usually we are supposing that technology will stay forever and you won't change your UI framework or database or whatever. But the author was involved in such a projects like adapting WinCE application to IOS and Android, so if your approach gives your possibility to quickly change the framework and not requiring to much effort to do it - it's better
-- Effectiveness - the ability to bring mode developers into the project and split the work between them. This NFR is usually tightly related to Time-to-Market (TTM)
+- Effectiveness - the ability to bring more developers into the project and split the work between them. This NFR is usually tightly related to Time-to-Market (TTM)
 - Reusability - the ability to move functionality between components.
 - Readability - the ability to minimize cognitive pressure then reading the code - usually it is easier to think about one aim at the time and trust the contracts you have. It also related to the amount of boilerplate one need to get through
 
@@ -232,7 +232,7 @@ public partial class MainFixed : Form
 
 &nbsp;&nbsp;&nbsp;&nbsp;The code-behind approach may work! Indeed if you have:
 
-- Single responsibility windows with almost no validation logic, for example CRUD.
+- Single responsibility windows with almost no validation logic.
 - Multiple-windows UI, e.g. when any new operation is done by opening new window instead of changing the content of the shown one
 - User interaction is focused around entering data and confirmation dialogs.
 
