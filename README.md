@@ -4,7 +4,7 @@ By Fedor Reznik
 
 ## 1. Preface.
 
-### 1.1. The purpose 
+### 1.1. The Purpose 
 
 &nbsp;&nbsp;&nbsp;&nbsp;The whole purpose of this article is to summarize author's experience with regard to UI development and how it evolved via .Net technologies prism. Thus this point of view is highly opinionated and doesn't pretend to be 100% truth. Neither it is historically correct - in the end the MVC pattern itself is older than .Net! We will try to focus on trade-offs of different approaches and why developers have moved from one to another - trying to reveal the idea(s) behind them.
 </br>
@@ -20,13 +20,13 @@ By Fedor Reznik
 <img src="Images/CatFeederAppUX.png"/> 
 And the status of feeding should be provided by modal dialog with success/fail message and OK button to close it.
 
-## 2. Back in the days. Code-behind
+## 2. Back In The Days. Code-behind
 
-### 2.1 Code-behind "pattern" definition
+### 2.1 Code-behind "Pattern" Definition
 
 &nbsp;&nbsp;&nbsp;&nbsp;Let's imagine that everything is happening around 2005 and our team has proven expertise in Windows Forms, as well as code-behind approach seems quick and easy to implement: just open the form designer in your IDE, put some controls on it, wire the event handlers with mouse click, put the code into handlers and you are done. So you can hardly call this a pattern, the better word would be a process.
 
-### 2.2 The implementation
+### 2.2 The Implementation
 
 &nbsp;&nbsp;&nbsp;&nbsp;The best part of this approach is that there is almost nothing to discuss, so the basic implementation can look like this (you can find the complete solution [here](./Code-behind/)), see [Main.cs](./Code-behind/CodeBehind/Main.cs) file:
 ```C#
@@ -97,7 +97,7 @@ public partial class Main : Form
 
 Simple. Effective. Quick. Or...?
 
-### 2.3 Here comes the issues
+### 2.3 Here Comes The Issues
 
 &nbsp;&nbsp;&nbsp;&nbsp;Let's take a closer look on our code and try to answer is it easy to test? Unfortunately it is not, because to implement a test we need to instantiate our form in the correct environment e.g. in STA. More over we cannot separately test the logic - basically only end to end testing is possible. Now even if we want to create e2e test we will ought to use either reflection to call private `btnFeedCatOnClick` method or use UI-automation tools, which are notorious for their instability. So the only reasonable solution is to have manual QA team which will test it.
 </br>
@@ -219,14 +219,14 @@ public partial class MainFixed : Form
 
 &nbsp;&nbsp;&nbsp;&nbsp;So for code-behind we will have the following assessment:
 
-| NFR | Yes/No | Comment |
+| NFR | Level | Comment |
 |-----|--------|---------|
-| Testability | *No* | e2e via UI Automation is possible |
-| Extensibility | *No* | New Forms can be added |
-| Adaptability | *No* | UI is mixed with logic, so changing any part of technology is complicated |
-| Effectiveness | *No* | *Frontend* and *backend* will working with the same set of files, not via contracts |
-| Reusability | *No* |  One can extract UserControl(s) to improve it a bit |
-| Readability | *No* | The more features we will add the bigger and dirty will code-behind file become |
+| Testability | *Low* | e2e via UI Automation is possible |
+| Extensibility | *Low* | New Forms can be added |
+| Adaptability | *Low* | UI is mixed with logic, so changing any part of technology is complicated |
+| Effectiveness | *Low* | *Frontend* and *backend* will working with the same set of files, not via contracts |
+| Reusability | *Low* |  One can extract UserControl(s) to improve it a bit |
+| Readability | *Low* | The more features we will add the bigger and dirty will code-behind file become |
 
 ### The Blasphemy
 
@@ -240,9 +240,9 @@ In this case one can still maintain the good enough balance between code complex
 
 &nbsp;&nbsp;&nbsp;&nbsp;But soon everything was about to change...
 
-## 3. Moving towards patterns
+## 3. Moving Towards Patterns
 
-### 3.1 The driving force of change
+### 3.1 The Driving Force Of Change
 
 &nbsp;&nbsp;&nbsp;&nbsp;As we discussed in some conditions code-behind can be good enough option, but there are forces  violating those conditions, from authors perspective they are:
 
@@ -251,7 +251,7 @@ In this case one can still maintain the good enough balance between code complex
 
 &nbsp;&nbsp;&nbsp;&nbsp;And thus architects started to think about organizing code differently and creating new patterns of separating the concerns and responsibilities in UI - they have created patterns.
 
-### 3.2 A word about patterns in this article
+### 3.2 A Word About Patterns In This Article
 
 &nbsp;&nbsp;&nbsp;&nbsp;Each pattern has it's own definition that shapes what we consider during discussion between engineers. But also each pattern has it's own variations - here we won't discuss all of the variations. Sometimes we won't discuss even the main variation, but the most relative to the topic - we are considering this justified, because even popular frameworks like Microsoft ASP.Net MVC often aren't using the main variation of pattern. We also won't use any frameworks to show that there is no black magic inside.
 
@@ -259,12 +259,22 @@ In this case one can still maintain the good enough balance between code complex
 
 ## 4. MVC
 
+### 4.1 Definition
+
+### 4.2 Variation
+
+### 4.3 Implementation
+
+### 4.4 Second User Story
+
 ## 5. MVP
 
 ## 6. MVVM
 
 ## 7. Conclusion
 
-### 7.1 Modern state
+### 7.1 Modern State
 
-### 7.2 Which approach to select?
+### 7.2 Which Approach To Select?
+
+tbc: a word about react
