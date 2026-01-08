@@ -268,7 +268,7 @@ In this case one can still maintain the good enough balance between code complex
 <img src="Images/MVC - the State-View-Controller variation.jpg"/>
 
 - The State (Model) represents the data or state in the application in a logical way; it is in charge of carrying the data It also adapts external services for Controller.
-- The View is the graphical representation of the Model; it is responsible for displaying the Model data in suitable form.
+- The View is the graphical representation of the Model; it is responsible for displaying the Model data in suitable form. Usually the View itself better to be de-coupled from host or canvas that it is shown on - this gives the possibility to use it in different places even combining the Views on one host/canvas.
 - The Controller is the orchestrator of this pattern; it is in charge of intercepting user input (mouse and keyboard) and interacting with the State (Model) and the View: it calls the Model services, which provides new State, which is propagated to the View by Controller. It also **owns** the operations thus commanding the view about validation errors or operations availability.
 
 ### 4.2 Implementation
