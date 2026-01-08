@@ -18,6 +18,7 @@ By Fedor Reznik
 
 &nbsp;&nbsp;&nbsp;&nbsp;To quickly conquer the market we as the company must provide the simplest yet use-full desktop application: it should contain only "Feed the cat" button and should provide feedback if the feeding has been successful. So our UX team came-out with the following design:
 <img src="Images/CatFeederAppUX.png"/> 
+
 And the status of feeding should be provided by modal dialog with success/fail message and OK button to close it.
 
 ## 2. Back In The Days. Code-behind
@@ -259,7 +260,16 @@ In this case one can still maintain the good enough balance between code complex
 
 ## 4. MVC
 
+&nbsp;&nbsp;&nbsp;&nbsp;First logical step after pure code-behind approach would be to extract the layer which holds the data and operations over it as well as remove non-UI logic from the view. This leads us to Model-View-Controller or MVC pattern, or, to be precise, it's State-View-Controller variation - SVC: where Model does not raise any changes and only provides the current state from View perspective.
+
 ### 4.1 Definition
+
+&nbsp;&nbsp;&nbsp;&nbsp; The SVC variation of MVC pattern can be described with the following diagram:
+<img src="Images/MVC - the State-View-Controller variation.jpg"/>
+
+- The State (Model) represents the data or state in the application in a logical way; it is in charge of carrying the data It also adapts external services for Controller.
+- The View is the graphical representation of the Model; it is responsible for displaying the Model data in suitable form.
+- The Controller is the orchestrator of this pattern; it is in charge of intercepting user input (mouse and keyboard) and interacting with the State (Model) and the View: it calls the Model services, which provides new State, which is propagated to the View by Controller. It also **owns** the operations thus commanding the view about validation errors or operations availability.
 
 ### 4.2 Variation
 
