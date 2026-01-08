@@ -271,11 +271,9 @@ In this case one can still maintain the good enough balance between code complex
 - The View is the graphical representation of the Model; it is responsible for displaying the Model data in suitable form.
 - The Controller is the orchestrator of this pattern; it is in charge of intercepting user input (mouse and keyboard) and interacting with the State (Model) and the View: it calls the Model services, which provides new State, which is propagated to the View by Controller. It also **owns** the operations thus commanding the view about validation errors or operations availability.
 
-### 4.2 Variation
+### 4.2 Implementation
 
-### 4.3 Implementation
-
-### 4.4 Second User Story
+### 4.3 Second User Story
 
 ### 4.4 The Router
 
