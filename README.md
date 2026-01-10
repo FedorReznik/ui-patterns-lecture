@@ -29,7 +29,7 @@ And the status of feeding should be provided by modal dialog with success/fail m
 
 ### 2.2 The Implementation
 
-&nbsp;&nbsp;&nbsp;&nbsp;The best part of this approach is that there is almost nothing to discuss, so the basic implementation can look like this (you can find the complete solution [here](./Code-behind/)), see [Main.cs](./Code-behind/CodeBehind/Main.cs) file:
+&nbsp;&nbsp;&nbsp;&nbsp;The best part of this approach is that there is almost nothing to discuss, so the basic implementation can look like this (you can find the complete solution [here](./Code-behind/)), see [Main](./Code-behind/CodeBehind/Main.cs) file:
 ```C#
 public partial class Main : Form
 {
@@ -104,9 +104,9 @@ Simple. Effective. Quick. Or...?
 </br>
 &nbsp;&nbsp;&nbsp;&nbsp;And QA fortunately did find the issues:
 - First issue - driver throws exception if we are trying to call `Feed` while feeding in progress
-- Second issue - was much more harder to find: it appears, that closing the window w/o proper waiting for feeding to finish causes a memory leak in device. **Note:** This behavior is modeled via logging the correct feeding cancellation, see [CatFeederDriver.cs](./FeederDriver/FeederDriver/CatFeederDriver.cs) - just use your imagination.
+- Second issue - was much more harder to find: it appears, that closing the window w/o proper waiting for feeding to finish causes a memory leak in device. **Note:** This behavior is modeled via logging the correct feeding cancellation, see [CatFeederDriver](./FeederDriver/FeederDriver/CatFeederDriver.cs) - just use your imagination.
 
-&nbsp;&nbsp;&nbsp;&nbsp;Of course our dev-team quickly fixes it, see [MainFixed.cs](./Code-behind/CodeBehind/MainFixed.cs) (Please also change `@fixed` variable to true in [Program.cs](./Code-behind/CodeBehind/Program.cs)):
+&nbsp;&nbsp;&nbsp;&nbsp;Of course our dev-team quickly fixes it, see [MainFixed](./Code-behind/CodeBehind/MainFixed.cs) (Please also change `@fixed` variable to true in [Program](./Code-behind/CodeBehind/Program.cs)):
 ```C#
 public partial class MainFixed : Form
 {
@@ -254,7 +254,7 @@ In this case one can still maintain the good enough balance between code complex
 
 ### 3.2 A Word About Patterns In This Article
 
-&nbsp;&nbsp;&nbsp;&nbsp;Each pattern has it's own definition that shapes what we consider during discussion between engineers. But also each pattern has it's own variations - here we won't discuss all of the variations. Sometimes we won't discuss even the main variation, but the most relative to the topic - we are considering this justified, because even popular frameworks like Microsoft ASP.Net MVC often aren't using the main variation of pattern. We also won't use any frameworks to show that there is no black magic inside.
+&nbsp;&nbsp;&nbsp;&nbsp;Each pattern has it's own definition that shapes what we consider during discussion between engineers. But also each pattern has it's own variations - here we won't discuss all of the variations. Sometimes we won't discuss even the main variation, but the most relative to the topic - we are considering this justified, because even popular frameworks like Microsoft ASP.Net MVC often aren't using the main variation of pattern. We also won't use any frameworks and mostly stick with WinForms to show that there is no black magic inside.
 
 &nbsp;&nbsp;&nbsp;&nbsp;With all this in mind let's proceed with first improvement over code-behind.
 
@@ -264,7 +264,7 @@ In this case one can still maintain the good enough balance between code complex
 
 ### 4.1 Definition
 
-&nbsp;&nbsp;&nbsp;&nbsp; The SVC variation of MVC pattern can be described with the following diagram:
+&nbsp;&nbsp;&nbsp;&nbsp;The SVC variation of MVC pattern can be described with the following diagram:
 <img src="Images/MVC - the State-View-Controller variation.jpg"/>
 
 - The State (Model) represents the data or state in the application in a logical way; it is in charge of carrying the data It also adapts external services for Controller.
@@ -272,6 +272,215 @@ In this case one can still maintain the good enough balance between code complex
 - The Controller is the orchestrator of this pattern; it is in charge of intercepting user input (mouse and keyboard) and interacting with the State (Model) and the View: it calls the Model services, which provides new State, which is propagated to the View by Controller. It also **owns** the operations thus commanding the view about validation errors or operations availability.
 
 ### 4.2 Implementation
+
+&nbsp;&nbsp;&nbsp;&nbsp;The whole solution is presented in [MVC.sln](./MVC/MVC.sln) in [MVC project](./MVC/MVC/MVC.csproj). Now let's walk-through it.
+
+&nbsp;&nbsp;&nbsp;&nbsp;**First**, we will introduce the DI container - in this case [Autofac](https://autofac.org/), for now just to split dependency instantiation from usage. So all our classes will depend on interfaces instead of exact implementation - this will already reduce coupling a bit and improve testability with using of mocks. You can find all the registrations in [CompositionRoot](./MVC/MVC/DI/CompositionRoot.cs).
+
+&nbsp;&nbsp;&nbsp;&nbsp;**Second**, we will introduce the Model layer. This layer will adapt the feeder driver via [ICatFeederService](./MVC/MVC/CatFeederComponent/Models/ICatFeederService.cs) and implemented in [CatFeederService](./MVC/MVC/CatFeederComponent/Models/CatFeederService.cs):
+
+```C#
+public class CatFeederService : ICatFeederService
+{
+    private readonly ICatFeederDriver _catFeederDriver;
+    private readonly CancellationTokenSource _rootTokenSource = new CancellationTokenSource();
+
+    public CatFeederService([NotNull] ICatFeederDriver catFeederDriver)
+    {
+        _catFeederDriver = catFeederDriver ?? throw new ArgumentNullException(nameof(catFeederDriver));
+    }
+
+    public async Task<FeedingResult> Feed()
+    {
+        var cancellationToken = CancellationTokenSource
+            .CreateLinkedTokenSource(_rootTokenSource.Token)
+            .Token;
+
+        try
+        {
+            await _catFeederDriver.Feed(cancellationToken);
+            return new FeedingResult("The cat is successfully fed!", true);
+        }
+        catch (OperationCanceledException)
+        {
+            return new FeedingResult("Feeding canceled", false);
+        }
+        catch (Exception e)
+        {
+            return new FeedingResult(e.Message, false);
+        }
+    }
+
+    public void Dispose()
+    {
+        _rootTokenSource.Cancel();
+    }
+}
+```
+
+This Model layer:
+- Takes the operation ownership by owning the cancellation token
+- Takes the responsibility of exception handling - removing the necessity to handle the exceptions from clients
+- Provides a contract in *domain* language via `Task<FeedingResult> Feed()` method
+
+As the result we have implemented testable Model layer once for all the client interested in successful or failed feeding - exactly what we need in our domain.
+
+&nbsp;&nbsp;&nbsp;&nbsp;**Third**, as we are not using any kind of MVC framework, we need to implement simple View-Controller engine according to our pattern definition, as well as provide `CatFeederController` and `CatFeederView`. The engine itself will consist of 3 interfaces:
+- [IController](./MVC/MVC/Engine/IController.cs) which will provide the `IView View()` method for the View be hosted on some Form or another container:
+```C#
+public interface IController : IDisposable
+{
+    IView View();
+}
+``` 
+- [IView](./MVC/MVC/Engine/IView.cs) which will provide the `UserControl Render()` method to get the actual UI control representing the view. Here we could make this method to return `object` to further decouple the underlying technology, but this would require some kind of template engine - which we will discuss much later:
+```C#
+public interface IView
+{
+    UserControl Render();
+}
+```
+- [IView&lt;in TController&gt;](./MVC/MVC/Engine/IView`1.cs) with an ability to attach Controller to the View via `void AttachController(TController controller)` method. We are deliberately choosing this architecture to resolve View-Controller circular dependency, because we think that Controller as the lower layer should be instantiated first and should have the View injected into it's constructor:
+```C#
+public interface IView<in TController> : IView
+    where TController : IController
+{
+    void AttachController(TController controller);
+}
+```
+
+&nbsp;&nbsp;&nbsp;&nbsp;**Finally** we need to implement our `CatFeederController` and `CatFeederView` to actually fullfil our application logic. Let's start with [ICatFeederController](./MVC/MVC/CatFeederComponent/Controllers/ICatFeederController.cs) interface or better to say contract of it's capabilities:
+```C#
+public interface ICatFeederController : IController
+{
+    void Feed();
+}
+```
+So it will only provide fire-and-forget style `void Feed()` method to be called from view - perfect for handling a button click callback. Due to MVC pattern nature all the state should be provided to view from the controller implementation (**please** remember that we ought to exaggerate a bit due to the problem simplicity), which leads us to [CatFeederController](./MVC/MVC/CatFeederComponent/Controllers/CatFeederController.cs) implementation:
+```C#
+public class CatFeederController : ICatFeederController
+{
+    private readonly ICatFeederService _catFeederService;
+    private readonly ICatFeederView _view;
+
+    public CatFeederController(
+        [NotNull] ICatFeederService catFeederService,
+        [NotNull] ICatFeederView view)
+    {
+        _catFeederService = catFeederService ?? throw new ArgumentNullException(nameof(catFeederService));
+        _view = view ?? throw new ArgumentNullException(nameof(view));
+        
+        _view.AttachController(this);
+    }
+
+    public void Feed()
+    {
+        _view.Block();
+        // NOTE: using Task.Run here just to have a separate thread for feeder, because our feeder is artificial
+        Task.Run(async () => await _catFeederService.Feed())
+            .ContinueWith(t =>
+            {
+                var feedingResult = t.Result;
+                _view.UnBlock();
+                _view.ProcessFeedingResult(feedingResult);
+            });
+    }
+    
+    public IView View()
+    {
+        return _view;
+    }
+
+    public void Dispose()
+    {
+        _catFeederService.Dispose();
+    }
+}
+```
+As you can see it transforms the nature of *IO* operation over feeder to void method more suitable/consumable for button handler - taking the responsibility of thread management, as well as it controls the lifetime of the services. It also changes the view states by specific, *domain*, methods like `Block(), UnBlock()` and `ProcessFeedingResult(...)`. Which leads us to the [ICatFeederView](./MVC/MVC/CatFeederComponent/Views/ICatFeederView.cs) contract:
+```C#
+public interface ICatFeederView : IView<ICatFeederController>
+{
+    void ProcessFeedingResult(FeedingResult result);
+    void Block();
+    void UnBlock();
+}
+```
+And it's [implementation](./MVC/MVC/CatFeederComponent/Views/CatFeederView.cs):
+```C#
+public partial class CatFeederView : UserControl, ICatFeederView
+{
+    private ICatFeederController _controller;
+
+    public CatFeederView()
+    {
+        InitializeComponent();
+
+        Disposed += (sender, args) => _controller?.Dispose();
+    }
+
+    private void btnFeedCat_Click(object sender, EventArgs e)
+    {
+        _controller?.Feed();
+    }
+
+    public void ProcessFeedingResult(FeedingResult result)
+    {
+        if(result.Successful)
+            NotifyFeedingCompleted(result.Message);
+        else
+            NotifyError(result.Message);
+    }
+
+    private void NotifyFeedingCompleted(string message)
+    {
+        this.Guard(() => 
+            MessageBox.Show(this, message, "Success", MessageBoxButtons.OK, MessageBoxIcon.Information));
+    }
+
+    private void NotifyError(string error)
+    {
+        this.Guard(() => 
+            MessageBox.Show(error, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error));
+    }
+
+    public void Block()
+    {
+        // For example, we also can show progress bar - it's up to view how to render the states
+        this.Guard(() => btnFeedCat.Enabled = false);
+    }
+
+    public void UnBlock()
+    {
+        this.Guard(() => btnFeedCat.Enabled = true);
+    }
+
+    public void AttachController([NotNull] ICatFeederController controller)
+    {
+        if(_controller != null)
+            throw new InvalidOperationException($"Controller is already attached for {nameof(CatFeederView)}");
+        
+        _controller = controller ?? throw new ArgumentNullException(nameof(controller));
+    }
+
+    public UserControl Render()
+    {
+        return this;
+    }
+}
+```
+As you can see it's actually delegates all the work to Controller and reacts on state changes via **specific** methods stated in it's contract. There is one subtle thing though - as you can recall in code-behind we faced the need to mutate the UI only on UI-thread due to STA nature of WindowsForms. Seems reasonable to put this responsibility to the view, because ideally controller should not be dependent to underlying UI technology. This aspect is achieved via [Guard](./MVC/MVC/Engine/UIExtensions.cs) extension to implement it once and forever for all the views:
+```C#
+public static void Guard(this Control control, Action uiMutation)
+{
+    if (control.InvokeRequired)
+        control.BeginInvoke(uiMutation);
+    else
+        uiMutation();
+}
+```
+
+&nbsp;&nbsp;&nbsp;&nbsp;As the result of this actions we have mirrored code-behind solution logic. We also achieved separation of concerns between the layers: Model abstracts/adapts the driver to more useful way; Controller controls the user inputs and provides the state changes to the View, as well as manages the concurrency and shapes the logic; View is only responsible for delegating the user inputs to Controller and Model (State) graphical representation. We can even implement unit tests for Model and Controller, not without some mock pain though - especially in case of Controller. But as we stated in section [3.1 The Driving Force Of Change](#31-the-driving-force-of-change) hammering any pattern to such a basic problem can look like overkill, which leads us to the need of more *complex* UI interaction to be solved. 
 
 ### 4.3 Second User Story
 

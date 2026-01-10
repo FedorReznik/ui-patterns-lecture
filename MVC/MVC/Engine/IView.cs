@@ -6,10 +6,4 @@ namespace MVC.Engine
     {
         UserControl Render();
     }
-    
-    public interface IView<in TController> : IView
-        where TController : IController
-    {
-        void AttachController(TController controller);
-    }
 }

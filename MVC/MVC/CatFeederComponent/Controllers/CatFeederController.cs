@@ -25,6 +25,7 @@ namespace MVC.CatFeederComponent.Controllers
         public void Feed()
         {
             _view.Block();
+            // NOTE: using Task.Run here just to have a separate thread for feeder, because our feeder is artificial
             Task.Run(async () => await _catFeederService.Feed())
                 .ContinueWith(t =>
                 {

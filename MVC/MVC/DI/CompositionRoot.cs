@@ -19,7 +19,7 @@ namespace MVC.DI
             builder.RegisterType<CatFeederView>().As<ICatFeederView>();
             
             // register models
-            builder.RegisterType<CatFeederService>().As<ICatFeederService>().SingleInstance();
+            builder.RegisterType<CatFeederService>().As<ICatFeederService>();
             
             // register drivers
             builder.RegisterType<CatFeederDriver>().As<ICatFeederDriver>().SingleInstance();

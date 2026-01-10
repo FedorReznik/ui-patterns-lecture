@@ -2,7 +2,6 @@
 using System.Windows.Forms;
 using Autofac;
 using MVC.CatFeederComponent.Controllers;
-using MVC.CatFeederComponent.Views;
 using MVC.DI;
 
 namespace MVC
