@@ -277,7 +277,7 @@ In this case one can still maintain the good enough balance between code complex
 
 &nbsp;&nbsp;&nbsp;&nbsp;**First**, we will introduce the DI container - in this case [Autofac](https://autofac.org/), for now just to split dependency instantiation from usage. So all our classes will depend on interfaces instead of exact implementation - this will already reduce coupling a bit and improve testability with using of mocks. You can find all the registrations in [CompositionRoot](./MVC/MVC/DI/CompositionRoot.cs).
 
-&nbsp;&nbsp;&nbsp;&nbsp;**Second**, we will introduce the Model layer. This layer will adapt the feeder driver via [ICatFeederService](./MVC/MVC/CatFeederComponent/Models/ICatFeederService.cs) and implemented in [CatFeederService](./MVC/MVC/CatFeederComponent/Models/CatFeederService.cs):
+&nbsp;&nbsp;&nbsp;&nbsp;**Second**, we will introduce the Model layer. This layer will adapt the feeder driver via [ICatFeederService](./MVC/MVC/CatFeederComponent/Models/ICatFeederService.cs) as implemented in [CatFeederService](./MVC/MVC/CatFeederComponent/Models/CatFeederService.cs):
 
 ```C#
 public class CatFeederService : ICatFeederService
@@ -480,13 +480,15 @@ public static void Guard(this Control control, Action uiMutation)
 }
 ```
 
-&nbsp;&nbsp;&nbsp;&nbsp;As the result of this actions we have mirrored code-behind solution logic. We also achieved separation of concerns between the layers: Model abstracts/adapts the driver to more useful way; Controller controls the user inputs and provides the state changes to the View, as well as manages the concurrency and shapes the logic; View is only responsible for delegating the user inputs to Controller and Model (State) graphical representation. We can even implement unit tests for Model and Controller, not without some mock pain though - especially in case of Controller. But as we stated in section [3.1 The Driving Force Of Change](#31-the-driving-force-of-change) hammering any pattern to such a basic problem can look like overkill, which leads us to the need of more *complex* UI interaction to be solved. 
+&nbsp;&nbsp;&nbsp;&nbsp;As the result of this actions we have mirrored code-behind solution logic. We also achieved separation of concerns between the layers: Model abstracts/adapts the driver into more useful way; Controller controls the user inputs and provides the state changes to the View, as well as manages the concurrency and shapes the logic; View is only responsible for delegating the user inputs to Controller and for Model (State) graphical representation. We can even implement unit tests for Model and Controller, not without some mocking pain though - especially in case of Controller. But as we stated in section [3.1 The Driving Force Of Change](#31-the-driving-force-of-change) hammering any pattern to such a basic problem can look like overkill, which leads us to the need of more *complex* UI interaction to be solved. 
 
 ### 4.3 Second User Story
 
 ### 4.4 The Router
 
 ### 4.5 The Assessment
+
+tbc: Looks like ASP.Net MVC, isn't it? 
 
 ## 5. MVP
 
