@@ -537,7 +537,7 @@ public sealed class Router : IRouter
         
         if(!_viewFactoriesMap.TryGetValue(url, out var viewFactory))
             throw new InvalidOperationException($"Url '{url}' does not mapped to any view");
-            
+
         var controller = controllerFactory();
         var view = await _uiExecutor.Execute(() => viewFactory());
         
@@ -560,8 +560,22 @@ As a result we decoupled navigation logic from our Controllers with quite modera
 Looks like ASP.Net MVC, isn't it? :wink:
 
 ### 4.5 The Assessment
+&nbsp;&nbsp;&nbsp;&nbsp;Let's summarize what we have achieved in the same way as we have done for code-behind approach:
+
+| NFR | Level | Comment |
+|-----|--------|---------|
+| Testability | *Moderate* | Heavy usage of mocks. Testing implementation |
+| Extensibility | *Moderate* |Much easier support of complex scenarios including in-place Views (see [4.3 Second User Story](#43-second-user-story)) |
+| Adaptability | *Moderate* | Controllers know about Views. 2x work |
+| Effectiveness | *Moderate* | Both *frontend* and *backend* should agree on interfaces |
+| Reusability | *Moderate* | Controller and View are bound |
+| Readability | *Low* | Controller/View “spaghetti” code - both call each other |
+
+&nbsp;&nbsp;&nbsp;&nbsp;We can say that code become much cleaner and we raised marks almost for each NFR. But we still have a bit of a problem due to the fact that Controller and View should know about each other. If only we could decouple them by making this reference one-directional. Can we do it?
 
 ## 5. MVP
+
+TBD: application boundary!
 
 ## 6. MVVM
 
