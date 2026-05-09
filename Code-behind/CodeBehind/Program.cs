@@ -16,9 +16,10 @@ namespace CodeBehind
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             
-            var @fixed = 0;
+            // Change to any true to run the version w/o "artificial" bug
+            var @fixed = false;
             
-            Application.Run(@fixed == 0 ? (Form)new MainFixed() : new Main()); 
+            Application.Run(@fixed ? (Form)new MainFixed() : new Main()); 
         }
     }
 }

@@ -92,6 +92,7 @@
         <Compile Include="DI\CompositionRoot.cs" />
         <Compile Include="Engine\IController.cs" />
         <Compile Include="Engine\IView.cs" />
+        <Compile Include="Engine\IView`1.cs" />
         <Compile Include="Engine\UIExtensions.cs" />
         <Compile Include="Main.cs">
             <SubType>Form</SubType>
