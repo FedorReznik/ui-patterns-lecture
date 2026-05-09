@@ -483,21 +483,20 @@ public static void Guard(this Control control, Action uiMutation)
 &nbsp;&nbsp;&nbsp;&nbsp;As the result of this actions we have mirrored code-behind solution logic. We also achieved separation of concerns between the layers: Model abstracts/adapts the driver into more useful way; Controller controls the user inputs and provides the state changes to the View, as well as manages the concurrency and shapes the logic; View is only responsible for delegating the user inputs to Controller and for Model (State) graphical representation. We can even implement unit tests for Model and Controller, not without some mocking pain though - especially in case of Controller. But as we stated in section [3.1 The Driving Force Of Change](#31-the-driving-force-of-change) hammering any pattern to such a basic problem can look like overkill, which leads us to the need of more *complex* UI interaction to be solved... 
 
 ### 4.3 Second User Story
-&nbsp;&nbsp;&nbsp;&nbsp;Let's imagine our UX designers have addressed come to us and told that using modal dialogs to report progress or errors is a bit weird technique painful for our users. So they are asking development team to embed all the screens into the form itself and navigate between them during the application lifetime.
+&nbsp;&nbsp;&nbsp;&nbsp;Let's imagine our UX designers have come to us and told that using modal dialogs to report progress or errors is a bit weird technique painful for our users. So they are asking development team to embed all the screens into the form itself and navigate between them during the application lifetime.
 
 ### 4.4 The Router
-&nbsp;&nbsp;&nbsp;&nbsp;Obviously we could create place the logic of view changes inside each View-Controller interaction, but in this case we will quickly violate SRP and made our code very fragile and complex - we can even say that such kind of approach puts as not far away from code-behind.
+&nbsp;&nbsp;&nbsp;&nbsp;Obviously we could place the logic of view changes inside each View-Controller interaction, but in this case we will quickly violate SRP and made our code very fragile and complex - we can even say that such kind of approach puts as not far away from code-behind.
 
 &nbsp;&nbsp;&nbsp;&nbsp;A typical solution for such kind of problems in MVC world is adding a router. Let's take a look on the diagram and describe responsibilities of new elements:
 <img src="Images/MVC + Router.jpg"/>
 
-- Let's first of all speak about URL - we are using term URL here just to mimic practices wide-spread in web development, it basically can be any identifier of the screen we want to show
-- Router works as an entry-point from basic MVC sample but on steroids - it *knows* which View and Controller to create and attaches them to each other based on URL provided. It also responsible for updating the ViewHost to show new View
+- Let's first of all speak about URL - we are using term URL here just to mimic practices wide-spread in web development, it basically can be any identifier of the screen we want to show.
+- Router works as an entry-point from basic MVC sample but on steroids - it *knows* which View and Controller to create and attaches them to each other based on URL provided. It also responsible for updating the ViewHost to show new View.
 - ViewHost is only responsible for accepting the View to show and displaying it. It doesn't know any details of application logic or whatsoever.
 - Controller uses router to navigate to new URL, causing the View to be updated in the ViewHost.
 
-&nbsp;&nbsp;&nbsp;&nbsp;The whole implementation is presented in [MVC.sln](./MVC/MVC.sln) in [MVC.Routing project](./MVC/MVC.Routing/MVC.Routing.csproj). 
-
+&nbsp;&nbsp;&nbsp;&nbsp;The whole implementation is presented in [MVC.sln](./MVC/MVC.sln) in [MVC.Routing project](./MVC/MVC.Routing/MVC.Routing.csproj) with the following notable differences to basic MVC project:
 - First of all one can spot that now each screen has corresponding Controller and View, compared to MessageBox based solution. 
 - Router is represented with the following [IRouter](./MVC/MVC.Routing/Engine/IRouter.cs) interface:
 ```C#
@@ -509,9 +508,9 @@ public interface IRouter
 }
 ```
 
-We need both generic and non-generic method to reduce coupling when we don't care about further interaction with new View from current Controller e.g. we are eliminating knowledge about which actual Controller will be in use after navigation.
-</br>
-To implement the Router we will rely on capabilities of our DI container in particular on so called [Keyed services](https://autofac.readthedocs.io/en/latest/advanced/keyed-services.html#keyed-services) and [Keyed services lookup](https://autofac.readthedocs.io/en/latest/resolve/relationships.html#keyed-service-lookup-iindex-x-b). As we already mentioned DI containers are quite powerful and can save a lot of time during implementation - in our case simple router can be implemented like this (see [Router](./MVC/MVC.Routing/Engine/IRouter.cs)):
+&nbsp;&nbsp;&nbsp;&nbsp;We need both generic and non-generic method to reduce coupling when we don't care about further interaction with new View from current Controller e.g. we are eliminating knowledge about which actual Controller will be in use after navigation.
+
+&nbsp;&nbsp;&nbsp;&nbsp;To implement the Router we will rely on capabilities of our DI container, in particular on so called [Keyed services](https://autofac.readthedocs.io/en/latest/advanced/keyed-services.html#keyed-services) and [Keyed services lookup](https://autofac.readthedocs.io/en/latest/resolve/relationships.html#keyed-service-lookup-iindex-x-b). As we already mentioned DI containers are quite powerful and can save a lot of time during implementation - in our case simple router can be implemented like this (see [Router](./MVC/MVC.Routing/Engine/IRouter.cs)):
 ```C#
 public sealed class Router : IRouter
 {
@@ -560,8 +559,6 @@ As a result we decoupled navigation logic from our Controllers with quite modera
 Looks like ASP.Net MVC, isn't it? :wink:
 
 ### 4.5 The Assessment
-
-tbc: Looks like ASP.Net MVC, isn't it? 
 
 ## 5. MVP
 
