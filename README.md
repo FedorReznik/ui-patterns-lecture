@@ -537,6 +537,7 @@ public sealed class Router : IRouter
         
         if(!_viewFactoriesMap.TryGetValue(url, out var viewFactory))
             throw new InvalidOperationException($"Url '{url}' does not mapped to any view");
+            
         var controller = controllerFactory();
         var view = await _uiExecutor.Execute(() => viewFactory());
         
