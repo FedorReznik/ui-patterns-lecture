@@ -566,9 +566,9 @@ Looks like ASP.Net MVC, isn't it? :wink:
 |-----|--------|---------|
 | Testability | *Moderate* | Heavy usage of mocks. Testing implementation |
 | Extensibility | *Moderate* |Much easier support of complex scenarios including in-place Views (see [4.3 Second User Story](#43-second-user-story)) |
-| Adaptability | *Moderate* | Controllers know about Views. 2x work |
+| Adaptability | *Moderate* | Controllers know about Views - means 2x work in case of change in interaction. |
 | Effectiveness | *Moderate* | Both *frontend* and *backend* should agree on interfaces |
-| Reusability | *Moderate* | Controller and View are bound |
+| Reusability | *Moderate* | Controller and View are bound via interfaces, but still changing a View for Controller requires significant efforts |
 | Readability | *Low* | Controller/View “spaghetti” code - both call each other |
 
 &nbsp;&nbsp;&nbsp;&nbsp;We can say that code become much cleaner and we raised marks almost for each NFR. But we still have a bit of a problem due to the fact that Controller and View should know about each other. If only we could decouple them by making this reference one-directional. Can we do it?
