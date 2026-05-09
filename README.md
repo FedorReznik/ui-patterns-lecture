@@ -483,6 +483,7 @@ public static void Guard(this Control control, Action uiMutation)
 &nbsp;&nbsp;&nbsp;&nbsp;As the result of this actions we have mirrored code-behind solution logic. We also achieved separation of concerns between the layers: Model abstracts/adapts the driver into more useful way; Controller controls the user inputs and provides the state changes to the View, as well as manages the concurrency and shapes the logic; View is only responsible for delegating the user inputs to Controller and for Model (State) graphical representation. We can even implement unit tests for Model and Controller, not without some mocking pain though - especially in case of Controller. But as we stated in section [3.1 The Driving Force Of Change](#31-the-driving-force-of-change) hammering any pattern to such a basic problem can look like overkill, which leads us to the need of more *complex* UI interaction to be solved. 
 
 ### 4.3 Second User Story
+&nbsp;&nbsp;&nbsp;&nbsp;Let's imagine our UX designers have addressed come to us and told that using modal dialogs to report progress or errors is a bit weird technique painful for our users. So they are asking to embed all the screens into the form itself and navigate between them during the application lifetime.
 
 ### 4.4 The Router
 
