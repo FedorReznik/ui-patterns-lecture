@@ -3,50 +3,50 @@
 By Fedor Reznik
 
 - [The history of UI architecture design approaches: from Code-behind to MVVM](#the-history-of-ui-architecture-design-approaches-from-code-behind-to-mvvm)
-  - [1. Preface](#1-preface)
-    - [1.1. The Purpose](#11-the-purpose)
-    - [1.2. Domain](#12-domain)
-    - [1.3. First User Story](#13-first-user-story)
-  - [2. Back In The Days. Code-behind](#2-back-in-the-days-code-behind)
+  - [1 Preface](#1-preface)
+    - [1.1 The Purpose](#11-the-purpose)
+    - [1.2 Domain](#12-domain)
+    - [1.3 First User Story](#13-first-user-story)
+  - [2 Back In The Days. Code-behind](#2-back-in-the-days-code-behind)
     - [2.1 Code-behind "Pattern" Definition](#21-code-behind-pattern-definition)
     - [2.2 The Implementation](#22-the-implementation)
     - [2.3 Here Comes The Issues](#23-here-comes-the-issues)
-    - [The Blasphemy](#the-blasphemy)
-  - [3. Moving Towards Patterns](#3-moving-towards-patterns)
+    - [2.4 The Blasphemy](#24-the-blasphemy)
+  - [3 Moving Towards Patterns](#3-moving-towards-patterns)
     - [3.1 The Driving Force Of Change](#31-the-driving-force-of-change)
     - [3.2 A Word About Patterns In This Article](#32-a-word-about-patterns-in-this-article)
-  - [4. MVC](#4-mvc)
+  - [4 MVC](#4-mvc)
     - [4.1 Definition](#41-definition)
     - [4.2 Implementation](#42-implementation)
     - [4.3 Second User Story](#43-second-user-story)
     - [4.4 The Router](#44-the-router)
     - [4.5 The Assessment](#45-the-assessment)
-  - [5. MVP](#5-mvp)
-  - [6. MVVM](#6-mvvm)
-  - [7. Conclusion](#7-conclusion)
+  - [5 MVP](#5-mvp)
+  - [6 MVVM](#6-mvvm)
+  - [7 Conclusion](#7-conclusion)
     - [7.1 Modern State](#71-modern-state)
     - [7.2 Which Approach To Select?](#72-which-approach-to-select)
 
-## 1. Preface
+## 1 Preface
 
-### 1.1. The Purpose 
+### 1.1 The Purpose 
 
 &nbsp;&nbsp;&nbsp;&nbsp;The whole purpose of this article is to summarize author's experience with regard to UI development and how it evolved via .Net technologies prism. Thus this point of view is highly opinionated and doesn't pretend to be 100% truth. Neither it is historically correct - in the end the MVC pattern itself is older than .Net! We will try to focus on trade-offs of different approaches and why developers have moved from one to another - trying to reveal the idea(s) behind them.
 </br>
 &nbsp;&nbsp;&nbsp;&nbsp;To give more examples we will need some kind of "Business/Problem domain" wired through different solutions. The problem is if we select a complex one we will hide the ideas in KLOCs and KLOCs of code not related to the actual topic. If we select a simple one some of our arguments might seem a bit artificial and issues highlighted can look dubious or non-existing at all. Well, we will try to keep the domain as simple as it possible - so prepare your imagination to extend the pros and cons highlighted to more complex areas.
 
-### 1.2. Domain
+### 1.2 Domain
 
 &nbsp;&nbsp;&nbsp;&nbsp;Let's imagine that we are running an automatic cat feeder business. Right now we are only providing hardware configured feeders - with physical buttons on device. Our engineering team has developed and integrated into device the bluetooth adapter, as well as provided corresponding driver, so the idea is to quickly provide application to control cat feeder remotely. 
 
-### 1.3. First User Story
+### 1.3 First User Story
 
 &nbsp;&nbsp;&nbsp;&nbsp;To quickly conquer the market we as the company must provide the simplest yet use-full desktop application: it should contain only "Feed the cat" button and should provide feedback if the feeding has been successful. So our UX team came-out with the following design:
 <img src="Images/CatFeederAppUX.png"/> 
 
 And the status of feeding should be provided by modal dialog with success/fail message and OK button to close it.
 
-## 2. Back In The Days. Code-behind
+## 2 Back In The Days. Code-behind
 
 ### 2.1 Code-behind "Pattern" Definition
 
@@ -254,7 +254,7 @@ public partial class MainFixed : Form
 | Reusability | *Low* |  One can extract UserControl(s) to improve it a bit |
 | Readability | *Low* | The more features we will add the bigger and dirty will code-behind file become |
 
-### The Blasphemy
+### 2.4 The Blasphemy
 
 &nbsp;&nbsp;&nbsp;&nbsp;The code-behind approach may work! Indeed if you have:
 
@@ -266,7 +266,7 @@ In this case one can still maintain the good enough balance between code complex
 
 &nbsp;&nbsp;&nbsp;&nbsp;But soon everything was about to change...
 
-## 3. Moving Towards Patterns
+## 3 Moving Towards Patterns
 
 ### 3.1 The Driving Force Of Change
 
@@ -283,7 +283,7 @@ In this case one can still maintain the good enough balance between code complex
 
 &nbsp;&nbsp;&nbsp;&nbsp;With all this in mind let's proceed with first improvement over code-behind.
 
-## 4. MVC
+## 4 MVC
 
 &nbsp;&nbsp;&nbsp;&nbsp;First logical step after pure code-behind approach would be to extract the layer which holds the data and operations over it as well as remove non-UI logic from the view. This leads us to Model-View-Controller or MVC pattern, or, to be precise, it's State-View-Controller variation - SVC: where Model does not raise any changes and only provides the current state from View perspective.
 
@@ -598,13 +598,13 @@ Looks like ASP.Net MVC, isn't it? :wink:
 
 &nbsp;&nbsp;&nbsp;&nbsp;We can say that code become much cleaner and we raised marks almost for each NFR. But we still have a bit of a problem due to the fact that Controller and View should know about each other. If only we could decouple them by making this reference one-directional. Can we do it?
 
-## 5. MVP
+## 5 MVP
 
 TBD: application boundary!
 
-## 6. MVVM
+## 6 MVVM
 
-## 7. Conclusion
+## 7 Conclusion
 
 ### 7.1 Modern State
 
