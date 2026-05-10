@@ -25,8 +25,7 @@ By Fedor Reznik
     - [5.1 Definition](#51-definition)
     - [5.2 Implementation](#52-implementation)
     - [5.3 The sub-system boundary](#53-the-sub-system-boundary)
-    - [5.4 The sub-system boundary caveat](#54-the-sub-system-boundary-caveat)
-    - [5.5 The Assessment](#55-the-assessment)
+    - [5.4 The Assessment](#54-the-assessment)
   - [6 MVVM](#6-mvvm)
   - [7 Conclusion](#7-conclusion)
     - [7.1 Modern State](#71-modern-state)
@@ -611,11 +610,10 @@ Looks like ASP.Net MVC, isn't it? :wink:
 
 ### 5.3 The sub-system boundary
 
-### 5.4 The sub-system boundary caveat
-
-### 5.5 The Assessment
+### 5.4 The Assessment
 
 ## 6 MVVM
+tbd: example on how to overcome sub-system boundary caveat in the world of data binding!
 
 ## 7 Conclusion
 
