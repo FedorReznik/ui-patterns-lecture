@@ -607,6 +607,7 @@ Looks like ASP.Net MVC, isn't it? :wink:
 ### 5.1 Definition
 
 ### 5.2 Implementation
+tbd: note about injecting factories instead of instances for presenters
 
 ### 5.3 The sub-system boundary
 
