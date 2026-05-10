@@ -24,7 +24,8 @@ By Fedor Reznik
   - [5 MVP](#5-mvp)
     - [5.1 Definition](#51-definition)
     - [5.2 Implementation](#52-implementation)
-    - [5.3 The sub-system boundary](#53-the-sub-system-boundary)
+    - [5.3 The Router transformation](#53-the-router-transformation)
+    - [5.4 The sub-system boundary](#54-the-sub-system-boundary)
     - [5.4 The Assessment](#54-the-assessment)
   - [6 MVVM](#6-mvvm)
   - [7 Conclusion](#7-conclusion)
@@ -289,14 +290,14 @@ In this case one can still maintain the good enough balance between code complex
 
 ## 4 MVC
 
-&nbsp;&nbsp;&nbsp;&nbsp;First logical step after pure code-behind approach would be to extract the layer which holds the data and operations over it as well as remove non-UI logic from the view. This leads us to Model-View-Controller or MVC pattern, or, to be precise, it's State-View-Controller variation - SVC: where Model does not raise any changes and only provides the current state from View perspective.
+&nbsp;&nbsp;&nbsp;&nbsp;First logical step after pure code-behind approach would be to extract the layer which holds the data and operations over it. As well as remove non-UI logic from the view. This leads us to Model-View-Controller or MVC pattern, or, to be precise, it's State-View-Controller variation - SVC: where Model does not raise any changes and only provides the current state from View perspective.
 
 ### 4.1 Definition
 
 &nbsp;&nbsp;&nbsp;&nbsp;The SVC variation of MVC pattern can be described with the following diagram:
 <img src="Images/MVC - the State-View-Controller variation.jpg"/>
 
-- The State (Model) represents the data or state in the application in a logical way; it is in charge of carrying the data It also adapts external services for Controller.
+- The State (Model) represents the data or state in the application in a logical way; it is in charge of carrying the data. It also adapts external services for Controller.
 - The View is the graphical representation of the Model; it is responsible for displaying the Model data in suitable form. Usually the View itself better to be de-coupled from host or canvas that it is shown on - this gives the possibility to use it in different places even combining the Views on one host/canvas.
 - The Controller is the orchestrator of this pattern; it is in charge of intercepting user input (mouse and keyboard) and interacting with the State (Model) and the View: it calls the Model services, which provides new State, which is propagated to the View by Controller. It also **owns** the operations thus commanding the view about validation errors or operations availability.
 
@@ -603,13 +604,19 @@ Looks like ASP.Net MVC, isn't it? :wink:
 &nbsp;&nbsp;&nbsp;&nbsp;We can say that code become much cleaner and we raised marks almost for each NFR. But we still have a bit of a problem due to the fact that Controller and View should know about each other. If only we could decouple them by making this reference one-directional. Can we do it?
 
 ## 5 MVP
+&nbsp;&nbsp;&nbsp;&nbsp;Second step after we have removed the non-UI logic from View is to eliminate coupling between the View and Controller. Which leads us to Model-View-Presenter pattern, especially it's pinnacle: MVP(M) aka Model-View-PresentationModel - where Presenter in the "Presentation Model" doesn't know anything about the view even through interface, while View is a passive **observer** of PM.
 
 ### 5.1 Definition
+&nbsp;&nbsp;&nbsp;&nbsp;The MVP(M) variation of the MVP pattern can be described with the following diagram:
+<img src="Images/MVP(M) + Router.jpg"/>
 
 ### 5.2 Implementation
 tbd: note about injecting factories instead of instances for presenters
 
-### 5.3 The sub-system boundary
+### 5.3 The Router transformation
+tbd: It's now a part of View layer and responsible only for View selection for presenter, thus giving us possibility to bind different views for the same presenter for example via interface hierarchy. Router can also use different strategies depending on Presenter (or View) attributes to use ether current ViewHost or produce new one including showing the message boxes if needed - it's a matter of adding more introspections to Router engine.
+
+### 5.4 The sub-system boundary
 
 ### 5.4 The Assessment
 

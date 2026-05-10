@@ -121,6 +121,7 @@
         <Compile Include="Engine\Main.Designer.cs">
           <DependentUpon>Main.cs</DependentUpon>
         </Compile>
+        <Compile Include="Engine\Router.cs" />
         <Compile Include="Engine\UIExtensions.cs" />
         <Compile Include="Program.cs"/>
         <Compile Include="Properties\AssemblyInfo.cs"/>
