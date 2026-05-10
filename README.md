@@ -611,6 +611,10 @@ Looks like ASP.Net MVC, isn't it? :wink:
 &nbsp;&nbsp;&nbsp;&nbsp;The MVP(M) variation of the MVP pattern can be described with the following diagram:
 <img src="Images/MVP(M) + Router.jpg"/>
 
+- The State (Model) holds exactly the same responsibilities as in MVC pattern, e.g. represents the data or state in the application in a logical way; it is in charge of carrying the data. It also adapts external services for Presenter.
+- The View responsibilities is also the same as for MVC, but in addition to State(Model) representation, rendering and delegating user input to Presenter it also observers the presenter: directly via results of calling the methods; and indirectly by subscribing to presenter events.
+- The Presenter role has the biggest changes compared to MVC pattern. It is now responsible for providing **all** possible ways of interaction via methods, as well as **all** possible reactions via events. It knows nothing about View and only *claims* that it has the following input endpoints (methods and properties) and the following output endpoints (events). It's up to View or any other consumer to handle them correctly. Moreover one can easily change the View itself for any particular presenter.    
+
 ### 5.2 Implementation
 tbd: note about injecting factories instead of instances for presenters
 
