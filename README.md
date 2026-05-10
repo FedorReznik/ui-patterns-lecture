@@ -22,6 +22,11 @@ By Fedor Reznik
     - [4.4 The Router](#44-the-router)
     - [4.5 The Assessment](#45-the-assessment)
   - [5 MVP](#5-mvp)
+    - [5.1 Definition](#51-definition)
+    - [5.2 Implementation](#52-implementation)
+    - [5.3 The sub-system boundary](#53-the-sub-system-boundary)
+    - [5.4 The sub-system boundary caveat](#54-the-sub-system-boundary-caveat)
+    - [5.5 The Assessment](#55-the-assessment)
   - [6 MVVM](#6-mvvm)
   - [7 Conclusion](#7-conclusion)
     - [7.1 Modern State](#71-modern-state)
@@ -600,7 +605,15 @@ Looks like ASP.Net MVC, isn't it? :wink:
 
 ## 5 MVP
 
-TBD: application boundary!
+### 5.1 Definition
+
+### 5.2 Implementation
+
+### 5.3 The sub-system boundary
+
+### 5.4 The sub-system boundary caveat
+
+### 5.5 The Assessment
 
 ## 6 MVVM
 
