@@ -123,6 +123,7 @@
         </Compile>
         <Compile Include="Engine\Router.cs" />
         <Compile Include="Engine\UIExtensions.cs" />
+        <Compile Include="Engine\ViewBase.cs" />
         <Compile Include="Program.cs"/>
         <Compile Include="Properties\AssemblyInfo.cs"/>
         <EmbeddedResource Include="Engine\Main.resx">
