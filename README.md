@@ -566,7 +566,7 @@ Looks like ASP.Net MVC, isn't it? :wink:
 |-----|--------|---------|
 | Testability | *Moderate* | Heavy usage of mocks. Testing implementation |
 | Extensibility | *Moderate* |Much easier support of complex scenarios including in-place Views (see [4.3 Second User Story](#43-second-user-story)) |
-| Adaptability | *Moderate* | Controllers know about Views - means 2x work in case of change in interaction. |
+| Adaptability | *Moderate* | Controllers know about Views - means 2x work in case of change. |
 | Effectiveness | *Moderate* | Both *frontend* and *backend* should agree on interfaces |
 | Reusability | *Moderate* | Controller and View are bound via interfaces, but still changing a View for Controller requires significant efforts |
 | Readability | *Low* | Controller/View “spaghetti” code - both call each other |
