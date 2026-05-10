@@ -616,7 +616,7 @@ Looks like ASP.Net MVC, isn't it? :wink:
 - The Presenter role has the biggest changes compared to MVC pattern. It is now responsible for providing **all** possible ways of interaction via methods, as well as **all** possible reactions via events. It knows nothing about View and only *claims* that it has the following input endpoints (methods and properties) and the following output endpoints (events). It's up to View or any other consumer to handle them correctly. Moreover one can easily change the View itself for any particular presenter.    
 
 ### 5.2 Implementation
-&nbsp;&nbsp;&nbsp;&nbsp;The definition might sound a bit confusing and raise a questions, so let' walk-through the implementation. The whole solution can be found in [MVP.sln](./MVP/MVP.sln). 
+&nbsp;&nbsp;&nbsp;&nbsp;The definition might sound a bit confusing and raise a questions about the *events* magic, so let' walk-through the implementation. The whole solution can be found in [MVP.sln](./MVP/MVP.sln). 
 
 
 
