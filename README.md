@@ -26,7 +26,8 @@ By Fedor Reznik
     - [5.2 Implementation](#52-implementation)
     - [5.3 The Router transformation](#53-the-router-transformation)
     - [5.4 The sub-system boundary](#54-the-sub-system-boundary)
-    - [5.4 The Assessment](#54-the-assessment)
+    - [5.5 The sub-system boundary caveat](#55-the-sub-system-boundary-caveat)
+    - [5.6 The Assessment](#56-the-assessment)
   - [6 MVVM](#6-mvvm)
   - [7 Conclusion](#7-conclusion)
     - [7.1 Modern State](#71-modern-state)
@@ -618,7 +619,10 @@ tbd: It's now a part of View layer and responsible only for View selection for p
 
 ### 5.4 The sub-system boundary
 
-### 5.4 The Assessment
+### 5.5 The sub-system boundary caveat
+tbd: example and note to overcome it with router.
+
+### 5.6 The Assessment
 
 ## 6 MVVM
 tbd: example on how to overcome sub-system boundary caveat in the world of data binding!
