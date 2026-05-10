@@ -535,7 +535,7 @@ public interface IRouter
 
 &nbsp;&nbsp;&nbsp;&nbsp;We need both generic and non-generic method to reduce coupling when we don't care about further interaction with new View from current Controller e.g. we are eliminating knowledge about which actual Controller will be in use after navigation.
 
-&nbsp;&nbsp;&nbsp;&nbsp;To implement the Router we will rely on capabilities of our DI container, in particular on so called [Keyed services](https://autofac.readthedocs.io/en/latest/advanced/keyed-services.html#keyed-services) and [Keyed services lookup](https://autofac.readthedocs.io/en/latest/resolve/relationships.html#keyed-service-lookup-iindex-x-b). As we already mentioned DI containers are quite powerful and can save a lot of time during implementation - in our case simple router can be implemented like this (see [Router](./MVC/MVC.Routing/Engine/IRouter.cs)):
+&nbsp;&nbsp;&nbsp;&nbsp;To implement the Router we will rely on capabilities of our DI container, in particular on so called [Keyed services](https://autofac.readthedocs.io/en/latest/advanced/keyed-services.html#keyed-services) and [Keyed services lookup](https://autofac.readthedocs.io/en/latest/resolve/relationships.html#keyed-service-lookup-iindex-x-b). As we already mentioned DI containers are quite powerful and can save a lot of time during implementation - in our case simple router can be implemented like this (see [Router](./MVC/MVC.Routing/Engine/Router.cs)):
 ```C#
 public sealed class Router : IRouter
 {
