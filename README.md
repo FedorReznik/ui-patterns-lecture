@@ -830,9 +830,48 @@ public partial class CatFeederView : ViewBase, IView<ICatFeederPresenter>
 As you can see it is absolutely passive - it only delegates and observes the presenter, as well as passing presenters it cannot handle to the router for navigation. Let's discuss the router separately.
 
 ### 5.3 The Router transformation
+&nbsp;&nbsp;&nbsp;&nbsp;Compared to MVC the role of the router has changed - it's now a part of View layer and responsible only for View selection for presenter, thus giving us possibility to bind different views for the same presenter for example via interface hierarchy. Router can also use different strategies depending on Presenter (or View) attributes to use ether current ViewHost or produce new one including showing the message boxes if needed - it's a matter of adding more introspections to Router engine. So it decouples application state transition, which is now managed by Presenters from the actual rendering (View), it also maintains low-coupling between Views - it is Router responsibility to select a View for Presenter not the View itself.
 
+&nbsp;&nbsp;&nbsp;&nbsp;As a result the [IRouter](./MVP/MVP.PM/Engine/IRouter.cs) interface now contains only one method:
+```C#
+public interface IRouter
+{
+    Task NavigateTo<T>([NotNull] T presenter) where T : IPresenter;
+}
+```
+And the [implementation](./MVP/MVP.PM/Engine/Router.cs) now free of Presenter instantiation, because presenter is the state of application now and managed by PM layer:
+```C#
+public sealed class Router : IRouter
+{
+    private readonly IIndex<Type, Func<IView>> _viewFactoriesMap;
+    private readonly IUIExecutor _uiExecutor;
+    private readonly INavigationHost _navigationHost;
 
-tbd: It's now a part of View layer and responsible only for View selection for presenter, thus giving us possibility to bind different views for the same presenter for example via interface hierarchy. Router can also use different strategies depending on Presenter (or View) attributes to use ether current ViewHost or produce new one including showing the message boxes if needed - it's a matter of adding more introspections to Router engine.
+    public Router(
+        [NotNull] IIndex<Type, Func<IView>> viewFactoriesMap,
+        [NotNull] IUIExecutor uiExecutor,
+        [NotNull] INavigationHost navigationHost)
+    {
+        _viewFactoriesMap = viewFactoriesMap ?? throw new ArgumentNullException(nameof(viewFactoriesMap));
+        _uiExecutor = uiExecutor ?? throw new ArgumentNullException(nameof(uiExecutor));
+        _navigationHost = navigationHost ?? throw new ArgumentNullException(nameof(navigationHost));
+    }
+
+    public async Task NavigateTo<T>(T presenter) where T : IPresenter
+    {
+        if (presenter == null) throw new ArgumentNullException(nameof(presenter));
+        
+        if(!_viewFactoriesMap.TryGetValue(typeof(T), out var viewFactory))
+            throw new InvalidOperationException($"Presenter '{typeof(T)}' does not mapped to any view");
+        
+        var view = await _uiExecutor.Execute(() => viewFactory());
+        
+        view.AttachPresenter(presenter);
+        
+        _navigationHost.ShowView(view.Render());
+    }
+}
+```
 
 ### 5.4 The sub-system boundary
 
