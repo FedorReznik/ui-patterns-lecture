@@ -875,7 +875,16 @@ public sealed class Router : IRouter
 
 ### 5.4 The sub-system boundary
 
+&nbsp;&nbsp;&nbsp;&nbsp;For a second let's step aside of UI development topic and look at what we reach in more general way, but for this we need to give one definition:
+
+> **The sub-system boundary:** is the set of APIs which forms necessary and sufficient set of endpoints to interact with. So that no complex objects need to cross the boundary for application to be functional - whether directly via method parameters or indirectly via constructor injection or whatsoever. Only the POCOs are passed into the sub-system from consumer layers. The sub-system does not reference anything from consumer layers.
+
+&nbsp;&nbsp;&nbsp;&nbsp;The thing is: when you program in terms of sub-systems with clear boundaries your NFRs naturally raise, because those boundaries are much easier to test and/or re-use: you just change the consumers without changing the sub-systems. 
+
+&nbsp;&nbsp;&nbsp;&nbsp;Do we have any sub-system boundaries in our MVP(M) solution? Yes we do - the Model and the Presentation Model layers are fully independent (directly and indirectly) and provide contracts for all possible interactions. Believe it or not the price is worth the result - author himself once had an experience of re-writing the application initially build for WinCE and compact framework to support iOS and Android on Xamarin framework. And it was relatively easy to change just the View code and override some device specific services like GPS tracker, due to having PM and M layers already implemented.
+
 ### 5.5 The sub-system boundary caveat - the notorious `IWindowService`
+
 tbd: example and note to overcome it with router.
 
 ### 5.6 The Assessment
