@@ -1,4 +1,5 @@
-﻿using System.Windows.Input;
+﻿using System.Windows;
+using System.Windows.Input;
 using MVVM.CatFeederComponent.Models;
 using MVVM.Engine;
 
@@ -11,8 +12,10 @@ public class CatFeederVm : ViewModelBase, ICatFeederVm
     private readonly Func<IFailedFeedingVm> _failedFeedingVmFactory;
 
     private readonly ICommand _feedCommand;
+    private readonly ICommand _aboutCommand;
     
     private readonly NextVmSinkPart _nextVmSinkPart = new();
+    private readonly ConfirmationSinkPart _confirmationSinkPart = new();
 
     public CatFeederVm(
         ICatFeederService catFeederService,
@@ -24,6 +27,7 @@ public class CatFeederVm : ViewModelBase, ICatFeederVm
         _failedFeedingVmFactory = failedFeedingVmFactory;
         
         _feedCommand = new ActionCommand(FeedCore);
+        _aboutCommand = new ActionCommand(AboutCore);
     }
 
     public ICommand Feed => _feedCommand;
@@ -77,5 +81,23 @@ public class CatFeederVm : ViewModelBase, ICatFeederVm
         _nextVmSinkPart.Dispose();
         
         base.DisposeCore();
+    }
+
+    Func<IConfirmationVm, MessageBoxResult>? IConfirmationSink.Confirm
+    {
+        set => _confirmationSinkPart.Confirm = value;
+    }
+
+    public ICommand About => _aboutCommand;
+    
+    private void AboutCore()
+    {
+        _confirmationSinkPart.AskConfirmation(new ConfirmationVm()
+        {
+            Caption = "Feeder App 4.0",
+            Text = "This is app version 4.0",
+            Icon = MessageBoxImage.Information,
+            Buttons =  MessageBoxButton.OK
+        });
     }
 }
