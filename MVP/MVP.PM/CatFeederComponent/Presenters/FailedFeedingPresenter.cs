@@ -1,9 +1,10 @@
 using System;
 using JetBrains.Annotations;
+using MVP.Engine;
 
 namespace MVP.CatFeederComponent.Presenters
 {
-    public class FailedFeedingPresenter : IFailedFeedingPresenter
+    public class FailedFeedingPresenter : PresenterBase, IFailedFeedingPresenter
     {
         private readonly Func<ICatFeederPresenter> _catFeederPresenterFactory;
 
@@ -18,10 +19,5 @@ namespace MVP.CatFeederComponent.Presenters
         }
 
         public string Reason { get; set; }
-        
-        public void Dispose()
-        {
-            // intentionally left blank
-        }
     }
 }

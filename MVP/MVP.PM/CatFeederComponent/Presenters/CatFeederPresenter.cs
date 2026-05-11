@@ -3,10 +3,11 @@ using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using MVP.CatFeederComponent.Models;
+using MVP.Engine;
 
 namespace MVP.CatFeederComponent.Presenters
 {
-    public class CatFeederPresenter : ICatFeederPresenter
+    public class CatFeederPresenter : PresenterBase, ICatFeederPresenter
     {
         [NotNull] 
         private readonly ICatFeederService _catFeederService;
@@ -35,17 +36,23 @@ namespace MVP.CatFeederComponent.Presenters
             {
                 var result = await _catFeederService.Feed();
                 _isBusy.OnNext(false);
-                if (result.Successful)
+                
+                switch (result.Successful)
                 {
-                    var successfulFeedingPresenter = _successfulFeedingPresenterFactory();
-                    successfulFeedingPresenter.Message = result.Message;
-                    _successfulFeeding.OnNext(successfulFeedingPresenter);
-                }
-                else
-                {
-                    var failedFeedingPresenter = _failedFeedingPresenterFactory();
-                    failedFeedingPresenter.Reason = result.Message;
-                    _failedFeeding.OnNext(failedFeedingPresenter);
+                    case true:
+                    {
+                        var successfulFeedingPresenter = _successfulFeedingPresenterFactory();
+                        successfulFeedingPresenter.Message = result.Message;
+                        _successfulFeeding.OnNext(successfulFeedingPresenter);
+                        break;
+                    }
+                    default:
+                    {
+                        var failedFeedingPresenter = _failedFeedingPresenterFactory();
+                        failedFeedingPresenter.Reason = result.Message;
+                        _failedFeeding.OnNext(failedFeedingPresenter);
+                        break;
+                    }
                 }
             });
         }
@@ -56,13 +63,15 @@ namespace MVP.CatFeederComponent.Presenters
 
         public IObservable<IFailedFeedingPresenter> FailedFeeding => _failedFeeding;
 
-        public void Dispose()
+        protected override void DisposeCore()
         {
             _catFeederService.Dispose();
             
             _isBusy.OnCompleted();
             _successfulFeeding.OnCompleted();
             _failedFeeding.OnCompleted();
+            
+            base.DisposeCore();
         }
     }
 }
