@@ -4,13 +4,13 @@ namespace MVVM.Engine;
 
 public interface IConfirmationVm : IViewModel
 {
-    public string? Caption { get; set; }
+    public string? Caption { get; }
     
-    public string? Text { get; set; }
+    public string? Text { get; }
     
-    public MessageBoxButton Buttons { get; set; }
+    public MessageBoxButton Buttons { get; }
     
-    public MessageBoxImage Icon { get; set; }
+    public MessageBoxImage Icon { get; }
 }
 
 public class ConfirmationVm : ViewModelBase, IConfirmationVm
