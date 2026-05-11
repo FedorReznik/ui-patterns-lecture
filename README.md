@@ -907,6 +907,17 @@ public interface ICatFeederPresenter : IPresenter
 &nbsp;&nbsp;&nbsp;&nbsp;The good news is that overcoming this issue is very easy - one just need to use `IWindowService` without changing the Presenter contracts. Or, better, use the router approach we have described in [5.3 The Router transformation](#53-the-router-transformation) section above. As usual on the scale of such simple problem as our Cat Feeder it's very subtle, but still very crucial, difference.
 
 ### 5.6 The Assessment
+&nbsp;&nbsp;&nbsp;&nbsp;Let's check our architecture against our NFRs:
+| NFR | Level | Comment |
+|-----|--------|---------|
+| Testability | *High* | Mocks are only needed for *downstream* layers |
+| Extensibility | *High* | The application state transition is encapsulated in PM layer, UI representation is totally separated to View layer |
+| Adaptability | *High* | The Presenters are already in place - do whatever your want in your View layer. Readers are encouraged to implement cmd-like UI for existing PM layers to see how easy it is |
+| Effectiveness | *High* | Consumer layer must know contracts, PM layer knows nothing about consumers |
+| Reusability | *High* | There is no coupling to View from PM layer |
+| Readability | *Moderate* | Being very demanding to ourselves we can complain about the need to subscribe/unsubscribe  presenter events from View causing some boilerplate in code |
+
+&nbsp;&nbsp;&nbsp;&nbsp;Overall MVP(M) can be called sufficient in terms of NFRs fulfillment. But the need to write imperative code in View is a bit annoying. That's why very *lazy* people has invented MVVM which we will move on shortly.
 
 ## 6 MVVM
 tbd: example on how to overcome sub-system boundary caveat in the world of data binding!
