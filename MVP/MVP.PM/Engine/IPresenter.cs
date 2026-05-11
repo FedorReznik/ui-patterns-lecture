@@ -8,7 +8,6 @@ namespace MVP.Engine
 {
     public interface IPresenter : INotifyPropertyChanged, IDisposable
     {
-        
     }
 
     public abstract class PresenterBase : IPresenter

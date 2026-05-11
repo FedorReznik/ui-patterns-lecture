@@ -925,7 +925,7 @@ public interface ICatFeederPresenter : IPresenter
 &nbsp;&nbsp;&nbsp;&nbsp;Overall MVP(M) can be called sufficient in terms of NFRs fulfillment. But the need to write imperative code in View is a bit annoying. That's why very *lazy* people has invented MVVM which we will move on shortly.
 
 ## 6 MVVM
-&nbsp;&nbsp;&nbsp;&nbsp;Probably the most controversial statement of the whole article: MVVM is not more than MVP(M) + a good MVVM framework containing binding engine, data template engine and other nice to have like behaviors and commands to extend the template engine. So author position is - there is no MVVM without a good framework, but one can always "stop" at the MVP(M) level in almost each and any technology and be happy with it.
+&nbsp;&nbsp;&nbsp;&nbsp;Probably the most controversial statement of the whole article: MVVM is not more than MVP(M) + a good MVVM framework containing binding engine, data template engine and other nice to have features like behaviors and commands to extend the template engine. So author position is - there is no MVVM without a good framework, but one can always "stop" at the MVP(M) level in almost each and any technology and be happy with it.
 
 ### 6.1 Definition
 &nbsp;&nbsp;&nbsp;&nbsp; Having said that MVVM is MVP(M) + framework, let's give it a definition, as usual starting with diagram:

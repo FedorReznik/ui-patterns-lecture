@@ -8,4 +8,16 @@
         <UseWPF>true</UseWPF>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\..\FeederDriver\FeederDriver\FeederDriver.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Autofac" Version="9.1.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="CatFeederComponent\Views\" />
+    </ItemGroup>
+
 </Project>
