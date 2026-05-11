@@ -2,6 +2,7 @@
 using FeederDriver;
 using MVVM.CatFeederComponent.Models;
 using MVVM.CatFeederComponent.ViewModels;
+using MVVM.Engine;
 
 namespace MVVM.DI;
 
@@ -10,6 +11,10 @@ public static class CompositionRoot
     public static IContainer Compose()
     {
         var builder = new ContainerBuilder();
+        
+        // register engine
+        builder.RegisterType<MainVm>().As<IMainVm>().SingleInstance();
+        builder.RegisterType<MainWindow>().AsSelf().SingleInstance();
             
         // register ViewModels
         builder.RegisterType<CatFeederVm>().As<ICatFeederVm>();

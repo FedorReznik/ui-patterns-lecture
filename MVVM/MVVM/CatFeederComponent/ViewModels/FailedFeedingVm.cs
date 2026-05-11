@@ -3,14 +3,14 @@ using MVVM.Engine;
 
 namespace MVVM.CatFeederComponent.ViewModels;
 
-public class SuccessfulFeedingVm : ViewModelBase, ISuccessfulFeedingVm
+public class FailedFeedingVm : ViewModelBase, IFailedFeedingVm
 {
     private readonly Func<ICatFeederVm> _catFeederVmFactory;
     private readonly ICommand _continueCommand;
     
     private readonly NextVmSinkPart _nextVmSinkPart = new();
 
-    public SuccessfulFeedingVm(Func<ICatFeederVm> catFeederVmFactory)
+    public FailedFeedingVm(Func<ICatFeederVm> catFeederVmFactory)
     {
         _catFeederVmFactory = catFeederVmFactory;
 
@@ -23,7 +23,7 @@ public class SuccessfulFeedingVm : ViewModelBase, ISuccessfulFeedingVm
 
     public ICommand Continue => _continueCommand;
 
-    public string? Message
+    public string? Reason
     {
         get;
         set => SetField(ref field, value);
