@@ -874,7 +874,6 @@ public sealed class Router : IRouter
 ```
 
 ### 5.4 The sub-system boundary
-
 &nbsp;&nbsp;&nbsp;&nbsp;For a second let's step aside of UI development topic and look at what we reach in more general way, but for this we need to give one definition:
 
 > **The sub-system boundary:** is the set of APIs which forms necessary and sufficient set of endpoints to interact with. So that no complex objects need to cross the boundary for application to be functional - whether directly via method parameters or indirectly via constructor injection or whatsoever. Only the POCOs are passed into the sub-system from consumer layers. The sub-system does not reference anything from consumer layers.
@@ -884,8 +883,28 @@ public sealed class Router : IRouter
 &nbsp;&nbsp;&nbsp;&nbsp;Do we have any sub-system boundaries in our MVP(M) solution? Yes we do - the Model and the Presentation Model layers are fully independent (directly and indirectly) and provide contracts for all possible interactions. Believe it or not the price is worth the result - author himself once had an experience of re-writing the application initially build for WinCE and compact framework to support iOS and Android on Xamarin framework. And it was relatively easy to change just the View code and override some device specific services like GPS tracker, due to having PM and M layers already implemented.
 
 ### 5.5 The sub-system boundary caveat - the notorious `IWindowService`
+&nbsp;&nbsp;&nbsp;&nbsp;The sub-system boundaries are shinny and pure, which is good. **But** one should be very careful because as any pureness it can be easily and subconsciously spoiled. And there is the very particular example how it usually spoiled. Let's get back for our first user story where success and failure notifications were implemented as modal message boxes. Even having mature PM frameworks 99% of developers will implement this requirement by using injectable `IWindowService` which will show message boxes from it's implementation. This service, in our example, could have the following contract:
+```C#
+public interface IWindowService
+{
+    void ShowSuccess(ISuccessfulFeedingPresenter success);
+    void ShowFailure(IFailedFeedingPresenter failure);
+}
+```
 
-tbd: example and note to overcome it with router.
+&nbsp;&nbsp;&nbsp;&nbsp;Then one could inject this service directly into `ICatFeederPresenter` and use it from there, thus changing it's interface to:
+```C#
+public interface ICatFeederPresenter : IPresenter
+{
+    void Feed();
+    
+    IObservable<bool> IsBusy { get; }
+}
+```
+
+&nbsp;&nbsp;&nbsp;&nbsp;What's the problem reader may ask? The problem is that your PM layer is no longer forms sub-system boundary by not claiming all the possible interaction in it's contract and by having the indirect reference to `IWindowService` in the implementation! Moreover PM layer now reference the entity from consumer (UI) world breaking separation of concerns even further! PM layer testing is harder now, changing UI is harder now and so on - so all our efforts to make architecture better and raise NFRs are rendered void.
+
+&nbsp;&nbsp;&nbsp;&nbsp;The good news is that overcoming this issue is very easy - one just need to use `IWindowService` without changing the Presenter contracts. Or, better, use the router approach we have described in [5.3 The Router transformation](#53-the-router-transformation) section above. As usual on the scale of such simple problem as our Cat Feeder it's very subtle, but still very crucial, difference.
 
 ### 5.6 The Assessment
 
