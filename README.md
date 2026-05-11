@@ -30,6 +30,10 @@ By Fedor Reznik
     - [5.6 The Assessment](#56-the-assessment)
   - [6 MVVM](#6-mvvm)
     - [6.1 Definition](#61-definition)
+    - [6.2 Implementation](#62-implementation)
+    - [6.3 Where is the router?](#63-where-is-the-router)
+    - [6.4 How not to fall into `IWindowService` caveat](#64-how-not-to-fall-into-iwindowservice-caveat)
+    - [6.5 The Assessment](#65-the-assessment)
   - [7 Conclusion](#7-conclusion)
     - [7.1 Modern State](#71-modern-state)
     - [7.2 Which Approach To Select?](#72-which-approach-to-select)
@@ -925,6 +929,18 @@ public interface ICatFeederPresenter : IPresenter
 
 ### 6.1 Definition
 &nbsp;&nbsp;&nbsp;&nbsp; Having said that MVVM is MVP(M) + framework, let's give it a definition, as usual starting with diagram:
+
+### 6.2 Implementation
+
+### 6.3 Where is the router?
+
+tbd: Interface template selector
+
+### 6.4 How not to fall into `IWindowService` caveat
+
+tbd: IObservable binding and Presenter handler extension to show message boxes
+
+### 6.5 The Assessment
 
 tbd: example on how to overcome sub-system boundary caveat in the world of data binding!
 
