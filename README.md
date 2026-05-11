@@ -839,7 +839,7 @@ public interface IRouter
     Task NavigateTo<T>([NotNull] T presenter) where T : IPresenter;
 }
 ```
-And the [implementation](./MVP/MVP.PM/Engine/Router.cs) now free of Presenter instantiation, because presenter is the state of application now and managed by PM layer:
+And the [implementation](./MVP/MVP.PM/Engine/Router.cs) is free of Presenter instantiation, because presenter is the state of application now and managed by PM layer:
 ```C#
 public sealed class Router : IRouter
 {
