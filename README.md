@@ -22,6 +22,12 @@ By Fedor Reznik
     - [4.4 The Router](#44-the-router)
     - [4.5 The Assessment](#45-the-assessment)
   - [5 MVP](#5-mvp)
+    - [5.1 Definition](#51-definition)
+    - [5.2 Implementation](#52-implementation)
+    - [5.3 The Router transformation](#53-the-router-transformation)
+    - [5.4 The sub-system boundary](#54-the-sub-system-boundary)
+    - [5.5 The sub-system boundary caveat - the notorious `IWindowService`](#55-the-sub-system-boundary-caveat---the-notorious-iwindowservice)
+    - [5.6 The Assessment](#56-the-assessment)
   - [6 MVVM](#6-mvvm)
   - [7 Conclusion](#7-conclusion)
     - [7.1 Modern State](#71-modern-state)
@@ -285,14 +291,14 @@ In this case one can still maintain the good enough balance between code complex
 
 ## 4 MVC
 
-&nbsp;&nbsp;&nbsp;&nbsp;First logical step after pure code-behind approach would be to extract the layer which holds the data and operations over it as well as remove non-UI logic from the view. This leads us to Model-View-Controller or MVC pattern, or, to be precise, it's State-View-Controller variation - SVC: where Model does not raise any changes and only provides the current state from View perspective.
+&nbsp;&nbsp;&nbsp;&nbsp;First logical step after pure code-behind approach would be to extract the layer which holds the data and operations over it. As well as remove non-UI logic from the view. This leads us to Model-View-Controller or MVC pattern, or, to be precise, it's State-View-Controller variation - SVC: where Model does not raise any changes and only provides the current state from View perspective.
 
 ### 4.1 Definition
 
 &nbsp;&nbsp;&nbsp;&nbsp;The SVC variation of MVC pattern can be described with the following diagram:
 <img src="Images/MVC - the State-View-Controller variation.jpg"/>
 
-- The State (Model) represents the data or state in the application in a logical way; it is in charge of carrying the data It also adapts external services for Controller.
+- The State (Model) represents the data or state in the application in a logical way; it is in charge of carrying the data. It also adapts external services for Controller.
 - The View is the graphical representation of the Model; it is responsible for displaying the Model data in suitable form. Usually the View itself better to be de-coupled from host or canvas that it is shown on - this gives the possibility to use it in different places even combining the Views on one host/canvas.
 - The Controller is the orchestrator of this pattern; it is in charge of intercepting user input (mouse and keyboard) and interacting with the State (Model) and the View: it calls the Model services, which provides new State, which is propagated to the View by Controller. It also **owns** the operations thus commanding the view about validation errors or operations availability.
 
@@ -535,7 +541,7 @@ public interface IRouter
 
 &nbsp;&nbsp;&nbsp;&nbsp;We need both generic and non-generic method to reduce coupling when we don't care about further interaction with new View from current Controller e.g. we are eliminating knowledge about which actual Controller will be in use after navigation.
 
-&nbsp;&nbsp;&nbsp;&nbsp;To implement the Router we will rely on capabilities of our DI container, in particular on so called [Keyed services](https://autofac.readthedocs.io/en/latest/advanced/keyed-services.html#keyed-services) and [Keyed services lookup](https://autofac.readthedocs.io/en/latest/resolve/relationships.html#keyed-service-lookup-iindex-x-b). As we already mentioned DI containers are quite powerful and can save a lot of time during implementation - in our case simple router can be implemented like this (see [Router](./MVC/MVC.Routing/Engine/IRouter.cs)):
+&nbsp;&nbsp;&nbsp;&nbsp;To implement the Router we will rely on capabilities of our DI container, in particular on so called [Keyed services](https://autofac.readthedocs.io/en/latest/advanced/keyed-services.html#keyed-services) and [Keyed services lookup](https://autofac.readthedocs.io/en/latest/resolve/relationships.html#keyed-service-lookup-iindex-x-b). As we already mentioned DI containers are quite powerful and can save a lot of time during implementation - in our case simple router can be implemented like this (see [Router](./MVC/MVC.Routing/Engine/Router.cs)):
 ```C#
 public sealed class Router : IRouter
 {
@@ -599,10 +605,322 @@ Looks like ASP.Net MVC, isn't it? :wink:
 &nbsp;&nbsp;&nbsp;&nbsp;We can say that code become much cleaner and we raised marks almost for each NFR. But we still have a bit of a problem due to the fact that Controller and View should know about each other. If only we could decouple them by making this reference one-directional. Can we do it?
 
 ## 5 MVP
+&nbsp;&nbsp;&nbsp;&nbsp;Second step after we have removed the non-UI logic from the View is to eliminate coupling between the View and Controller. Which leads us to Model-View-Presenter pattern, especially it's pinnacle: MVP(M) aka Model-View-PresentationModel - where Presenter in the "Presentation Model" doesn't know anything about the view even through interface, while View is a passive **observer** of PM.
 
-TBD: application boundary!
+### 5.1 Definition
+&nbsp;&nbsp;&nbsp;&nbsp;The MVP(M) variation of the MVP pattern can be described with the following diagram:
+<img src="Images/MVP(M) + Router.jpg"/>
+
+- The State (Model) holds exactly the same responsibilities as in MVC pattern, e.g. represents the data or state in the application in a logical way; it is in charge of carrying the data. It also adapts external services for Presenter.
+- The View responsibilities is also the same as for MVC, but in addition to State(Model) representation, rendering and delegating user input to Presenter, it also observers the Presenter: directly via results of calling the methods; and indirectly by subscribing to presenter events.
+- The Presenter role has the biggest changes compared to MVC pattern. It is now responsible for providing **all** possible ways of interaction via methods, as well as **all** possible reactions via events. It knows nothing about View and only *claims* that it has the following input endpoints (methods and properties) and the following output endpoints (events). It's up to View or any other consumer to handle them correctly. Moreover one can easily change the View itself for any particular presenter.    
+
+### 5.2 Implementation
+&nbsp;&nbsp;&nbsp;&nbsp;The definition might sound a bit confusing and raise a questions about the *events* magic, so let' walk-through the implementation.Note that, there is no changes to State (Model) layer at all - which is a good confirmation that our first, MVC, approach to introduce this layer was correct. The whole solution can be found in [MVP.sln](./MVP/MVP.sln). 
+
+&nbsp;&nbsp;&nbsp;&nbsp;**First,** let's change our core interfaces for View and Presenter (ex Controller):
+
+- The Presenter will only require claiming that it can be disposed and can notify about it's property changes. As not every presenter needs actual logic of disposing and we don't want to repeat change notification boilerplate it is wise to have base implementation for presenters in addition to interface:
+```C#
+public interface IPresenter : INotifyPropertyChanged, IDisposable
+{
+    
+}
+
+public abstract class PresenterBase : IPresenter
+{
+    public event PropertyChangedEventHandler PropertyChanged;
+
+    protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    [UsedImplicitly]
+    protected bool SetField<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
+    {
+        if (EqualityComparer<T>.Default.Equals(field, value)) 
+            return false;
+        
+        field = value;
+        
+        OnPropertyChanged(propertyName);
+        
+        return true;
+    }
+
+    protected virtual void DisposeCore()
+    {
+    }
+
+    public void Dispose()
+    {
+        DisposeCore();
+    }
+}
+``` 
+As one can spot it now looks more like marking interface, because it doesn't have any references to View - this is the crucial difference to MVC.
+- The View contract is barely the same as in MVC, which is logical because in MVP View is *defined* by the presenter to be shown:
+```C#
+public interface IView
+{
+    void AttachPresenter([NotNull] IPresenter presenter);
+    
+    [NotNull]
+    UserControl Render();
+}
+
+public interface IView<T> : IView
+    where T : IPresenter
+{
+    [UsedImplicitly]
+    T Presenter { get; }
+}
+```
+All of it's contract methods are actually called by the MVP engine and rarely used in *logic* code.
+
+&nbsp;&nbsp;&nbsp;&nbsp;**Second,** we need to change [ICatFeederPresenter](./MVP/MVP.PM/CatFeederComponent/Presenters/ICatFeederPresenter.cs) contract to provide necessary and sufficient contract for **any** possible view:
+```C#
+public interface ICatFeederPresenter : IPresenter
+{
+    void Feed();
+    
+    IObservable<bool> IsBusy { get; }
+    
+    IObservable<ISuccessfulFeedingPresenter> SuccessfulFeeding { get; }
+    
+    IObservable<IFailedFeedingPresenter> FailedFeeding { get; }
+}
+```
+So the contract of `ICatFeederPresenter` states:
+- I can invoke feeding via `Feed()` method
+- I can be busy, please observe `IsBusy` state change  
+- I can *present* successful or failed feeding, please observe `SuccessfulFeeding` and `FailedFeeding`
+
+We can say that the contract is complete - there is no other actions or events that can be invoked or observed during feeding, and the Presenter itself doesn't care how one will render those events or where the action will be called from. The Presenter is also responsible for application state transition: from feeder to feeding result. Feeding result presenters will also contain state transition claims in there code, please refer to [ISuccessfulFeedingPresenter](./MVP/MVP.PM/CatFeederComponent/Presenters/ISuccessfulFeedingPresenter.cs) and [IFailedFeedingPresenter](./MVP/MVP.PM/CatFeederComponent/Presenters/IFailedFeedingPresenter.cs). We will omit the contracts and implementations listings for those peripheral presenter here for brevity, one can always refer to solution to see them.
+<br/>
+Let's also look at the `CatFeederPresenter` implementation, which you can find [here](./MVP/MVP.PM/CatFeederComponent/Presenters/CatFeederPresenter.cs):
+```C#
+public class CatFeederPresenter : PresenterBase, ICatFeederPresenter
+{
+    [NotNull] 
+    private readonly ICatFeederService _catFeederService;
+
+    private readonly Func<ISuccessfulFeedingPresenter> _successfulFeedingPresenterFactory;
+    private readonly Func<IFailedFeedingPresenter> _failedFeedingPresenterFactory;
+
+    private readonly ReplaySubject<bool> _isBusy = new ReplaySubject<bool>(1);
+    private readonly Subject<ISuccessfulFeedingPresenter> _successfulFeeding = new Subject<ISuccessfulFeedingPresenter>();
+    private readonly Subject<IFailedFeedingPresenter> _failedFeeding = new Subject<IFailedFeedingPresenter>();
+
+    public CatFeederPresenter(
+        [NotNull] ICatFeederService catFeederService,
+        [NotNull] Func<ISuccessfulFeedingPresenter> successfulFeedingPresenterFactory,
+        [NotNull] Func<IFailedFeedingPresenter> failedFeedingPresenterFactory)
+    {
+        _catFeederService = catFeederService ?? throw new ArgumentNullException(nameof(catFeederService));
+        _successfulFeedingPresenterFactory = successfulFeedingPresenterFactory ?? throw new ArgumentNullException(nameof(successfulFeedingPresenterFactory));
+        _failedFeedingPresenterFactory = failedFeedingPresenterFactory ?? throw new ArgumentNullException(nameof(failedFeedingPresenterFactory));
+    }
+
+    public void Feed()
+    {
+        _isBusy.OnNext(true);
+        Task.Run(async () =>
+        {
+            try
+            {
+                var result = await _catFeederService.Feed();
+                
+                switch (result.Successful)
+                {
+                    case true:
+                    {
+                        var successfulFeedingPresenter = _successfulFeedingPresenterFactory();
+                        successfulFeedingPresenter.Message = result.Message;
+                        _successfulFeeding.OnNext(successfulFeedingPresenter);
+                        break;
+                    }
+                    default:
+                    {
+                        var failedFeedingPresenter = _failedFeedingPresenterFactory();
+                        failedFeedingPresenter.Reason = result.Message;
+                        _failedFeeding.OnNext(failedFeedingPresenter);
+                        break;
+                    }
+                }
+            }
+            finally
+            {
+                _isBusy.OnNext(false);
+            }
+        });
+    }
+
+    public IObservable<bool> IsBusy => _isBusy;
+
+    public IObservable<ISuccessfulFeedingPresenter> SuccessfulFeeding => _successfulFeeding;
+
+    public IObservable<IFailedFeedingPresenter> FailedFeeding => _failedFeeding;
+
+    protected override void DisposeCore()
+    {
+        _catFeederService.Dispose();
+        
+        _isBusy.OnCompleted();
+        _successfulFeeding.OnCompleted();
+        _failedFeeding.OnCompleted();
+        
+        base.DisposeCore();
+    }
+}
+```
+The interesting part here as that we use factories `Func<IPresenter>` to inject the possibility to create new states for feeding results each time we need them. And again we are putting the implementation complexity of factories onto our DI container, thus having them for free.
+
+&nbsp;&nbsp;&nbsp;&nbsp;**Finally,** let's see what happens to the [CatFeederView](./MVP/MVP.PM/CatFeederComponent/Views/CatFeederView.cs):
+```C#
+public partial class CatFeederView : ViewBase, IView<ICatFeederPresenter>
+{
+    private readonly IRouter _router;
+    
+    private IDisposable _isBusySubscription;
+    private IDisposable _failedFeedingSubscription;
+    private IDisposable _successfulFeedingSubscription;
+
+    public CatFeederView([NotNull] IRouter router)
+    {
+        InitializeComponent();
+        
+        _router = router ?? throw new ArgumentNullException(nameof(router));
+
+        Disposed += (sender, args) => UnSubscribePresenter();
+    }
+
+    private void btnFeedCat_Click(object sender, EventArgs e)
+    {
+        Presenter?.Feed();
+    }
+
+    protected override void OnPresenterAttached()
+    {
+        SubscribePresenter(); 
+        base.OnPresenterAttached();
+    }
+    
+    private void SubscribePresenter()
+    {
+        _isBusySubscription = Presenter.IsBusy.Subscribe(isBusy => 
+            this.Guard(() => btnFeedCat.Enabled = !isBusy));
+
+        _successfulFeedingSubscription = Presenter.SuccessfulFeeding.Subscribe(sf => _router.NavigateTo(sf));
+        _failedFeedingSubscription = Presenter.FailedFeeding.Subscribe(ff => _router.NavigateTo(ff));
+    }
+    
+    private void UnSubscribePresenter()
+    {
+        _isBusySubscription.Dispose();
+        
+        _failedFeedingSubscription.Dispose();
+        _successfulFeedingSubscription.Dispose();
+    }
+
+    public ICatFeederPresenter Presenter => (ICatFeederPresenter)AttachedPresenter;
+}
+```
+As you can see it is absolutely passive - it only delegates and observes the presenter, as well as passing presenters it cannot handle to the router for navigation. Let's discuss the router separately.
+
+### 5.3 The Router transformation
+&nbsp;&nbsp;&nbsp;&nbsp;Compared to MVC the role of the router has changed - it's now a part of View layer and responsible only for View selection for presenter, thus giving us possibility to bind different views for the same presenter for example via interface hierarchy. Router can also use different strategies depending on Presenter (or View) attributes to use ether current ViewHost or produce new one including showing the message boxes if needed - it's a matter of adding more introspections to Router engine. So it decouples application state transition, which is now managed by Presenters from the actual rendering (View), it also maintains low-coupling between Views - it is Router responsibility to select a View for Presenter not the View itself.
+
+&nbsp;&nbsp;&nbsp;&nbsp;As a result the [IRouter](./MVP/MVP.PM/Engine/IRouter.cs) interface now contains only one method:
+```C#
+public interface IRouter
+{
+    Task NavigateTo<T>([NotNull] T presenter) where T : IPresenter;
+}
+```
+And the [implementation](./MVP/MVP.PM/Engine/Router.cs) is free of Presenter instantiation, because presenter is the state of application now and managed by PM layer:
+```C#
+public sealed class Router : IRouter
+{
+    private readonly IIndex<Type, Func<IView>> _viewFactoriesMap;
+    private readonly IUIExecutor _uiExecutor;
+    private readonly INavigationHost _navigationHost;
+
+    public Router(
+        [NotNull] IIndex<Type, Func<IView>> viewFactoriesMap,
+        [NotNull] IUIExecutor uiExecutor,
+        [NotNull] INavigationHost navigationHost)
+    {
+        _viewFactoriesMap = viewFactoriesMap ?? throw new ArgumentNullException(nameof(viewFactoriesMap));
+        _uiExecutor = uiExecutor ?? throw new ArgumentNullException(nameof(uiExecutor));
+        _navigationHost = navigationHost ?? throw new ArgumentNullException(nameof(navigationHost));
+    }
+
+    public async Task NavigateTo<T>(T presenter) where T : IPresenter
+    {
+        if (presenter == null) throw new ArgumentNullException(nameof(presenter));
+        
+        if(!_viewFactoriesMap.TryGetValue(typeof(T), out var viewFactory))
+            throw new InvalidOperationException($"Presenter '{typeof(T)}' does not mapped to any view");
+        
+        var view = await _uiExecutor.Execute(() => viewFactory());
+        
+        view.AttachPresenter(presenter);
+        
+        _navigationHost.ShowView(view.Render());
+    }
+}
+```
+
+### 5.4 The sub-system boundary
+&nbsp;&nbsp;&nbsp;&nbsp;For a second let's step aside of UI development topic and look at what we reach in more general way, but for this we need to give one definition:
+
+> **The sub-system boundary:** is the set of APIs which forms necessary and sufficient set of endpoints to interact with. So that no complex objects need to cross the boundary for application to be functional - whether directly via method parameters or indirectly via constructor injection or whatsoever. Only the POCOs are passed into the sub-system from consumer layers. The sub-system does not reference anything from consumer layers.
+
+&nbsp;&nbsp;&nbsp;&nbsp;The thing is: when you program in terms of sub-systems with clear boundaries your NFRs naturally raise, because those boundaries are much easier to test and/or re-use: you just change the consumers without changing the sub-systems. 
+
+&nbsp;&nbsp;&nbsp;&nbsp;Do we have any sub-system boundaries in our MVP(M) solution? Yes we do - the Model and the Presentation Model layers are fully independent (directly and indirectly) and provide contracts for all possible interactions. Believe it or not the price is worth the result - author himself once had an experience of re-writing the application initially build for WinCE and compact framework to support iOS and Android on Xamarin framework. And it was relatively easy to change just the View code and override some device specific services like GPS tracker, due to having PM and M layers already implemented.
+
+### 5.5 The sub-system boundary caveat - the notorious `IWindowService`
+&nbsp;&nbsp;&nbsp;&nbsp;The sub-system boundaries are shinny and pure, which is good. **But** one should be very careful because as any pureness it can be easily and subconsciously spoiled. And there is the very particular example how it usually spoiled. Let's get back for our first user story where success and failure notifications were implemented as modal message boxes. Even having mature PM frameworks 99% of developers will implement this requirement by using injectable `IWindowService` which will show message boxes from it's implementation. This service, in our example, could have the following contract:
+```C#
+public interface IWindowService
+{
+    void ShowSuccess(ISuccessfulFeedingPresenter success);
+    void ShowFailure(IFailedFeedingPresenter failure);
+}
+```
+
+&nbsp;&nbsp;&nbsp;&nbsp;Then one could inject this service directly into `ICatFeederPresenter` and use it from there, thus changing it's interface to:
+```C#
+public interface ICatFeederPresenter : IPresenter
+{
+    void Feed();
+    
+    IObservable<bool> IsBusy { get; }
+}
+```
+
+&nbsp;&nbsp;&nbsp;&nbsp;What's the problem reader may ask? The problem is that your PM layer is no longer forms sub-system boundary by not claiming all the possible interaction in it's contract and by having the indirect reference to `IWindowService` in the implementation! Moreover PM layer now reference the entity from consumer (UI) world breaking separation of concerns even further! PM layer testing is harder now, changing UI is harder now and so on - so all our efforts to make architecture better and raise NFRs are rendered void.
+
+&nbsp;&nbsp;&nbsp;&nbsp;The good news is that overcoming this issue is very easy - one just need to use `IWindowService` without changing the Presenter contracts. Or, better, use the router approach we have described in [5.3 The Router transformation](#53-the-router-transformation) section above. As usual on the scale of such simple problem as our Cat Feeder it's very subtle, but still very crucial, difference.
+
+### 5.6 The Assessment
+&nbsp;&nbsp;&nbsp;&nbsp;Let's check our architecture against our NFRs:
+| NFR | Level | Comment |
+|-----|--------|---------|
+| Testability | *High* | Mocks are only needed for *downstream* layers |
+| Extensibility | *High* | The application state transition is encapsulated in PM layer, UI representation is totally separated to View layer |
+| Adaptability | *High* | The Presenters are already in place - do whatever your want in your View layer. Readers are encouraged to implement cmd-like UI for existing PM layers to see how easy it is |
+| Effectiveness | *High* | Consumer layer must know contracts, PM layer knows nothing about consumers |
+| Reusability | *High* | There is no coupling to View from PM layer |
+| Readability | *Moderate* | Being very demanding to ourselves we can complain about the need to subscribe/unsubscribe  presenter events from View causing some boilerplate in code |
+
+&nbsp;&nbsp;&nbsp;&nbsp;Overall MVP(M) can be called sufficient in terms of NFRs fulfillment. But the need to write imperative code in View is a bit annoying. That's why very *lazy* people has invented MVVM which we will move on shortly.
 
 ## 6 MVVM
+tbd: example on how to overcome sub-system boundary caveat in the world of data binding!
 
 ## 7 Conclusion
 

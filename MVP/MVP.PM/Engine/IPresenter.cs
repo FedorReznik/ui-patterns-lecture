@@ -1,9 +1,45 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using JetBrains.Annotations;
 
 namespace MVP.Engine
 {
-    public interface IPresenter : IDisposable
+    public interface IPresenter : INotifyPropertyChanged, IDisposable
     {
         
+    }
+
+    public abstract class PresenterBase : IPresenter
+    {
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        [UsedImplicitly]
+        protected bool SetField<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
+        {
+            if (EqualityComparer<T>.Default.Equals(field, value)) 
+                return false;
+            
+            field = value;
+            
+            OnPropertyChanged(propertyName);
+            
+            return true;
+        }
+
+        protected virtual void DisposeCore()
+        {
+        }
+
+        public void Dispose()
+        {
+            DisposeCore();
+        }
     }
 }
