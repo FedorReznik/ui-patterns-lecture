@@ -14,6 +14,7 @@ namespace MVP.Engine
     public interface IView<T> : IView
         where T : IPresenter
     {
+        [UsedImplicitly]
         T Presenter { get; }
     }
 }
