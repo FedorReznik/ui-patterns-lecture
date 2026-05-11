@@ -34,25 +34,31 @@ namespace MVP.CatFeederComponent.Presenters
             _isBusy.OnNext(true);
             Task.Run(async () =>
             {
-                var result = await _catFeederService.Feed();
-                _isBusy.OnNext(false);
-                
-                switch (result.Successful)
+                try
                 {
-                    case true:
+                    var result = await _catFeederService.Feed();
+                    
+                    switch (result.Successful)
                     {
-                        var successfulFeedingPresenter = _successfulFeedingPresenterFactory();
-                        successfulFeedingPresenter.Message = result.Message;
-                        _successfulFeeding.OnNext(successfulFeedingPresenter);
-                        break;
+                        case true:
+                        {
+                            var successfulFeedingPresenter = _successfulFeedingPresenterFactory();
+                            successfulFeedingPresenter.Message = result.Message;
+                            _successfulFeeding.OnNext(successfulFeedingPresenter);
+                            break;
+                        }
+                        default:
+                        {
+                            var failedFeedingPresenter = _failedFeedingPresenterFactory();
+                            failedFeedingPresenter.Reason = result.Message;
+                            _failedFeeding.OnNext(failedFeedingPresenter);
+                            break;
+                        }
                     }
-                    default:
-                    {
-                        var failedFeedingPresenter = _failedFeedingPresenterFactory();
-                        failedFeedingPresenter.Reason = result.Message;
-                        _failedFeeding.OnNext(failedFeedingPresenter);
-                        break;
-                    }
+                }
+                finally
+                {
+                    _isBusy.OnNext(false);
                 }
             });
         }

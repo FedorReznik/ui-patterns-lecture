@@ -26,7 +26,7 @@ By Fedor Reznik
     - [5.2 Implementation](#52-implementation)
     - [5.3 The Router transformation](#53-the-router-transformation)
     - [5.4 The sub-system boundary](#54-the-sub-system-boundary)
-    - [5.5 The sub-system boundary caveat](#55-the-sub-system-boundary-caveat)
+    - [5.5 The sub-system boundary caveat - the notorious `IWindowService`](#55-the-sub-system-boundary-caveat---the-notorious-iwindowservice)
     - [5.6 The Assessment](#56-the-assessment)
   - [6 MVVM](#6-mvvm)
   - [7 Conclusion](#7-conclusion)
@@ -616,18 +616,227 @@ Looks like ASP.Net MVC, isn't it? :wink:
 - The Presenter role has the biggest changes compared to MVC pattern. It is now responsible for providing **all** possible ways of interaction via methods, as well as **all** possible reactions via events. It knows nothing about View and only *claims* that it has the following input endpoints (methods and properties) and the following output endpoints (events). It's up to View or any other consumer to handle them correctly. Moreover one can easily change the View itself for any particular presenter.    
 
 ### 5.2 Implementation
-&nbsp;&nbsp;&nbsp;&nbsp;The definition might sound a bit confusing and raise a questions about the *events* magic, so let' walk-through the implementation. The whole solution can be found in [MVP.sln](./MVP/MVP.sln). 
+&nbsp;&nbsp;&nbsp;&nbsp;The definition might sound a bit confusing and raise a questions about the *events* magic, so let' walk-through the implementation.Note that, there is not changes to State (Model) layer at all - which is a good confirmation that our first, MVC, approach to introduce this layer was correct. The whole solution can be found in [MVP.sln](./MVP/MVP.sln). 
 
+&nbsp;&nbsp;&nbsp;&nbsp;**First,** let's change our core interfaces for View and Presenter (ex Controller):
 
+- The Presenter will only require claiming that it can be disposed and can notify about it's property changes. As not every presenter needs actual logic of disposing and we don't want to repeat change notification boilerplate it is wise to have base implementation for presenters in addition to interface:
+```C#
+public interface IPresenter : INotifyPropertyChanged, IDisposable
+{
+    
+}
 
-tbd: note about injecting factories instead of instances for presenters
+public abstract class PresenterBase : IPresenter
+{
+    public event PropertyChangedEventHandler PropertyChanged;
+
+    protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    [UsedImplicitly]
+    protected bool SetField<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
+    {
+        if (EqualityComparer<T>.Default.Equals(field, value)) 
+            return false;
+        
+        field = value;
+        
+        OnPropertyChanged(propertyName);
+        
+        return true;
+    }
+
+    protected virtual void DisposeCore()
+    {
+    }
+
+    public void Dispose()
+    {
+        DisposeCore();
+    }
+}
+``` 
+As one can spot it now looks more like marking interface, because it doesn't have any references to View - this is the crucial difference to MVC.
+- The View contract is barely the same as in MVC, which is logical because in MVP View is *defined* by the presenter to be shown:
+```C#
+public interface IView
+{
+    void AttachPresenter([NotNull] IPresenter presenter);
+    
+    [NotNull]
+    UserControl Render();
+}
+
+public interface IView<T> : IView
+    where T : IPresenter
+{
+    [UsedImplicitly]
+    T Presenter { get; }
+}
+```
+All of it's contract methods are actually called by the MVP engine and rarely used in *logic* code.
+
+&nbsp;&nbsp;&nbsp;&nbsp;**Second,** we need to change [ICatFeederPresenter](./MVP/MVP.PM/CatFeederComponent/Presenters/ICatFeederPresenter.cs) contract to provide necessary and sufficient contract for **any** possible view:
+```C#
+ public interface ICatFeederPresenter : IPresenter
+{
+    void Feed();
+    
+    IObservable<bool> IsBusy { get; }
+    
+    IObservable<ISuccessfulFeedingPresenter> SuccessfulFeeding { get; }
+    
+    IObservable<IFailedFeedingPresenter> FailedFeeding { get; }
+}
+```
+So the contract of `ICatFeederPresenter` states:
+- I can invoke feeding via `Feed()` method
+- I can be busy, please observe `IsBusy` state change  
+- I can *present* successful or failed feeding, please observe `SuccessfulFeeding` and `FailedFeeding`
+
+We can say that the contract is complete - there is no other actions or events that can be invoked or observed during feeding, and the Presenter itself doesn't care how one will render those events or where the action will be called from. The Presenter is also responsible for application state transition: from feeder to feeding result. Feeding result presenters will also contain state transition claims in there code, please refer to [ISuccessfulFeedingPresenter](./MVP/MVP.PM/CatFeederComponent/Presenters/ISuccessfulFeedingPresenter.cs) and [IFailedFeedingPresenter](./MVP/MVP.PM/CatFeederComponent/Presenters/IFailedFeedingPresenter.cs). We will omit the contracts and implementations listings for those peripheral presenter here for brevity, one can always refer to solution to see them.
+<br/>
+Let's also look at the `CatFeederPresenter` implementation, which you can find [here](./MVP/MVP.PM/CatFeederComponent/Presenters/CatFeederPresenter.cs):
+```C#
+public class CatFeederPresenter : PresenterBase, ICatFeederPresenter
+{
+    [NotNull] 
+    private readonly ICatFeederService _catFeederService;
+
+    private readonly Func<ISuccessfulFeedingPresenter> _successfulFeedingPresenterFactory;
+    private readonly Func<IFailedFeedingPresenter> _failedFeedingPresenterFactory;
+
+    private readonly ReplaySubject<bool> _isBusy = new ReplaySubject<bool>(1);
+    private readonly Subject<ISuccessfulFeedingPresenter> _successfulFeeding = new Subject<ISuccessfulFeedingPresenter>();
+    private readonly Subject<IFailedFeedingPresenter> _failedFeeding = new Subject<IFailedFeedingPresenter>();
+
+    public CatFeederPresenter(
+        [NotNull] ICatFeederService catFeederService,
+        [NotNull] Func<ISuccessfulFeedingPresenter> successfulFeedingPresenterFactory,
+        [NotNull] Func<IFailedFeedingPresenter> failedFeedingPresenterFactory)
+    {
+        _catFeederService = catFeederService ?? throw new ArgumentNullException(nameof(catFeederService));
+        _successfulFeedingPresenterFactory = successfulFeedingPresenterFactory ?? throw new ArgumentNullException(nameof(successfulFeedingPresenterFactory));
+        _failedFeedingPresenterFactory = failedFeedingPresenterFactory ?? throw new ArgumentNullException(nameof(failedFeedingPresenterFactory));
+    }
+
+    public void Feed()
+    {
+        _isBusy.OnNext(true);
+        Task.Run(async () =>
+        {
+            try
+            {
+                var result = await _catFeederService.Feed();
+                
+                switch (result.Successful)
+                {
+                    case true:
+                    {
+                        var successfulFeedingPresenter = _successfulFeedingPresenterFactory();
+                        successfulFeedingPresenter.Message = result.Message;
+                        _successfulFeeding.OnNext(successfulFeedingPresenter);
+                        break;
+                    }
+                    default:
+                    {
+                        var failedFeedingPresenter = _failedFeedingPresenterFactory();
+                        failedFeedingPresenter.Reason = result.Message;
+                        _failedFeeding.OnNext(failedFeedingPresenter);
+                        break;
+                    }
+                }
+            }
+            finally
+            {
+                _isBusy.OnNext(false);
+            }
+        });
+    }
+
+    public IObservable<bool> IsBusy => _isBusy;
+
+    public IObservable<ISuccessfulFeedingPresenter> SuccessfulFeeding => _successfulFeeding;
+
+    public IObservable<IFailedFeedingPresenter> FailedFeeding => _failedFeeding;
+
+    protected override void DisposeCore()
+    {
+        _catFeederService.Dispose();
+        
+        _isBusy.OnCompleted();
+        _successfulFeeding.OnCompleted();
+        _failedFeeding.OnCompleted();
+        
+        base.DisposeCore();
+    }
+}
+```
+The interesting part here as that we use factories `Func<IPresenter>` to inject the possibility to create new states for feeding results each time we need them. And again we are putting the implementation complexity of factories implementation onto our DI container, thus having them for free.
+
+&nbsp;&nbsp;&nbsp;&nbsp;**Finally,** let's see what happens to the [CatFeederView](./MVP/MVP.PM/CatFeederComponent/Views/CatFeederView.cs):
+```C#
+public partial class CatFeederView : ViewBase, IView<ICatFeederPresenter>
+    {
+        private readonly IRouter _router;
+        
+        private IDisposable _isBusySubscription;
+        private IDisposable _failedFeedingSubscription;
+        private IDisposable _successfulFeedingSubscription;
+
+        public CatFeederView([NotNull] IRouter router)
+        {
+            InitializeComponent();
+            
+            _router = router ?? throw new ArgumentNullException(nameof(router));
+
+            Disposed += (sender, args) => UnSubscribePresenter();
+        }
+
+        private void btnFeedCat_Click(object sender, EventArgs e)
+        {
+            Presenter?.Feed();
+        }
+
+        protected override void OnPresenterAttached()
+        {
+            SubscribePresenter(); 
+            base.OnPresenterAttached();
+        }
+        
+        private void SubscribePresenter()
+        {
+            _isBusySubscription = Presenter.IsBusy.Subscribe(isBusy => 
+                this.Guard(() => btnFeedCat.Enabled = !isBusy));
+
+            _successfulFeedingSubscription = Presenter.SuccessfulFeeding.Subscribe(sf => _router.NavigateTo(sf));
+            _failedFeedingSubscription = Presenter.FailedFeeding.Subscribe(ff => _router.NavigateTo(ff));
+        }
+        
+        private void UnSubscribePresenter()
+        {
+            _isBusySubscription.Dispose();
+            
+            _failedFeedingSubscription.Dispose();
+            _successfulFeedingSubscription.Dispose();
+        }
+
+        public ICatFeederPresenter Presenter => (ICatFeederPresenter)AttachedPresenter;
+    }
+```
+As you can see it is absolutely passive - it only delegates and observes the presenter, as well as passing presenters it cannot handle to the router for navigation. Let's discuss the router separately.
 
 ### 5.3 The Router transformation
+
+
 tbd: It's now a part of View layer and responsible only for View selection for presenter, thus giving us possibility to bind different views for the same presenter for example via interface hierarchy. Router can also use different strategies depending on Presenter (or View) attributes to use ether current ViewHost or produce new one including showing the message boxes if needed - it's a matter of adding more introspections to Router engine.
 
 ### 5.4 The sub-system boundary
 
-### 5.5 The sub-system boundary caveat
+### 5.5 The sub-system boundary caveat - the notorious `IWindowService`
 tbd: example and note to overcome it with router.
 
 ### 5.6 The Assessment
