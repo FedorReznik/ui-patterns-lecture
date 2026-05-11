@@ -3,5 +3,6 @@
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="CatFeederView.xaml"/>
         <ResourceDictionary Source="SuccessfulFeedingView.xaml"/>
+        <ResourceDictionary Source="FailedFeedingView.xaml"/>
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

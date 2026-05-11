@@ -1,0 +1,27 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:viewModels="clr-namespace:MVVM.CatFeederComponent.ViewModels">
+    <DataTemplate DataType="{x:Type viewModels:IFailedFeedingVm}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            
+            <TextBlock
+                Grid.Row="0"
+                Text="{Binding Reason}"
+                FontSize="{StaticResource FontSizeMedium}"
+                TextAlignment="Center"
+                VerticalAlignment="Center"/>
+            <Button
+                Grid.Row="1"
+                Command="{Binding Continue}"
+                FontSize="{StaticResource FontSizeSmall}"
+                Margin="{StaticResource DefaultMargin}"
+                Padding="{StaticResource DefaultPadding}">
+                Continue
+            </Button>
+        </Grid>
+    </DataTemplate>
+</ResourceDictionary>
