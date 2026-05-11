@@ -605,7 +605,7 @@ Looks like ASP.Net MVC, isn't it? :wink:
 &nbsp;&nbsp;&nbsp;&nbsp;We can say that code become much cleaner and we raised marks almost for each NFR. But we still have a bit of a problem due to the fact that Controller and View should know about each other. If only we could decouple them by making this reference one-directional. Can we do it?
 
 ## 5 MVP
-&nbsp;&nbsp;&nbsp;&nbsp;Second step after we have removed the non-UI logic from View is to eliminate coupling between the View and Controller. Which leads us to Model-View-Presenter pattern, especially it's pinnacle: MVP(M) aka Model-View-PresentationModel - where Presenter in the "Presentation Model" doesn't know anything about the view even through interface, while View is a passive **observer** of PM.
+&nbsp;&nbsp;&nbsp;&nbsp;Second step after we have removed the non-UI logic from the View is to eliminate coupling between the View and Controller. Which leads us to Model-View-Presenter pattern, especially it's pinnacle: MVP(M) aka Model-View-PresentationModel - where Presenter in the "Presentation Model" doesn't know anything about the view even through interface, while View is a passive **observer** of PM.
 
 ### 5.1 Definition
 &nbsp;&nbsp;&nbsp;&nbsp;The MVP(M) variation of the MVP pattern can be described with the following diagram:
@@ -616,7 +616,7 @@ Looks like ASP.Net MVC, isn't it? :wink:
 - The Presenter role has the biggest changes compared to MVC pattern. It is now responsible for providing **all** possible ways of interaction via methods, as well as **all** possible reactions via events. It knows nothing about View and only *claims* that it has the following input endpoints (methods and properties) and the following output endpoints (events). It's up to View or any other consumer to handle them correctly. Moreover one can easily change the View itself for any particular presenter.    
 
 ### 5.2 Implementation
-&nbsp;&nbsp;&nbsp;&nbsp;The definition might sound a bit confusing and raise a questions about the *events* magic, so let' walk-through the implementation.Note that, there is not changes to State (Model) layer at all - which is a good confirmation that our first, MVC, approach to introduce this layer was correct. The whole solution can be found in [MVP.sln](./MVP/MVP.sln). 
+&nbsp;&nbsp;&nbsp;&nbsp;The definition might sound a bit confusing and raise a questions about the *events* magic, so let' walk-through the implementation.Note that, there is no changes to State (Model) layer at all - which is a good confirmation that our first, MVC, approach to introduce this layer was correct. The whole solution can be found in [MVP.sln](./MVP/MVP.sln). 
 
 &nbsp;&nbsp;&nbsp;&nbsp;**First,** let's change our core interfaces for View and Presenter (ex Controller):
 
@@ -681,7 +681,7 @@ All of it's contract methods are actually called by the MVP engine and rarely us
 
 &nbsp;&nbsp;&nbsp;&nbsp;**Second,** we need to change [ICatFeederPresenter](./MVP/MVP.PM/CatFeederComponent/Presenters/ICatFeederPresenter.cs) contract to provide necessary and sufficient contract for **any** possible view:
 ```C#
- public interface ICatFeederPresenter : IPresenter
+public interface ICatFeederPresenter : IPresenter
 {
     void Feed();
     
@@ -775,57 +775,57 @@ public class CatFeederPresenter : PresenterBase, ICatFeederPresenter
     }
 }
 ```
-The interesting part here as that we use factories `Func<IPresenter>` to inject the possibility to create new states for feeding results each time we need them. And again we are putting the implementation complexity of factories implementation onto our DI container, thus having them for free.
+The interesting part here as that we use factories `Func<IPresenter>` to inject the possibility to create new states for feeding results each time we need them. And again we are putting the implementation complexity of factories onto our DI container, thus having them for free.
 
 &nbsp;&nbsp;&nbsp;&nbsp;**Finally,** let's see what happens to the [CatFeederView](./MVP/MVP.PM/CatFeederComponent/Views/CatFeederView.cs):
 ```C#
 public partial class CatFeederView : ViewBase, IView<ICatFeederPresenter>
+{
+    private readonly IRouter _router;
+    
+    private IDisposable _isBusySubscription;
+    private IDisposable _failedFeedingSubscription;
+    private IDisposable _successfulFeedingSubscription;
+
+    public CatFeederView([NotNull] IRouter router)
     {
-        private readonly IRouter _router;
+        InitializeComponent();
         
-        private IDisposable _isBusySubscription;
-        private IDisposable _failedFeedingSubscription;
-        private IDisposable _successfulFeedingSubscription;
+        _router = router ?? throw new ArgumentNullException(nameof(router));
 
-        public CatFeederView([NotNull] IRouter router)
-        {
-            InitializeComponent();
-            
-            _router = router ?? throw new ArgumentNullException(nameof(router));
-
-            Disposed += (sender, args) => UnSubscribePresenter();
-        }
-
-        private void btnFeedCat_Click(object sender, EventArgs e)
-        {
-            Presenter?.Feed();
-        }
-
-        protected override void OnPresenterAttached()
-        {
-            SubscribePresenter(); 
-            base.OnPresenterAttached();
-        }
-        
-        private void SubscribePresenter()
-        {
-            _isBusySubscription = Presenter.IsBusy.Subscribe(isBusy => 
-                this.Guard(() => btnFeedCat.Enabled = !isBusy));
-
-            _successfulFeedingSubscription = Presenter.SuccessfulFeeding.Subscribe(sf => _router.NavigateTo(sf));
-            _failedFeedingSubscription = Presenter.FailedFeeding.Subscribe(ff => _router.NavigateTo(ff));
-        }
-        
-        private void UnSubscribePresenter()
-        {
-            _isBusySubscription.Dispose();
-            
-            _failedFeedingSubscription.Dispose();
-            _successfulFeedingSubscription.Dispose();
-        }
-
-        public ICatFeederPresenter Presenter => (ICatFeederPresenter)AttachedPresenter;
+        Disposed += (sender, args) => UnSubscribePresenter();
     }
+
+    private void btnFeedCat_Click(object sender, EventArgs e)
+    {
+        Presenter?.Feed();
+    }
+
+    protected override void OnPresenterAttached()
+    {
+        SubscribePresenter(); 
+        base.OnPresenterAttached();
+    }
+    
+    private void SubscribePresenter()
+    {
+        _isBusySubscription = Presenter.IsBusy.Subscribe(isBusy => 
+            this.Guard(() => btnFeedCat.Enabled = !isBusy));
+
+        _successfulFeedingSubscription = Presenter.SuccessfulFeeding.Subscribe(sf => _router.NavigateTo(sf));
+        _failedFeedingSubscription = Presenter.FailedFeeding.Subscribe(ff => _router.NavigateTo(ff));
+    }
+    
+    private void UnSubscribePresenter()
+    {
+        _isBusySubscription.Dispose();
+        
+        _failedFeedingSubscription.Dispose();
+        _successfulFeedingSubscription.Dispose();
+    }
+
+    public ICatFeederPresenter Presenter => (ICatFeederPresenter)AttachedPresenter;
+}
 ```
 As you can see it is absolutely passive - it only delegates and observes the presenter, as well as passing presenters it cannot handle to the router for navigation. Let's discuss the router separately.
 
