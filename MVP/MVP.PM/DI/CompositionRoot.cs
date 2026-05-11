@@ -32,7 +32,7 @@ namespace MVP.DI
                 .Keyed<IView>(typeof(IFailedFeedingPresenter));
             
             // register models
-            builder.RegisterType<CatFeederService>().As<ICatFeederService>().SingleInstance();
+            builder.RegisterType<CatFeederService>().As<ICatFeederService>();
             
             // register drivers
             builder.RegisterType<CatFeederDriver>().As<ICatFeederDriver>().SingleInstance();
