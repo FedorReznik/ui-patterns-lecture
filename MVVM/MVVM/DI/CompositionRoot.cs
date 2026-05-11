@@ -22,7 +22,7 @@ public static class CompositionRoot
         builder.RegisterType<FailedFeedingVm>().As<IFailedFeedingVm>();
             
         // register models
-        builder.RegisterType<CatFeederService>().As<ICatFeederService>().SingleInstance();
+        builder.RegisterType<CatFeederService>().As<ICatFeederService>();
             
         // register drivers
         builder.RegisterType<CatFeederDriver>().As<ICatFeederDriver>().SingleInstance();

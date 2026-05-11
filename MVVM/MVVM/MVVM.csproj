@@ -18,7 +18,11 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="CatFeederComponent\Views\" />
+      <Page Update="CatFeederComponent\Views\ViewTemplates.xaml">
+        <Generator>MSBuild:Compile</Generator>
+        <XamlRuntime>Wpf</XamlRuntime>
+        <SubType>Designer</SubType>
+      </Page>
     </ItemGroup>
 
 </Project>

@@ -1,11 +1,16 @@
 ﻿<Application x:Class="MVVM.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:system="clr-namespace:System;assembly=System.Runtime">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="DI/TemplateSelectors.xaml"/>
-                <ResourceDictionary Source="DI/ViewTemplates.xaml"/>
+                <ResourceDictionary Source="DI/Converters.xaml"/>
+                <ResourceDictionary Source="DI/Fonts.xaml"/>
+                <ResourceDictionary Source="DI/Sizes.xaml"/>
+                <ResourceDictionary Source="Engine/MainView.xaml"/>
+                <ResourceDictionary Source="CatFeederComponent/Views/ViewTemplates.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

@@ -1,5 +1,4 @@
-﻿using System.Reactive.Subjects;
-using System.Windows.Input;
+﻿using System.Windows.Input;
 using MVVM.CatFeederComponent.Models;
 using MVVM.Engine;
 
@@ -12,7 +11,6 @@ public class CatFeederVm : ViewModelBase, ICatFeederVm
     private readonly Func<IFailedFeedingVm> _failedFeedingVmFactory;
 
     private readonly ICommand _feedCommand;
-    private readonly ReplaySubject<bool> _isBusy = new(1);
     
     private readonly NextVmSinkPart _nextVmSinkPart = new();
 
@@ -29,12 +27,17 @@ public class CatFeederVm : ViewModelBase, ICatFeederVm
     }
 
     public ICommand Feed => _feedCommand;
-    
-    public IObservable<bool> IsBusy => _isBusy;
-    
+
+    public bool IsBusy
+    {
+        get;
+        private set => SetField(ref field, value);
+    }
+
     private void FeedCore()
     {
-        _isBusy.OnNext(true);
+        IsBusy = true;
+        
         Task.Run(async () =>
         {
             try
@@ -61,7 +64,7 @@ public class CatFeederVm : ViewModelBase, ICatFeederVm
             }
             finally
             {
-                _isBusy.OnNext(false);
+                IsBusy = false;
             }
         });
     }
@@ -71,8 +74,6 @@ public class CatFeederVm : ViewModelBase, ICatFeederVm
     protected override void DisposeCore()
     {
         _catFeederService.Dispose();
-        
-        _isBusy.OnCompleted();
         _nextVmSinkPart.Dispose();
         
         base.DisposeCore();

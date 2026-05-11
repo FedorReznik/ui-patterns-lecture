@@ -7,5 +7,5 @@ public interface ICatFeederVm : IViewModel, INextVmSink
 {
     ICommand Feed { get; }
         
-    IObservable<bool> IsBusy { get; }
+    bool IsBusy { get; }
 }
