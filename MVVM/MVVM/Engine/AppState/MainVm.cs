@@ -1,4 +1,4 @@
-namespace MVVM.Engine;
+namespace MVVM.Engine.AppState;
 
 public class MainVm : ViewModelBase, IMainVm
 {

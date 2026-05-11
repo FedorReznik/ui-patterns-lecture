@@ -9,7 +9,7 @@
                 <ResourceDictionary Source="DI/Converters.xaml"/>
                 <ResourceDictionary Source="DI/Fonts.xaml"/>
                 <ResourceDictionary Source="DI/Sizes.xaml"/>
-                <ResourceDictionary Source="Engine/MainView.xaml"/>
+                <ResourceDictionary Source="/Engine/AppState/MainView.xaml"/>
                 <ResourceDictionary Source="CatFeederComponent/Views/ViewTemplates.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>

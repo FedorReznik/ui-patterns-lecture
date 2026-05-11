@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 
-namespace MVVM.Engine;
+namespace MVVM.Engine.TemplateSelectors;
 
 /// <summary>
 /// Allows WPF DataTemplates to be resolved by interface type,

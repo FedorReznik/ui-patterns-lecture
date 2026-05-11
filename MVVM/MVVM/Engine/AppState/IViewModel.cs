@@ -1,14 +1,16 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
+
 #pragma warning disable CS8612 // Nullability of reference types in type doesn't match implicitly implemented member.
 
-namespace MVVM.Engine;
+namespace MVVM.Engine.AppState;
 
 public interface IViewModel : INotifyPropertyChanged, IDisposable
 {
 }
 
+[PublicAPI]
 public abstract class ViewModelBase : IViewModel
 {
     public event PropertyChangedEventHandler PropertyChanged = (_, _) => {} ;

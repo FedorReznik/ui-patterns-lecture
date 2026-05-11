@@ -3,7 +3,7 @@ using JetBrains.Annotations;
 
 #pragma warning disable CS8612 // Nullability of reference types in type doesn't match implicitly implemented member.
 
-namespace MVVM.Engine;
+namespace MVVM.Engine.Commands;
 
 [PublicAPI]
 public class ActionCommand(Action<object?> execute, Func<object?, bool> canExecute) : ICommand

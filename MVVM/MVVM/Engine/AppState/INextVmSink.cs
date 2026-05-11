@@ -1,6 +1,6 @@
 ﻿using System.Reactive.Subjects;
 
-namespace MVVM.Engine;
+namespace MVVM.Engine.AppState;
 
 public interface INextVmSink : IDisposable
 {

@@ -1,7 +1,7 @@
 ﻿using System.Globalization;
 using System.Windows.Data;
 
-namespace MVVM.Engine;
+namespace MVVM.Engine.Converters;
 
 [ValueConversion(typeof(bool), typeof(bool))]
 public class InvertedBoolConverter : IValueConverter

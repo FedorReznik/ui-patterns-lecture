@@ -3,6 +3,7 @@ using FeederDriver;
 using MVVM.CatFeederComponent.Models;
 using MVVM.CatFeederComponent.ViewModels;
 using MVVM.Engine;
+using MVVM.Engine.AppState;
 
 namespace MVVM.DI;
 

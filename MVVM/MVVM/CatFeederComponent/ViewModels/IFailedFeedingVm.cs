@@ -1,5 +1,6 @@
 ﻿using System.Windows.Input;
 using MVVM.Engine;
+using MVVM.Engine.AppState;
 
 namespace MVVM.CatFeederComponent.ViewModels;
 

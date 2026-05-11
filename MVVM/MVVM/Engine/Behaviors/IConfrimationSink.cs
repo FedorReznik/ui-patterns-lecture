@@ -1,12 +1,14 @@
 ﻿using System.Windows;
+using JetBrains.Annotations;
 
-namespace MVVM.Engine;
+namespace MVVM.Engine.Behaviors;
 
 public interface IConfirmationSink
 {
     Func<IConfirmationVm, MessageBoxResult>? Confirm { set; }
 }
 
+[PublicAPI]
 public class ConfirmationSinkPart : IConfirmationSink
 {
     private Func<IConfirmationVm, MessageBoxResult>? _confirm;

@@ -3,6 +3,7 @@ using Autofac;
 using MVVM.CatFeederComponent.ViewModels;
 using MVVM.DI;
 using MVVM.Engine;
+using MVVM.Engine.AppState;
 
 namespace MVVM;
 
