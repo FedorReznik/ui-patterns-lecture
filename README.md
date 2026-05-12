@@ -928,6 +928,7 @@ public interface ICatFeederPresenter : IPresenter
 
 ### 6.1 Definition
 &nbsp;&nbsp;&nbsp;&nbsp; Having said that MVVM is MVP(M) + framework, let's give it a definition, as usual starting with diagram:
+<img src="Images/MVVM.jpg"/>
 
 ### 6.2 Implementation
 
