@@ -942,7 +942,7 @@ tbd: IObservable binding and Presenter handler extension to show message boxes
 
 ### 6.5 The Assessment
 
-tbd: example on how to overcome sub-system boundary caveat in the world of data binding!
+tbd: a word about size of engine comparable to other solutions
 
 ## 7 Conclusion
 
