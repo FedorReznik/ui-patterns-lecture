@@ -1202,7 +1202,7 @@ tbd: IObservable binding and Presenter handler extension to show message boxes
 
 ### 6.5 The Assessment
 
-tbd: a word about size of engine comparable to other solutions
+tbd: a word about size of engine comparable to other solutions + learning curve
 
 ## 7 Conclusion
 
