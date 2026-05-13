@@ -930,7 +930,267 @@ public interface ICatFeederPresenter : IPresenter
 &nbsp;&nbsp;&nbsp;&nbsp; Having said that MVVM is MVP(M) + framework, let's give it a definition, as usual starting with diagram:
 <img src="Images/MVVM.jpg"/>
 
+- The State (Model) holds exactly the same responsibilities as for MVC and MVP(M). Has no changes at all.
+- The ViewModel still provides all possible ways of interaction and reactions as in MVP(M). Thus forming the sub-system boundary.
+- The View also does the same as in MVP(M) - it observers ViewModel and delegates actions to it. But instead of doing it imperatively it uses the MVVM engine to become completely declarative.
+
 ### 6.2 Implementation
+&nbsp;&nbsp;&nbsp;&nbsp;As we can see from the definition there is no difference in responsibilities between MVP(M) and MVVM. The main new participant here is MVVM engine, which depends on particular framework, here we will use WPF for implementation. One can find the whole solution [here](./MVVM/MVVM.sln).
+
+&nbsp;&nbsp;&nbsp;&nbsp;**First**, let's define [IViewModel](./MVVM/MVVM/Engine/AppState/IViewModel.cs) interface and base implementation for it:
+```C#
+public interface IViewModel : INotifyPropertyChanged, IDisposable
+{
+}
+
+[PublicAPI]
+public abstract class ViewModelBase : IViewModel
+{
+    public event PropertyChangedEventHandler PropertyChanged = (_, _) => {} ;
+
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    [UsedImplicitly]
+    protected bool SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
+    {
+        if (EqualityComparer<T>.Default.Equals(field, value)) 
+            return false;
+            
+        field = value;
+            
+        OnPropertyChanged(propertyName);
+            
+        return true;
+    }
+
+    protected virtual void DisposeCore()
+    {
+    }
+
+    public void Dispose() => 
+        DisposeCore();
+}
+```
+As one can spot it looks like renaming the Presenter to ViewModel, now let's change our `CatFeederPresenter` interface and implementation to ViewModel [interface](./MVVM/MVVM/CatFeederComponent/ViewModels/ICatFeederVm.cs) and [implementation](./MVVM/MVVM/CatFeederComponent/ViewModels/CatFeederVm.cs) suitable for using with WPF:
+```C#
+public interface ICatFeederVm : IViewModel, INextVmSink, IConfirmationSink
+{
+    ICommand Feed { get; }
+        
+    bool IsBusy { get; }
+}
+
+public class CatFeederVm : ViewModelBase, ICatFeederVm
+{
+    private readonly ICatFeederService _catFeederService;
+    private readonly Func<ISuccessfulFeedingVm> _successfulFeedingVmFactory;
+    private readonly Func<IFailedFeedingVm> _failedFeedingVmFactory;
+
+    private readonly ICommand _feedCommand;
+    private readonly ICommand _aboutCommand;
+    
+    private readonly NextVmSinkPart _nextVmSinkPart = new();
+    private readonly ConfirmationSinkPart _confirmationSinkPart = new();
+
+    public CatFeederVm(
+        ICatFeederService catFeederService,
+        Func<ISuccessfulFeedingVm> successfulFeedingVmFactory,
+        Func<IFailedFeedingVm> failedFeedingVmFactory)
+    {
+        _catFeederService = catFeederService;
+        _successfulFeedingVmFactory = successfulFeedingVmFactory;
+        _failedFeedingVmFactory = failedFeedingVmFactory;
+        
+        _feedCommand = new ActionCommand(FeedCore);
+        _aboutCommand = new ActionCommand(AboutCore);
+    }
+
+    public ICommand Feed => _feedCommand;
+
+    public bool IsBusy
+    {
+        get;
+        private set => SetField(ref field, value);
+    }
+
+    private void FeedCore()
+    {
+        IsBusy = true;
+        
+        Task.Run(async () =>
+        {
+            try
+            {
+                var result = await _catFeederService.Feed();
+                    
+                switch (result.Successful)
+                {
+                    case true:
+                    {
+                        var successfulFeedingVm = _successfulFeedingVmFactory();
+                        successfulFeedingVm.Message = result.Message;
+                        _nextVmSinkPart.Proceed(successfulFeedingVm);
+                        break;
+                    }
+                    default:
+                    {
+                        var failedFeedingVm = _failedFeedingVmFactory();
+                        failedFeedingVm.Reason = result.Message;
+                        _nextVmSinkPart.Proceed(failedFeedingVm);
+                        break;
+                    }
+                }
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        });
+    }
+
+    IObservable<IViewModel> INextVmSink.ProceedWith => _nextVmSinkPart.ProceedWith;
+
+    protected override void DisposeCore()
+    {
+        _catFeederService.Dispose();
+        _nextVmSinkPart.Dispose();
+        
+        base.DisposeCore();
+    }
+
+    Func<IConfirmationVm, MessageBoxResult>? IConfirmationSink.Confirm
+    {
+        set => _confirmationSinkPart.Confirm = value;
+    }
+
+    public ICommand About => _aboutCommand;
+    
+    private void AboutCore()
+    {
+        _confirmationSinkPart.AskConfirmation(new ConfirmationVm()
+        {
+            Caption = "Feeder App 4.0",
+            Text = "This is app version 4.0",
+            Icon = MessageBoxImage.Information,
+            Buttons =  MessageBoxButton.OK
+        });
+    }
+}
+```
+Please don't pay attention to `IConfirmationSink` for now we will discuss it later. 
+
+&nbsp;&nbsp;&nbsp;&nbsp;As one can see the contract and implementation is almost the same as for [ICatFeederPresenter](./MVP/MVP.PM/CatFeederComponent/Presenters/ICatFeederPresenter.cs) and [CatFeederPresenter](./MVP/MVP.PM/CatFeederComponent/Presenters/CatFeederPresenter.cs). The biggest difference is that we have removed the `IObservable` and now using plain property with change notification for `IsBusy` contract, as well as `Feed` method become `ICommand Feed` - those primitives are first class citizens for WPF allowing reacting to events and binding user input to methods respectively. ViewModel layer still drives the application state transition. But instead of providing specific `IObservable<IXXXPresenter>` properties it uses common [INextVmSink](./MVVM/MVVM/Engine/AppState/INextVmSink.cs) interface to plug into MVVM engine navigation part:
+```C#
+public interface INextVmSink : IDisposable
+{
+    IObservable<IViewModel> ProceedWith { get; }
+}
+```
+&nbsp;&nbsp;&nbsp;&nbsp;And the navigation part is now incorporated to the ViewModel layer as well, by adding [IMainVm](./MVVM/MVVM/Engine/AppState/IMainVm.cs) and it's [implementation](./MVVM/MVVM/Engine/AppState/MainVm.cs) to the engine:
+```C#
+public interface IMainVm : IViewModel
+{
+    IViewModel? CurrentVm { get; set; }
+}
+
+public class MainVm : ViewModelBase, IMainVm
+{
+    private IViewModel? _currentVm;
+    private IDisposable? _currentSubscription;
+
+    public IViewModel? CurrentVm
+    {
+        get => _currentVm;
+        set
+        {
+            if (Equals(value, _currentVm)) return;
+            
+            StopListeningToTransitions();
+     
+            var old = _currentVm;
+            _currentVm = value;
+            old?.Dispose();
+            
+            StartListeningToTransitions();
+            
+            OnPropertyChanged();
+        }
+    }
+
+    private void StartListeningToTransitions()
+    {
+        if (_currentVm is INextVmSink nextVmSink)
+        {
+            _currentSubscription = nextVmSink
+                .ProceedWith
+                .Subscribe(next => CurrentVm = next);
+        }
+    }
+
+    private void StopListeningToTransitions()
+    {
+        _currentSubscription?.Dispose();
+    }
+
+    protected override void DisposeCore()
+    {
+        var currentSubscription = Interlocked.Exchange(ref _currentSubscription, null);
+        currentSubscription?.Dispose();
+        
+        var currentVm = Interlocked.Exchange(ref _currentVm, null);
+        currentVm?.Dispose();
+        
+        base.DisposeCore();
+    }
+}
+``` 
+
+&nbsp;&nbsp;&nbsp;&nbsp;**Second**, and most interesting part is how [CatFeederView](./MVVM/MVVM/CatFeederComponent/Views/CatFeederView.xaml) look like:
+```XML
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:viewModels="clr-namespace:MVVM.CatFeederComponent.ViewModels"
+                    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+                    xmlns:engine="clr-namespace:MVVM.Engine"
+                    xmlns:behaviors="clr-namespace:MVVM.Engine.Behaviors">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary>
+            <DataTemplate DataType="{x:Type viewModels:ICatFeederVm}">
+                <Grid>
+                    <i:Interaction.Behaviors>
+                        <behaviors:ConfirmationBehavior/>
+                    </i:Interaction.Behaviors>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Button 
+                        IsEnabled="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}"
+                        Command="{Binding Feed}" 
+                        Grid.Row="0"
+                        Margin="{StaticResource DefaultMargin}"
+                        Padding="{StaticResource DefaultPadding}"
+                        FontSize="{StaticResource FontSizeBig}">
+                        Feed the cat!
+                    </Button>
+                    <Button
+                        Command="{Binding About}"
+                        Margin="{StaticResource DefaultMargin}"
+                        Padding="{StaticResource DefaultPadding}"
+                        FontSize="{StaticResource FontSizeMedium}"
+                        Grid.Row="1">
+                        About
+                    </Button>
+                </Grid>
+            </DataTemplate>
+        </ResourceDictionary>
+    </ResourceDictionary.MergedDictionaries>
+</ResourceDictionary>
+```
+So yes, finally it's fully declarative with no code behind at all. Again this is achieved that WPF gives us Binding engine for properties and events. As well as extension points like Template engine: `<DataTemplate DataType="{x:Type viewModels:ICatFeederVm}">` actually tells that whenever the DataContext is `ICatFeederVm` it should use this template. 
 
 ### 6.3 Where is the router?
 
