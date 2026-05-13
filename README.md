@@ -1148,7 +1148,7 @@ public class MainVm : ViewModelBase, IMainVm
 }
 ``` 
 
-&nbsp;&nbsp;&nbsp;&nbsp;**Second**, and most interesting part is how [CatFeederView](./MVVM/MVVM/CatFeederComponent/Views/CatFeederView.xaml) looks like:
+&nbsp;&nbsp;&nbsp;&nbsp;**Second**, and most interesting part, is how [CatFeederView](./MVVM/MVVM/CatFeederComponent/Views/CatFeederView.xaml) looks like:
 ```XML
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
