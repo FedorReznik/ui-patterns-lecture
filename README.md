@@ -1190,7 +1190,7 @@ public class MainVm : ViewModelBase, IMainVm
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>
 ```
-So yes, finally it's fully declarative with no code behind at all. Again this is achieved that WPF gives us Binding engine for properties and events. As well as extension points like Template engine: `<DataTemplate DataType="{x:Type viewModels:ICatFeederVm}">` actually tells that whenever the DataContext is `ICatFeederVm` it should use this template. 
+So yes, **finally** it's fully declarative with no code behind at all. Again this is achieved that WPF gives us Binding engine for properties and events. As well as extension points like Template engine: `<DataTemplate DataType="{x:Type viewModels:ICatFeederVm}">` actually tells that whenever the DataContext is `ICatFeederVm` it should use this template. 
 
 ### 6.3 Where is the router?
 
