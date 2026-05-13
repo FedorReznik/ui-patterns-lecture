@@ -1193,8 +1193,95 @@ public class MainVm : ViewModelBase, IMainVm
 So yes, **finally** it's fully declarative with no code behind at all. Again this is achieved that WPF gives us Binding engine for properties and events. As well as extension points like Template engine: `<DataTemplate DataType="{x:Type viewModels:ICatFeederVm}">` actually tells that whenever the DataContext is `ICatFeederVm` it should use this template. 
 
 ### 6.3 Where is the router?
+&nbsp;&nbsp;&nbsp;&nbsp;Attentive reader can really wonder at this point: ok, we have incorporate `INavigationHost` into ViewModel layer and now it's `IMainVm` - fine; we are providing `<DataTemplate DataType="{x:Type viewModels:IXXXVm}">` declarative templates - great. But how does it glues together? Can we have different datatemplates for the same ViewModel depending on UI requirements? Or, in other words: "Where is the router, Lebowski?"
 
-tbd: Interface template selector
+&nbsp;&nbsp;&nbsp;&nbsp;The truth is that for WPF MVVM engine the router is defined with with template selection strategy or `TemplateSelector`. In our case we will use custom [InterfaceTemplateSelector](./MVVM/MVVM/Engine/TemplateSelectors/InterfaceTemplateSelector.cs), so that View will only reference ViewModel contract, not the implementation - further decoupling them from each other:
+```C#
+/// <summary>
+/// Allows WPF DataTemplates to be resolved by interface type,
+/// preferring the most specific interface first.
+/// </summary>
+public sealed class InterfaceTemplateSelector : DataTemplateSelector
+{
+    public override DataTemplate? SelectTemplate(object? item, DependencyObject container)
+    {
+        if (item == null || container is not FrameworkElement element)
+            return base.SelectTemplate(item, container);
+
+        var type = item.GetType();
+
+        // 1. Exact type first (default WPF behavior)
+        var template = FindTemplate(type, element);
+        if (template != null)
+            return template;
+
+        // 2. Cached interfaces ordered from most specific to the least specific
+        foreach (var @interface in type.GetInterfaces())
+        {
+            template = FindTemplate(@interface, element);
+            if (template != null)
+                return template;
+        }
+
+        // 3. Base classes
+        var baseType = type.BaseType;
+        while (baseType != null)
+        {
+            template = FindTemplate(baseType, element);
+            if (template != null)
+                return template;
+
+            baseType = baseType.BaseType;
+        }
+
+        return base.SelectTemplate(item, container);
+    }
+
+    private static DataTemplate? FindTemplate(Type type, FrameworkElement element)
+    {
+        var key = new DataTemplateKey(type);
+
+        return element.TryFindResource(key) as DataTemplate
+               ?? Application.Current.TryFindResource(key) as DataTemplate;
+    }
+}
+```
+This particular strategy used in our app is searching first suitable template registered for particular ViewModel interface starting from UI control it applied to. Thus we only need two things:
+
+a) Define [template](./MVVM/MVVM/Engine/AppState/MainView.xaml) for `IMainVm` which acts as application state aka active ViewModel provider:
+```XML
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:appState="clr-namespace:MVVM.Engine.AppState">
+    <DataTemplate DataType="{x:Type appState:IMainVm}">
+       <ContentControl Content="{Binding CurrentVm}"
+                       ContentTemplateSelector="{StaticResource InterfaceTemplateSelector}"/>
+    </DataTemplate>
+</ResourceDictionary>
+```
+b) Register our View templates somewhere. As for our case all the templates are always the same we can do it in [App.xaml](./MVVM/MVVM/App.xaml):
+```XML
+<Application x:Class="MVVM.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:system="clr-namespace:System;assembly=System.Runtime">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="DI/TemplateSelectors.xaml"/>
+                <ResourceDictionary Source="DI/Converters.xaml"/>
+                <ResourceDictionary Source="DI/Fonts.xaml"/>
+                <ResourceDictionary Source="DI/Sizes.xaml"/>
+                <ResourceDictionary Source="/Engine/AppState/MainView.xaml"/>
+                <ResourceDictionary Source="CatFeederComponent/Views/ViewTemplates.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>
+```
+But if we ever need to override the template for particular IViewModel we can easily add the template for any View.
+
+&nbsp;&nbsp;&nbsp;&nbsp;**Important** achievement compared to MVP(M) is that there is **no** coupling at all between View, "Router" and ViewModel. ViewModel layer is now completely responsible for the whole application state including active ViewModel. And the View decides how to render it, but has **no** Control on state change at all. Thus giving us the form of loose-coupling not achieved in MVP/MVC style frameworks.
 
 ### 6.4 How not to fall into `IWindowService` caveat
 
