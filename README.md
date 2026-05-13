@@ -1080,7 +1080,7 @@ public class CatFeederVm : ViewModelBase, ICatFeederVm
     }
 }
 ```
-Please don't pay attention to `IConfirmationSink` for now we will discuss it later. 
+Please don't pay attention to `IConfirmationSink` and code related to it for now, we will discuss it later. 
 
 &nbsp;&nbsp;&nbsp;&nbsp;As one can see the contract and implementation is almost the same as for [ICatFeederPresenter](./MVP/MVP.PM/CatFeederComponent/Presenters/ICatFeederPresenter.cs) and [CatFeederPresenter](./MVP/MVP.PM/CatFeederComponent/Presenters/CatFeederPresenter.cs). The biggest difference is that we have removed the `IObservable` and now using plain property with change notification for `IsBusy` contract, as well as `Feed` method become `ICommand Feed` - those primitives are first class citizens for WPF allowing reacting to events and binding user input to methods respectively. ViewModel layer still drives the application state transition. But instead of providing specific `IObservable<IXXXPresenter>` properties it uses common [INextVmSink](./MVVM/MVVM/Engine/AppState/INextVmSink.cs) interface to plug into MVVM engine navigation part:
 ```C#
