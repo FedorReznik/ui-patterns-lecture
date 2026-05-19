@@ -36,6 +36,7 @@ By Fedor Reznik
 - [7 Conclusion](#7-conclusion)
   - [7.1 Modern State](#71-modern-state)
   - [7.2 Which Approach To Select?](#72-which-approach-to-select)
+  - [7.3 Final word.](#73-final-word)
 
 ## 1 Preface
 
@@ -1354,11 +1355,18 @@ Which can be used in View template as following, see [CatFeederView.xaml](./MVVM
 
 &nbsp;&nbsp;&nbsp;&nbsp;Seems like we finally reached the highest marks for our set of NFRs! Flawless victory, isn't it? Kinda. But look at the amount of code in *Engine* layer - it's much bigger and requires much more investments compared to MVC/MVP approaches. Yes it is basically implemented once and then tuned when new features are needed. But still this is the knowledge required for new comer to get used to. Moreover as usually even this Engine is based on already existing features of selected MVVM technology one needs some experts in it even to start. And the learning curve is much steeper compared to other MV-X techniques.
 
-<-- "P/R until here" -->
 ## 7 Conclusion
 
 ### 7.1 Modern State
+&nbsp;&nbsp;&nbsp;&nbsp;Let's give some quick overview of existing frameworks and which approaches are they tend too.
+
+- Code-behind: WindowsForms still alive and used in it's niche and it has no "framework" out-of-the-box, but we hope that we have shown that it can be relatively easily extended up to MVP(M). Surprisingly the Angular2+ is also pure code-behind beast, but at least with bindings: just because components are strictly bound to html views via templates, also the router is bound to components, not component is defining the route or application state. Though, it can also be extended to MVP(M), but as well requires a lot of efforts.
+- MVC: ASP.NET MVC - it is hard to imagine most iconic example of this pattern for .Net developer.
+- MVP: seems like there is no relatively popular, up to date and mature implementations of it on the market. We would really like to be wrong.
+- MVVM: for .Net world WPF is like a default choice, especially with recent addition of support for .net core. But if you want to have a true cross-platform implementation of it - take a look at [Avalonia](https://avaloniaui.net/) - a very mature and strong player, for those who knows .Net; we hope it will get more attention and market share soon.
 
 ### 7.2 Which Approach To Select?
+&nbsp;&nbsp;&nbsp;&nbsp;From our point of view if you have knowledge of mature MVVM framework - just stick to it. If you have enough time and resources try to reach at the very least MVP(M) state with clear sub-system boundaries. If you short on time, you have relatively simple domain or you have a good MVC like framework - as we said all approaches can work to some extent and limitations.
 
-tbc: a word about react
+### 7.3 Final word.
+&nbsp;&nbsp;&nbsp;&nbsp;In this article we have shown the evolution of UI architecture approaches, focusing on simple example and driving forces to seek "new ways of doing the same things" based on selected set of NFRs. We also have introduced the concept of **sub-system boundary**, which can be useful in any architecture: on micro level in backend or frontend; and on macro level when you are designing distributed micro-services. What we haven't touched is paradigm brought us by [React](https://react.dev/) like frameworks. Mostly because we have no great hands-on experience in it. We will be glad if readers provide feedback on how it acts against the selected NFRs.
