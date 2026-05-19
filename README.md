@@ -1340,7 +1340,7 @@ Which can be used in View template as following, see [CatFeederView.xaml](./MVVM
 </DataTemplate>
 ```
 
-&nbsp;&nbsp;&nbsp;&nbsp;By having this extensibility over MVVM engine we are keeping the sub-system boundary and avoiding `IWindowService` pitfall. Please also note that there are different approaches to do it - one can use Binding extensions and even keep `IObservable` like contract instead of a bit ugly "Func<IConfirmationVm, MessageBoxResult>? Confirm { set; }". Here we just showing the most straight-forward and easy to implement way to achieve the task.
+&nbsp;&nbsp;&nbsp;&nbsp;By having this extensibility over MVVM engine we are keeping the sub-system boundary and avoiding `IWindowService` pitfall. Please also note that there are different approaches to do it - one can use Binding extensions and even keep `IObservable` like contract instead of a bit ugly `Func<IConfirmationVm, MessageBoxResult>? Confirm { set; }`. Here we just showing the most straight-forward and easy to implement way to achieve the task.
 
 ### 6.5 The Assessment
 
