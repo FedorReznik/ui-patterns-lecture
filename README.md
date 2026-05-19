@@ -1283,11 +1283,10 @@ But if we ever need to override the template for particular IViewModel we can ea
 
 &nbsp;&nbsp;&nbsp;&nbsp;**Important** achievement compared to MVP(M) is that there is **no** coupling at all between View, "Router" and ViewModel. ViewModel layer is now completely responsible for the whole application state including active ViewModel. And the View decides how to render it, but has **no** control on state change at all. Thus giving us the form of loose-coupling not achieved in MVP/MVC style frameworks.
 
-<-- "Proof read until here" -->
 ### 6.4 How not to fall into `IWindowService` pitfall
-&nbsp;&nbsp;&nbsp;&nbsp; Of course we can't omit our "beloved" pitfall about adding possibility to show MessageBoxes to systems with sub-system boundaries. In case of MVVM the problem is even more more wide-spread than with MVP(M) like architectures. Just because Views are declarative and there is no dedicated complex Router - it looks really attractive and simple to go with IWindowService and inject it to ViewModels. But again, unfortunately, it breaks sub-system boundary as we have shown in [5.5 The sub-system boundary caveat - the notorious `IWindowService`](#55-the-sub-system-boundary-caveat---the-notorious-iwindowservice).
+&nbsp;&nbsp;&nbsp;&nbsp; Of course we can't omit our "beloved" pitfall about adding possibility to show MessageBoxes to architectures with sub-system boundaries. In case of MVVM the problem is even more more wide-spread than with MVP(M) like architectures. Just because Views are declarative and there is no dedicated complex Router - it looks really attractive and simple to go with `IWindowService` and inject it to ViewModels. But again, unfortunately, it breaks sub-system boundary as we have shown in [5.5 The sub-system boundary caveat - the notorious `IWindowService`](#55-the-sub-system-boundary-caveat---the-notorious-iwindowservice).
 
-&nbsp;&nbsp;&nbsp;&nbsp;So what to do? First of all we should create a possibility for ViewModel to state that it will **need** to have a differed result of showing particular presenter. We can do it, for example, via [IConfirmationSink](./MVVM/MVVM/Engine/Behaviors/IConfrimationSink.cs) and [IConfirmationVm](./MVVM/MVVM/Engine/Behaviors/IConfirmationVm.cs):
+&nbsp;&nbsp;&nbsp;&nbsp;So what to do? First of all, we should create a possibility for ViewModel to state that it will **need** to have a differed result of rendering particular confirmation. We can do it, for example, via [IConfirmationSink](./MVVM/MVVM/Engine/Behaviors/IConfrimationSink.cs) and [IConfirmationVm](./MVVM/MVVM/Engine/Behaviors/IConfirmationVm.cs) interfaces:
 ```C#
 public interface IConfirmationSink
 {
@@ -1340,7 +1339,7 @@ Which can be used in View template as following, see [CatFeederView.xaml](./MVVM
 </DataTemplate>
 ```
 
-&nbsp;&nbsp;&nbsp;&nbsp;By having this extensibility over MVVM engine we are keeping the sub-system boundary and avoiding `IWindowService` pitfall. Please also note that there are different approaches to do it - one can use Binding extensions and even keep `IObservable` like contract instead of a bit ugly `Func<IConfirmationVm, MessageBoxResult>? Confirm { set; }`. Here we just showing the most straight-forward and easy to implement way to achieve the task.
+&nbsp;&nbsp;&nbsp;&nbsp;By having this extensibility over MVVM engine we are keeping the sub-system boundary and avoiding `IWindowService` pitfall. Please also note, that there are different approaches to do it - one can use Binding extensions and even keep `IObservable` like contract instead of a bit ugly `Func<IConfirmationVm, MessageBoxResult>? Confirm { set; }`. Here we just showing the most straight-forward and easy to implement way to achieve the task.
 
 ### 6.5 The Assessment
 &nbsp;&nbsp;&nbsp;&nbsp;Let's check our architecture against our NFRs:
@@ -1355,6 +1354,7 @@ Which can be used in View template as following, see [CatFeederView.xaml](./MVVM
 
 &nbsp;&nbsp;&nbsp;&nbsp;Seems like we finally reached the highest marks for our set of NFRs! Flawless victory, isn't it? Kinda. But look at the amount of code in *Engine* layer - it's much bigger and requires much more investments compared to MVC/MVP approaches. Yes it is basically implemented once and then tuned when new features are needed. But still this is the knowledge required for new comer to get used to. Moreover as usually even this Engine is based on already existing features of selected MVVM technology one needs some experts in it even to start. And the learning curve is much steeper compared to other MV-X techniques.
 
+<-- "P/R until here" -->
 ## 7 Conclusion
 
 ### 7.1 Modern State
