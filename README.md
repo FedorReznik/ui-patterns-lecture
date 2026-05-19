@@ -31,7 +31,7 @@ By Fedor Reznik
   - [6.1 Definition](#61-definition)
   - [6.2 Implementation](#62-implementation)
   - [6.3 Where is the router?](#63-where-is-the-router)
-  - [6.4 How not to fall into `IWindowService` caveat](#64-how-not-to-fall-into-iwindowservice-caveat)
+  - [6.4 How not to fall into `IWindowService` pitfall](#64-how-not-to-fall-into-iwindowservice-pitfall)
   - [6.5 The Assessment](#65-the-assessment)
 - [7 Conclusion](#7-conclusion)
   - [7.1 Modern State](#71-modern-state)
@@ -1284,9 +1284,63 @@ But if we ever need to override the template for particular IViewModel we can ea
 &nbsp;&nbsp;&nbsp;&nbsp;**Important** achievement compared to MVP(M) is that there is **no** coupling at all between View, "Router" and ViewModel. ViewModel layer is now completely responsible for the whole application state including active ViewModel. And the View decides how to render it, but has **no** control on state change at all. Thus giving us the form of loose-coupling not achieved in MVP/MVC style frameworks.
 
 <-- "Proof read until here" -->
-### 6.4 How not to fall into `IWindowService` caveat
+### 6.4 How not to fall into `IWindowService` pitfall
+&nbsp;&nbsp;&nbsp;&nbsp; Of course we can't omit our "beloved" pitfall about adding possibility to show MessageBoxes to systems with sub-system boundaries. In case of MVVM the problem is even more more wide-spread than with MVP(M) like architectures. Just because Views are declarative and there is no dedicated complex Router - it looks really attractive and simple to go with IWindowService and inject it to ViewModels. But again, unfortunately, it breaks sub-system boundary as we have shown in [5.5 The sub-system boundary caveat - the notorious `IWindowService`](#55-the-sub-system-boundary-caveat---the-notorious-iwindowservice).
 
-tbd: IObservable binding and Presenter handler extension to show message boxes
+&nbsp;&nbsp;&nbsp;&nbsp;So what to do? First of all we should create a possibility for ViewModel to state that it will **need** to have a differed result of showing particular presenter. We can do it, for example, via [IConfirmationSink](./MVVM/MVVM/Engine/Behaviors/IConfrimationSink.cs) and [IConfirmationVm](./MVVM/MVVM/Engine/Behaviors/IConfirmationVm.cs):
+```C#
+public interface IConfirmationSink
+{
+    Func<IConfirmationVm, MessageBoxResult>? Confirm { set; }
+}
+
+public interface IConfirmationVm : IViewModel
+{
+    public string? Caption { get; }
+    
+    public string? Text { get; }
+    
+    public MessageBoxButton Buttons { get; }
+    
+    public MessageBoxImage Icon { get; }
+}
+```
+So now any ViewModel implementing `IConfirmationSink` will state: "I raise IConfirmationVm describing the confirmation and I do expect the result", by expecting consumer to provide `Func<IConfirmationVm, MessageBoxResult>? Confirm` handler.
+
+&nbsp;&nbsp;&nbsp;&nbsp;Next we need to create a generic MVVM engine part that will detect that `IConfirmationSink` ViewModel is now being shown and add the `Confirm` handler. In WPF one way of doing this is implementing the `Behavior`:
+```C#
+public class ConfirmationBehavior : Behavior<FrameworkElement>
+{
+    protected override void OnAttached()
+    {
+        base.OnAttached();
+        
+        if (AssociatedObject.DataContext is IConfirmationSink confirmationSink)
+        {
+            confirmationSink.Confirm = vm => MessageBox.Show(GetWindow(), vm.Text, vm.Caption, vm.Buttons, vm.Icon);
+        }
+    }
+
+    private Window GetWindow()
+    {
+        // Warning won't work before Loaded event as well as for popups and ContextMenus, skipping the implementation for simplicity
+        return Window.GetWindow(AssociatedObject)!;
+    }
+}
+```
+Which can be used in View template as following, see [CatFeederView.xaml](./MVVM/MVVM/CatFeederComponent/Views/CatFeederView.xaml):
+```XML
+<DataTemplate DataType="{x:Type viewModels:ICatFeederVm}">
+    <Grid>
+        <i:Interaction.Behaviors>
+            <confirmation:ConfirmationBehavior/>
+        </i:Interaction.Behaviors>
+        ...
+    </Grid>
+</DataTemplate>
+```
+
+&nbsp;&nbsp;&nbsp;&nbsp;By having this extensibility over MVVM engine we are keeping the sub-system boundary and avoiding `IWindowService` pitfall. Please also note that there are different approaches to do it - one can use Binding extensions and even keep `IObservable` like contract instead of a bit ugly "Func<IConfirmationVm, MessageBoxResult>? Confirm { set; }". Here we just showing the most straight-forward and easy to implement way to achieve the task.
 
 ### 6.5 The Assessment
 

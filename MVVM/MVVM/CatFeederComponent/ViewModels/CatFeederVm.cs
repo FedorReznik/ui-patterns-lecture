@@ -3,7 +3,7 @@ using System.Windows.Input;
 using MVVM.CatFeederComponent.Models;
 using MVVM.Engine;
 using MVVM.Engine.AppState;
-using MVVM.Engine.Behaviors;
+using MVVM.Engine.Behaviors.Confirmation;
 using MVVM.Engine.Commands;
 
 namespace MVVM.CatFeederComponent.ViewModels;

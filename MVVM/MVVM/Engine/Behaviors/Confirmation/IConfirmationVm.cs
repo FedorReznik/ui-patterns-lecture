@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using MVVM.Engine.AppState;
 
-namespace MVVM.Engine.Behaviors;
+namespace MVVM.Engine.Behaviors.Confirmation;
 
 public interface IConfirmationVm : IViewModel
 {

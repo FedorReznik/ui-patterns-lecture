@@ -2,14 +2,13 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:viewModels="clr-namespace:MVVM.CatFeederComponent.ViewModels"
                     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
-                    xmlns:engine="clr-namespace:MVVM.Engine"
-                    xmlns:behaviors="clr-namespace:MVVM.Engine.Behaviors">
+                    xmlns:confirmation="clr-namespace:MVVM.Engine.Behaviors.Confirmation">
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary>
             <DataTemplate DataType="{x:Type viewModels:ICatFeederVm}">
                 <Grid>
                     <i:Interaction.Behaviors>
-                        <behaviors:ConfirmationBehavior/>
+                        <confirmation:ConfirmationBehavior/>
                     </i:Interaction.Behaviors>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>

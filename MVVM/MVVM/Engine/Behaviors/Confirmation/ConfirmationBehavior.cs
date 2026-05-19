@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using Microsoft.Xaml.Behaviors;
 
-namespace MVVM.Engine.Behaviors;
+namespace MVVM.Engine.Behaviors.Confirmation;
 
 public class ConfirmationBehavior : Behavior<FrameworkElement>
 {

@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using JetBrains.Annotations;
 
-namespace MVVM.Engine.Behaviors;
+namespace MVVM.Engine.Behaviors.Confirmation;
 
 public interface IConfirmationSink
 {
