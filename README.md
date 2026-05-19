@@ -1283,6 +1283,7 @@ But if we ever need to override the template for particular IViewModel we can ea
 
 &nbsp;&nbsp;&nbsp;&nbsp;**Important** achievement compared to MVP(M) is that there is **no** coupling at all between View, "Router" and ViewModel. ViewModel layer is now completely responsible for the whole application state including active ViewModel. And the View decides how to render it, but has **no** control on state change at all. Thus giving us the form of loose-coupling not achieved in MVP/MVC style frameworks.
 
+<-- "Proof read until here" -->
 ### 6.4 How not to fall into `IWindowService` caveat
 
 tbd: IObservable binding and Presenter handler extension to show message boxes
