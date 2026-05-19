@@ -1343,8 +1343,17 @@ Which can be used in View template as following, see [CatFeederView.xaml](./MVVM
 &nbsp;&nbsp;&nbsp;&nbsp;By having this extensibility over MVVM engine we are keeping the sub-system boundary and avoiding `IWindowService` pitfall. Please also note that there are different approaches to do it - one can use Binding extensions and even keep `IObservable` like contract instead of a bit ugly `Func<IConfirmationVm, MessageBoxResult>? Confirm { set; }`. Here we just showing the most straight-forward and easy to implement way to achieve the task.
 
 ### 6.5 The Assessment
+&nbsp;&nbsp;&nbsp;&nbsp;Let's check our architecture against our NFRs:
+| NFR | Level | Comment |
+|-----|--------|---------|
+| Testability | *High* | Mocks are only needed for *downstream* layers |
+| Extensibility | *High* | The application state transition is encapsulated in ViewModel layer, UI representation is totally separated to View layer |
+| Adaptability | *High* | The ViewModels are already in place - do whatever your want in your View layer |
+| Effectiveness | *High* | Consumer layer must know contracts, VM layer knows nothing about consumers |
+| Reusability | *High* | There is no coupling to View from VM layer |
+| Readability | *High* | Both *FE* and *BE* cares only about there own technologies. View is completely declarative  |
 
-tbd: a word about size of engine comparable to other solutions + learning curve
+&nbsp;&nbsp;&nbsp;&nbsp;Seems like we finally reached the highest marks for our set of NFRs! Flawless victory, isn't it? Kinda. But look at the amount of code in *Engine* layer - it's much bigger and requires much more investments compared to MVC/MVP approaches. Yes it is basically implemented once and then tuned when new features are needed. But still this is the knowledge required for new comer to get used to. Moreover as usually even this Engine is based on already existing features of selected MVVM technology one needs some experts in it even to start. And the learning curve is much steeper compared to other MV-X techniques.
 
 ## 7 Conclusion
 
