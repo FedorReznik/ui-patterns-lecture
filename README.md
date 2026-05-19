@@ -834,7 +834,7 @@ public partial class CatFeederView : ViewBase, IView<ICatFeederPresenter>
 As you can see view is absolutely passive - it only delegates and observes the presenter, as well as passing presenters it cannot handle to the router for navigation. Let's discuss the router separately.
 
 ### 5.3 The Router transformation
-&nbsp;&nbsp;&nbsp;&nbsp;Compared to MVC the role of the router has changed - it's now a part of View layer and responsible only for View selection for presenter, thus giving us possibility to bind different views for the same presenter for example via interface hierarchy. Router can also use different strategies depending on Presenter (or View) attributes to use either current ViewHost or produce new one including showing the message boxes if needed - it's a matter of adding more introspections to Router engine. So it decouples application state transition, which is now managed by Presenters from the actual rendering (View), it also maintains low-coupling between Views - it is Router responsibility to select a View for Presenter not the View itself.
+&nbsp;&nbsp;&nbsp;&nbsp;Compared to MVC the role of the router has changed - it's now a part of View layer and responsible only for View selection for Presenter, thus giving us possibility to bind different views for the same presenter for example via interface hierarchy. Router can also use different strategies depending on Presenter (or View) attributes to use either current ViewHost or produce new one including showing the message boxes if needed - it's a matter of adding more introspections to Router engine. So it decouples application state transition, which is now managed by Presenters from the actual rendering (View), it also maintains low-coupling between Views - it is Router responsibility to select a View for Presenter not the View itself.
 
 &nbsp;&nbsp;&nbsp;&nbsp;As a result the [IRouter](./MVP/MVP.PM/Engine/IRouter.cs) interface now contains only one method:
 ```C#
@@ -931,7 +931,7 @@ public interface ICatFeederPresenter : IPresenter
 <img src="Images/MVVM.jpg"/>
 
 - The State (Model) holds exactly the same responsibilities as for MVC and MVP(M). Has no changes at all.
-- The ViewModel still provides all possible ways of interaction and reactions as in MVP(M). Thus forming the sub-system boundary.
+- The ViewModel still provides all possible ways of interaction and reactions as PresenterModel in MVP(M). Thus forming the sub-system boundary.
 - The View also does the same as in MVP(M) - it observers ViewModel and delegates actions to it. But instead of doing it imperatively it uses the MVVM engine to become completely declarative.
 
 ### 6.2 Implementation
@@ -1190,12 +1190,12 @@ public class MainVm : ViewModelBase, IMainVm
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>
 ```
-So yes, **finally** it's fully declarative with no code behind at all. Again this is achieved that WPF gives us Binding engine for properties and events. As well as extension points like Template engine: `<DataTemplate DataType="{x:Type viewModels:ICatFeederVm}">` actually tells that whenever the DataContext is `ICatFeederVm` it should use this template. 
+So yes, **finally** it's fully declarative with no code behind at all. Again this is achieved via  WPF that gives us Binding engine for properties and events. As well as extension points like Template engine: `<DataTemplate DataType="{x:Type viewModels:ICatFeederVm}">` which actually tells that whenever the DataContext is `ICatFeederVm` it should use this template. 
 
 ### 6.3 Where is the router?
-&nbsp;&nbsp;&nbsp;&nbsp;Attentive reader can really wonder at this point: ok, we have incorporate `INavigationHost` into ViewModel layer and now it's `IMainVm` - fine; we are providing `<DataTemplate DataType="{x:Type viewModels:IXXXVm}">` declarative templates - great. But how does it glues together? Can we have different datatemplates for the same ViewModel depending on UI requirements? Or, in other words: "Where is the router, Lebowski?"
+&nbsp;&nbsp;&nbsp;&nbsp;Attentive reader can really wonder at this point: ok, we have incorporate `INavigationHost` into ViewModel layer and now it's `IMainVm` - fine; we are providing `<DataTemplate DataType="{x:Type viewModels:IXXXVm}">` declarative templates - great. But how do they glue together? Can we have different datatemplates for the same ViewModel depending on UI requirements? Or, in other words: "Where is the router, Lebowski?"
 
-&nbsp;&nbsp;&nbsp;&nbsp;The truth is that for WPF MVVM engine the router is defined with with template selection strategy or `TemplateSelector`. In our case we will use custom [InterfaceTemplateSelector](./MVVM/MVVM/Engine/TemplateSelectors/InterfaceTemplateSelector.cs), so that View will only reference ViewModel contract, not the implementation - further decoupling them from each other:
+&nbsp;&nbsp;&nbsp;&nbsp;The truth is that for WPF-based MVVM engine the router is defined with with template selection strategy or `TemplateSelector`. In our case we will use custom [InterfaceTemplateSelector](./MVVM/MVVM/Engine/TemplateSelectors/InterfaceTemplateSelector.cs), so that View will only reference ViewModel contract, not the implementation - further decoupling them from each other:
 ```C#
 /// <summary>
 /// Allows WPF DataTemplates to be resolved by interface type,
@@ -1246,9 +1246,9 @@ public sealed class InterfaceTemplateSelector : DataTemplateSelector
     }
 }
 ```
-This particular strategy used in our app is searching first suitable template registered for particular ViewModel interface starting from UI control it applied to. Thus we only need two things:
+This strategy, used in our application, is searching first suitable template registered for particular ViewModel interface starting from UI control it applied to. Thus we only need two things:
 
-a) Define [template](./MVVM/MVVM/Engine/AppState/MainView.xaml) for `IMainVm` which acts as application state aka active ViewModel provider:
+a) Define [template](./MVVM/MVVM/Engine/AppState/MainView.xaml) for `IMainVm` which acts as an application state aka active ViewModel provider:
 ```XML
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -1259,7 +1259,7 @@ a) Define [template](./MVVM/MVVM/Engine/AppState/MainView.xaml) for `IMainVm` wh
     </DataTemplate>
 </ResourceDictionary>
 ```
-b) Register our View templates somewhere. As for our case all the templates are always the same we can do it in [App.xaml](./MVVM/MVVM/App.xaml):
+b) Register our View templates somewhere. As for our case all the templates are always the same for each ViewModel, we can do it once in [App.xaml](./MVVM/MVVM/App.xaml):
 ```XML
 <Application x:Class="MVVM.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -1281,7 +1281,7 @@ b) Register our View templates somewhere. As for our case all the templates are 
 ```
 But if we ever need to override the template for particular IViewModel we can easily add the template for any View.
 
-&nbsp;&nbsp;&nbsp;&nbsp;**Important** achievement compared to MVP(M) is that there is **no** coupling at all between View, "Router" and ViewModel. ViewModel layer is now completely responsible for the whole application state including active ViewModel. And the View decides how to render it, but has **no** Control on state change at all. Thus giving us the form of loose-coupling not achieved in MVP/MVC style frameworks.
+&nbsp;&nbsp;&nbsp;&nbsp;**Important** achievement compared to MVP(M) is that there is **no** coupling at all between View, "Router" and ViewModel. ViewModel layer is now completely responsible for the whole application state including active ViewModel. And the View decides how to render it, but has **no** control on state change at all. Thus giving us the form of loose-coupling not achieved in MVP/MVC style frameworks.
 
 ### 6.4 How not to fall into `IWindowService` caveat
 
