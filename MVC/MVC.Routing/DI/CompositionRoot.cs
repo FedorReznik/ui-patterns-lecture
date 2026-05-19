@@ -42,7 +42,7 @@ namespace MVC.Routing.DI
                 .Keyed<IView>(CatFeederRoutes.CatFedRoute);
             
             // register models
-            builder.RegisterType<CatFeederService>().As<ICatFeederService>().SingleInstance();
+            builder.RegisterType<CatFeederService>().As<ICatFeederService>();
             
             // register drivers
             builder.RegisterType<CatFeederDriver>().As<ICatFeederDriver>().SingleInstance();

@@ -1,37 +1,41 @@
-# The history of UI architecture design approaches: from Code-behind to MVVM
+<h1> The history of UI architecture design approaches: from Code-behind to MVVM </h1>
 
 By Fedor Reznik
 
-- [The history of UI architecture design approaches: from Code-behind to MVVM](#the-history-of-ui-architecture-design-approaches-from-code-behind-to-mvvm)
-  - [1 Preface](#1-preface)
-    - [1.1 The Purpose](#11-the-purpose)
-    - [1.2 Domain](#12-domain)
-    - [1.3 First User Story](#13-first-user-story)
-  - [2 Back In The Days. Code-behind](#2-back-in-the-days-code-behind)
-    - [2.1 Code-behind "Pattern" Definition](#21-code-behind-pattern-definition)
-    - [2.2 The Implementation](#22-the-implementation)
-    - [2.3 Here Comes The Issues](#23-here-comes-the-issues)
-    - [2.4 The Blasphemy](#24-the-blasphemy)
-  - [3 Moving Towards Patterns](#3-moving-towards-patterns)
-    - [3.1 The Driving Force Of Change](#31-the-driving-force-of-change)
-    - [3.2 A Word About Patterns In This Article](#32-a-word-about-patterns-in-this-article)
-  - [4 MVC](#4-mvc)
-    - [4.1 Definition](#41-definition)
-    - [4.2 Implementation](#42-implementation)
-    - [4.3 Second User Story](#43-second-user-story)
-    - [4.4 The Router](#44-the-router)
-    - [4.5 The Assessment](#45-the-assessment)
-  - [5 MVP](#5-mvp)
-    - [5.1 Definition](#51-definition)
-    - [5.2 Implementation](#52-implementation)
-    - [5.3 The Router transformation](#53-the-router-transformation)
-    - [5.4 The sub-system boundary](#54-the-sub-system-boundary)
-    - [5.5 The sub-system boundary caveat - the notorious `IWindowService`](#55-the-sub-system-boundary-caveat---the-notorious-iwindowservice)
-    - [5.6 The Assessment](#56-the-assessment)
-  - [6 MVVM](#6-mvvm)
-  - [7 Conclusion](#7-conclusion)
-    - [7.1 Modern State](#71-modern-state)
-    - [7.2 Which Approach To Select?](#72-which-approach-to-select)
+- [1 Preface](#1-preface)
+  - [1.1 The Purpose](#11-the-purpose)
+  - [1.2 Domain](#12-domain)
+  - [1.3 First User Story](#13-first-user-story)
+- [2 Back In The Days. Code-behind](#2-back-in-the-days-code-behind)
+  - [2.1 Code-behind "Pattern" Definition](#21-code-behind-pattern-definition)
+  - [2.2 The Implementation](#22-the-implementation)
+  - [2.3 Here Comes The Issues](#23-here-comes-the-issues)
+  - [2.4 The Blasphemy](#24-the-blasphemy)
+- [3 Moving Towards Patterns](#3-moving-towards-patterns)
+  - [3.1 The Driving Force Of Change](#31-the-driving-force-of-change)
+  - [3.2 A Word About Patterns In This Article](#32-a-word-about-patterns-in-this-article)
+- [4 MVC](#4-mvc)
+  - [4.1 Definition](#41-definition)
+  - [4.2 Implementation](#42-implementation)
+  - [4.3 Second User Story](#43-second-user-story)
+  - [4.4 The Router](#44-the-router)
+  - [4.5 The Assessment](#45-the-assessment)
+- [5 MVP](#5-mvp)
+  - [5.1 Definition](#51-definition)
+  - [5.2 Implementation](#52-implementation)
+  - [5.3 The Router transformation](#53-the-router-transformation)
+  - [5.4 The sub-system boundary](#54-the-sub-system-boundary)
+  - [5.5 The sub-system boundary caveat - the notorious `IWindowService`](#55-the-sub-system-boundary-caveat---the-notorious-iwindowservice)
+  - [5.6 The Assessment](#56-the-assessment)
+- [6 MVVM](#6-mvvm)
+  - [6.1 Definition](#61-definition)
+  - [6.2 Implementation](#62-implementation)
+  - [6.3 Where is the router?](#63-where-is-the-router)
+  - [6.4 How not to fall into `IWindowService` pitfall](#64-how-not-to-fall-into-iwindowservice-pitfall)
+  - [6.5 The Assessment](#65-the-assessment)
+- [7 Conclusion](#7-conclusion)
+  - [7.1 Modern State](#71-modern-state)
+  - [7.2 Which Approach To Select?](#72-which-approach-to-select)
 
 ## 1 Preface
 
@@ -125,7 +129,7 @@ public partial class Main : Form
 2. Calling `Feed` method in button click event handler - `btnFeedCatOnClick`
 3. Handling successful feeding
 4. Handling error during feeding
-5. Notifications should be shown on UI thread to adhere STA nature of desktop apps, so we are using continuation also avoiding avoiding `async void` method signature
+5. Notifications should be shown on UI thread to adhere STA nature of desktop apps, so we are using continuation also avoiding `async void` method signature
 
 Simple. Effective. Quick. Or...?
 
@@ -244,7 +248,7 @@ public partial class MainFixed : Form
 &nbsp;&nbsp;&nbsp;&nbsp;These and other problems can be formalized via NFRs: a non-functional requirements that specifies criteria that can be used to judge the operation of a system, rather than specific behaviors. They are contrasted with functional requirements that define specific behavior or functions. For this article we will select the following subset of NFRs:
 - Testability - the ability to implement the pyramid of tests: unit, integration, e2e
 - Extensibility - the ability to bring new features into the project without pain
-- Adaptability - the ability to withstand technology change. Usually we are supposing that technology will stay forever and you won't change your UI framework or database or whatever. But the author was involved in such a projects like adapting WinCE application to IOS and Android, so if your approach gives your possibility to quickly change the framework and not requiring to much effort to do it - it's better
+- Adaptability - the ability to withstand technology change. Usually we are supposing that technology will stay forever and one won't change your UI framework or database or whatever. But the author was involved in such a projects like adapting WinCE application to IOS and Android, so if your approach gives your possibility to quickly change the framework and not requiring to much effort to do it - it's better
 - Effectiveness - the ability to bring more developers into the project and split the work between them. This NFR is usually tightly related to Time-to-Market (TTM)
 - Reusability - the ability to move functionality between components.
 - Readability - the ability to minimize cognitive pressure then reading the code - usually it is easier to think about one aim at the time and trust the contracts you have. It also related to the amount of boilerplate one need to get through
@@ -281,7 +285,7 @@ In this case one can still maintain the good enough balance between code complex
 - First was the hardware evolution: computers become thousands time faster in the last 20 years and displays have jumped from SVGA(800x600) up to 4K(3840x2160) - 17x more space, not to speak about multi-displays set-ups. This means that we have more space to use and enough power to make the UI beautiful and interactive. That has introduced the shift to complex UI scenarios, single-page applications, tabbed and docked interfaces and so on - the rise of UX if we can say so. But all of this beauty requires more loosely coupled and cohesive components with UI separated from logic. 
 - Second was the shift of users needs from *just* an automation of part of work to complex interactions and integrations with different systems. For example in the begging it was enough to have billing system that only calculates balance numbers, now users want to integrate those numbers with external financial systems. All this integration flows multiplies the complexity of the code and thus deeming the code-behind approach as really hard to evolve and maintain.
 
-&nbsp;&nbsp;&nbsp;&nbsp;And thus architects started to think about organizing code differently and creating new patterns of separating the concerns and responsibilities in UI - they have created patterns.
+&nbsp;&nbsp;&nbsp;&nbsp;And thus architects started to think about organizing code differently and creating ways of separating the concerns and responsibilities in UI - they have created patterns.
 
 ### 3.2 A Word About Patterns In This Article
 
@@ -357,7 +361,7 @@ This Model layer:
 As the result we have implemented testable Model layer once for all the client interested in successful or failed feeding - exactly what we need in our domain.
 
 &nbsp;&nbsp;&nbsp;&nbsp;**Third**, as we are not using any kind of MVC framework, we need to implement simple View-Controller engine according to our pattern definition, as well as provide `CatFeederController` and `CatFeederView`. The engine itself will consist of 3 interfaces:
-- [IController](./MVC/MVC/Engine/IController.cs) which will provide the `IView View()` method for the View be hosted on some Form or another container:
+- [IController](./MVC/MVC/Engine/IController.cs) which will provide the `IView View()` method for the View to be hosted on some Form or another container:
 ```C#
 public interface IController : IDisposable
 {
@@ -387,7 +391,7 @@ public interface ICatFeederController : IController
     void Feed();
 }
 ```
-So it will only provide fire-and-forget style `void Feed()` method to be called from view - perfect for handling a button click callback. Due to MVC pattern nature all the state should be provided to view from the controller implementation (**please** remember that we ought to exaggerate a bit due to the problem simplicity), which leads us to [CatFeederController](./MVC/MVC/CatFeederComponent/Controllers/CatFeederController.cs) implementation:
+So it will only provide fire-and-forget style `void Feed()` method to be called from view - perfect for handling a button click callback. Due to MVC pattern nature state should be provided to view from the controller implementation (**please** remember that we ought to exaggerate a bit due to the problem simplicity), which leads us to [CatFeederController](./MVC/MVC/CatFeederComponent/Controllers/CatFeederController.cs) implementation:
 ```C#
 public class CatFeederController : ICatFeederController
 {
@@ -511,13 +515,13 @@ public static void Guard(this Control control, Action uiMutation)
 }
 ```
 
-&nbsp;&nbsp;&nbsp;&nbsp;As the result of this actions we have mirrored code-behind solution logic. We also achieved separation of concerns between the layers: Model abstracts/adapts the driver into more useful way; Controller controls the user inputs and provides the state changes to the View, as well as manages the concurrency and shapes the logic; View is only responsible for delegating the user inputs to Controller and for Model (State) graphical representation. We can even implement unit tests for Model and Controller, not without some mocking pain though - especially in case of Controller. But as we stated in section [3.1 The Driving Force Of Change](#31-the-driving-force-of-change) hammering any pattern to such a basic problem can look like overkill, which leads us to the need of more *complex* UI interaction to be solved... 
+&nbsp;&nbsp;&nbsp;&nbsp;As the result of this actions we have mirrored code-behind solution logic. We also achieved separation of concerns between the layers: Model abstracts/adapts the driver into more useful way; Controller controls the user inputs and provides the state changes to the View, as well as manages the concurrency and shapes the logic; View is only responsible for delegating the user inputs to Controller and for Model (State) graphical representation. We can even implement unit tests for Model and Controller, not without some mocking pain though - especially in case of Controller. But, as we stated, hammering any pattern to such a basic problem can look like overkill, so to showcase the benefits we need more *complex* UI interaction to be solved ... 
 
 ### 4.3 Second User Story
 &nbsp;&nbsp;&nbsp;&nbsp;Let's imagine our UX designers have come to us and told that using modal dialogs to report progress or errors is a bit weird technique painful for our users. So they are asking development team to embed all the screens into the form itself and navigate between them during the application lifetime.
 
 ### 4.4 The Router
-&nbsp;&nbsp;&nbsp;&nbsp;Obviously we could place the logic of view changes inside each View-Controller interaction, but in this case we will quickly violate SRP and made our code very fragile and complex - we can even say that such kind of approach puts as not far away from code-behind.
+&nbsp;&nbsp;&nbsp;&nbsp;Obviously we could place the logic of view changes inside each View-Controller interaction, but in this case we will quickly violate SRP and made our code very fragile and complex - we can even say that such kind of approach puts us not far away from code-behind.
 
 &nbsp;&nbsp;&nbsp;&nbsp;A typical solution for such kind of problems in MVC world is adding a router. Let's take a look on the diagram and describe responsibilities of new elements:
 <img src="Images/MVC + Router.jpg"/>
@@ -605,7 +609,7 @@ Looks like ASP.Net MVC, isn't it? :wink:
 &nbsp;&nbsp;&nbsp;&nbsp;We can say that code become much cleaner and we raised marks almost for each NFR. But we still have a bit of a problem due to the fact that Controller and View should know about each other. If only we could decouple them by making this reference one-directional. Can we do it?
 
 ## 5 MVP
-&nbsp;&nbsp;&nbsp;&nbsp;Second step after we have removed the non-UI logic from the View is to eliminate coupling between the View and Controller. Which leads us to Model-View-Presenter pattern, especially it's pinnacle: MVP(M) aka Model-View-PresentationModel - where Presenter in the "Presentation Model" doesn't know anything about the view even through interface, while View is a passive **observer** of PM.
+&nbsp;&nbsp;&nbsp;&nbsp;Second step after we have removed the non-UI logic from the View is to eliminate coupling between the View and Controller. Which leads us to Model-View-Presenter pattern, especially it's pinnacle variation: MVP(M) aka Model-View-PresentationModel - where Presenter in the "Presentation Model" doesn't know anything about the view even through interface, while View is a passive **observer** of PM.
 
 ### 5.1 Definition
 &nbsp;&nbsp;&nbsp;&nbsp;The MVP(M) variation of the MVP pattern can be described with the following diagram:
@@ -616,7 +620,7 @@ Looks like ASP.Net MVC, isn't it? :wink:
 - The Presenter role has the biggest changes compared to MVC pattern. It is now responsible for providing **all** possible ways of interaction via methods, as well as **all** possible reactions via events. It knows nothing about View and only *claims* that it has the following input endpoints (methods and properties) and the following output endpoints (events). It's up to View or any other consumer to handle them correctly. Moreover one can easily change the View itself for any particular presenter.    
 
 ### 5.2 Implementation
-&nbsp;&nbsp;&nbsp;&nbsp;The definition might sound a bit confusing and raise a questions about the *events* magic, so let' walk-through the implementation.Note that, there is no changes to State (Model) layer at all - which is a good confirmation that our first, MVC, approach to introduce this layer was correct. The whole solution can be found in [MVP.sln](./MVP/MVP.sln). 
+&nbsp;&nbsp;&nbsp;&nbsp;The definition might sound a bit confusing and raise questions about the *events* magic, so let' walk-through the implementation. Note that, there are no changes to State (Model) layer at all - which is a good confirmation that our first, MVC, approach to introduce this layer was correct. The whole solution can be found in [MVP.sln](./MVP/MVP.sln). 
 
 &nbsp;&nbsp;&nbsp;&nbsp;**First,** let's change our core interfaces for View and Presenter (ex Controller):
 
@@ -697,7 +701,7 @@ So the contract of `ICatFeederPresenter` states:
 - I can be busy, please observe `IsBusy` state change  
 - I can *present* successful or failed feeding, please observe `SuccessfulFeeding` and `FailedFeeding`
 
-We can say that the contract is complete - there is no other actions or events that can be invoked or observed during feeding, and the Presenter itself doesn't care how one will render those events or where the action will be called from. The Presenter is also responsible for application state transition: from feeder to feeding result. Feeding result presenters will also contain state transition claims in there code, please refer to [ISuccessfulFeedingPresenter](./MVP/MVP.PM/CatFeederComponent/Presenters/ISuccessfulFeedingPresenter.cs) and [IFailedFeedingPresenter](./MVP/MVP.PM/CatFeederComponent/Presenters/IFailedFeedingPresenter.cs). We will omit the contracts and implementations listings for those peripheral presenter here for brevity, one can always refer to solution to see them.
+We can say that the contract is complete - there is no other actions or events that can be invoked or observed during feeding, and the Presenter itself doesn't care how one will render those events or where the action will be called from. The Presenter is also responsible for application state transition: from feeder to feeding result. Feeding result presenters will also contain state transition claims in their code, please refer to [ISuccessfulFeedingPresenter](./MVP/MVP.PM/CatFeederComponent/Presenters/ISuccessfulFeedingPresenter.cs) and [IFailedFeedingPresenter](./MVP/MVP.PM/CatFeederComponent/Presenters/IFailedFeedingPresenter.cs). We will omit the contracts and implementations listings for those peripheral presenter here for brevity, one can always refer to solution to see them.
 <br/>
 Let's also look at the `CatFeederPresenter` implementation, which you can find [here](./MVP/MVP.PM/CatFeederComponent/Presenters/CatFeederPresenter.cs):
 ```C#
@@ -827,10 +831,10 @@ public partial class CatFeederView : ViewBase, IView<ICatFeederPresenter>
     public ICatFeederPresenter Presenter => (ICatFeederPresenter)AttachedPresenter;
 }
 ```
-As you can see it is absolutely passive - it only delegates and observes the presenter, as well as passing presenters it cannot handle to the router for navigation. Let's discuss the router separately.
+As you can see view is absolutely passive - it only delegates and observes the presenter, as well as passing presenters it cannot handle to the router for navigation. Let's discuss the router separately.
 
 ### 5.3 The Router transformation
-&nbsp;&nbsp;&nbsp;&nbsp;Compared to MVC the role of the router has changed - it's now a part of View layer and responsible only for View selection for presenter, thus giving us possibility to bind different views for the same presenter for example via interface hierarchy. Router can also use different strategies depending on Presenter (or View) attributes to use ether current ViewHost or produce new one including showing the message boxes if needed - it's a matter of adding more introspections to Router engine. So it decouples application state transition, which is now managed by Presenters from the actual rendering (View), it also maintains low-coupling between Views - it is Router responsibility to select a View for Presenter not the View itself.
+&nbsp;&nbsp;&nbsp;&nbsp;Compared to MVC the role of the router has changed - it's now a part of View layer and responsible only for View selection for Presenter, thus giving us possibility to bind different views for the same presenter for example via interface hierarchy. Router can also use different strategies depending on Presenter (or View) attributes to use either current ViewHost or produce new one including showing the message boxes if needed - it's a matter of adding more introspections to Router engine. So it decouples application state transition, which is now managed by Presenters from the actual rendering (View), it also maintains low-coupling between Views - it is Router responsibility to select a View for Presenter not the View itself.
 
 &nbsp;&nbsp;&nbsp;&nbsp;As a result the [IRouter](./MVP/MVP.PM/Engine/IRouter.cs) interface now contains only one method:
 ```C#
@@ -883,7 +887,7 @@ public sealed class Router : IRouter
 &nbsp;&nbsp;&nbsp;&nbsp;Do we have any sub-system boundaries in our MVP(M) solution? Yes we do - the Model and the Presentation Model layers are fully independent (directly and indirectly) and provide contracts for all possible interactions. Believe it or not the price is worth the result - author himself once had an experience of re-writing the application initially build for WinCE and compact framework to support iOS and Android on Xamarin framework. And it was relatively easy to change just the View code and override some device specific services like GPS tracker, due to having PM and M layers already implemented.
 
 ### 5.5 The sub-system boundary caveat - the notorious `IWindowService`
-&nbsp;&nbsp;&nbsp;&nbsp;The sub-system boundaries are shinny and pure, which is good. **But** one should be very careful because as any pureness it can be easily and subconsciously spoiled. And there is the very particular example how it usually spoiled. Let's get back for our first user story where success and failure notifications were implemented as modal message boxes. Even having mature PM frameworks 99% of developers will implement this requirement by using injectable `IWindowService` which will show message boxes from it's implementation. This service, in our example, could have the following contract:
+&nbsp;&nbsp;&nbsp;&nbsp;The sub-system boundaries are shinny and pure, which is good. **But** one should be very careful because as any pureness it can be easily and subconsciously spoiled. And there is the very particular example how it usually spoiled. Let's get back for our first user story where success and failure notifications were implemented as modal message boxes. Even having mature PM frameworks a lot of developers will implement this requirement by using injectable `IWindowService` which will show message boxes from it's implementation. This service, in our example, could have the following contract:
 ```C#
 public interface IWindowService
 {
@@ -904,7 +908,7 @@ public interface ICatFeederPresenter : IPresenter
 
 &nbsp;&nbsp;&nbsp;&nbsp;What's the problem reader may ask? The problem is that your PM layer is no longer forms sub-system boundary by not claiming all the possible interaction in it's contract and by having the indirect reference to `IWindowService` in the implementation! Moreover PM layer now reference the entity from consumer (UI) world breaking separation of concerns even further! PM layer testing is harder now, changing UI is harder now and so on - so all our efforts to make architecture better and raise NFRs are rendered void.
 
-&nbsp;&nbsp;&nbsp;&nbsp;The good news is that overcoming this issue is very easy - one just need to use `IWindowService` without changing the Presenter contracts. Or, better, use the router approach we have described in [5.3 The Router transformation](#53-the-router-transformation) section above. As usual on the scale of such simple problem as our Cat Feeder it's very subtle, but still very crucial, difference.
+&nbsp;&nbsp;&nbsp;&nbsp;The good news is that overcoming this issue is very easy - one just need to use `IWindowService` in the View layer without changing the Presenter contracts. Or, better, use the router approach we have described in [5.3 The Router transformation](#53-the-router-transformation) section above. As usual on the scale of such simple problem as our Cat Feeder it's very subtle, but still very crucial, difference.
 
 ### 5.6 The Assessment
 &nbsp;&nbsp;&nbsp;&nbsp;Let's check our architecture against our NFRs:
@@ -917,11 +921,440 @@ public interface ICatFeederPresenter : IPresenter
 | Reusability | *High* | There is no coupling to View from PM layer |
 | Readability | *Moderate* | Being very demanding to ourselves we can complain about the need to subscribe/unsubscribe  presenter events from View causing some boilerplate in code |
 
-&nbsp;&nbsp;&nbsp;&nbsp;Overall MVP(M) can be called sufficient in terms of NFRs fulfillment. But the need to write imperative code in View is a bit annoying. That's why very *lazy* people has invented MVVM which we will move on shortly.
+&nbsp;&nbsp;&nbsp;&nbsp;Overall MVP(M) can be called sufficient in terms of NFRs fulfillment. But the need to write imperative code in View is a bit annoying. That's why very *lazy* people have invented MVVM which we will move on shortly.
 
 ## 6 MVVM
-tbd: example on how to overcome sub-system boundary caveat in the world of data binding!
+&nbsp;&nbsp;&nbsp;&nbsp;Probably the most controversial statement of the whole article: MVVM is not more than MVP(M) + a good MVVM framework containing binding engine, data template engine and other nice to have features like behaviors and commands to extend the template engine. So author position is - there is no MVVM without a good framework, but one can always "stop" at the MVP(M) level in almost each and any technology and be happy with it.
 
+### 6.1 Definition
+&nbsp;&nbsp;&nbsp;&nbsp; Having said that MVVM is MVP(M) + framework, let's give it a definition, as usual starting with diagram:
+<img src="Images/MVVM.jpg"/>
+
+- The State (Model) holds exactly the same responsibilities as for MVC and MVP(M). Has no changes at all.
+- The ViewModel still provides all possible ways of interaction and reactions as PresenterModel in MVP(M). Thus forming the sub-system boundary.
+- The View also does the same as in MVP(M) - it observers ViewModel and delegates actions to it. But instead of doing it imperatively it uses the MVVM engine to become completely declarative.
+
+### 6.2 Implementation
+&nbsp;&nbsp;&nbsp;&nbsp;As we can see from the definition there is no difference in responsibilities between MVP(M) and MVVM. The main new participant here is MVVM engine, which depends on particular framework, here we will use WPF for implementation. One can find the whole solution [here](./MVVM/MVVM.sln).
+
+&nbsp;&nbsp;&nbsp;&nbsp;**First**, let's define [IViewModel](./MVVM/MVVM/Engine/AppState/IViewModel.cs) interface and base implementation for it:
+```C#
+public interface IViewModel : INotifyPropertyChanged, IDisposable
+{
+}
+
+[PublicAPI]
+public abstract class ViewModelBase : IViewModel
+{
+    public event PropertyChangedEventHandler PropertyChanged = (_, _) => {} ;
+
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    [UsedImplicitly]
+    protected bool SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
+    {
+        if (EqualityComparer<T>.Default.Equals(field, value)) 
+            return false;
+            
+        field = value;
+            
+        OnPropertyChanged(propertyName);
+            
+        return true;
+    }
+
+    protected virtual void DisposeCore()
+    {
+    }
+
+    public void Dispose() => 
+        DisposeCore();
+}
+```
+As one can spot it looks like renaming the Presenter to ViewModel, now let's change our `CatFeederPresenter` interface and implementation to ViewModel [interface](./MVVM/MVVM/CatFeederComponent/ViewModels/ICatFeederVm.cs) and [implementation](./MVVM/MVVM/CatFeederComponent/ViewModels/CatFeederVm.cs) suitable for using with WPF:
+```C#
+public interface ICatFeederVm : IViewModel, INextVmSink, IConfirmationSink
+{
+    ICommand Feed { get; }
+        
+    bool IsBusy { get; }
+}
+
+public class CatFeederVm : ViewModelBase, ICatFeederVm
+{
+    private readonly ICatFeederService _catFeederService;
+    private readonly Func<ISuccessfulFeedingVm> _successfulFeedingVmFactory;
+    private readonly Func<IFailedFeedingVm> _failedFeedingVmFactory;
+
+    private readonly ICommand _feedCommand;
+    private readonly ICommand _aboutCommand;
+    
+    private readonly NextVmSinkPart _nextVmSinkPart = new();
+    private readonly ConfirmationSinkPart _confirmationSinkPart = new();
+
+    public CatFeederVm(
+        ICatFeederService catFeederService,
+        Func<ISuccessfulFeedingVm> successfulFeedingVmFactory,
+        Func<IFailedFeedingVm> failedFeedingVmFactory)
+    {
+        _catFeederService = catFeederService;
+        _successfulFeedingVmFactory = successfulFeedingVmFactory;
+        _failedFeedingVmFactory = failedFeedingVmFactory;
+        
+        _feedCommand = new ActionCommand(FeedCore);
+        _aboutCommand = new ActionCommand(AboutCore);
+    }
+
+    public ICommand Feed => _feedCommand;
+
+    public bool IsBusy
+    {
+        get;
+        private set => SetField(ref field, value);
+    }
+
+    private void FeedCore()
+    {
+        IsBusy = true;
+        
+        Task.Run(async () =>
+        {
+            try
+            {
+                var result = await _catFeederService.Feed();
+                    
+                switch (result.Successful)
+                {
+                    case true:
+                    {
+                        var successfulFeedingVm = _successfulFeedingVmFactory();
+                        successfulFeedingVm.Message = result.Message;
+                        _nextVmSinkPart.Proceed(successfulFeedingVm);
+                        break;
+                    }
+                    default:
+                    {
+                        var failedFeedingVm = _failedFeedingVmFactory();
+                        failedFeedingVm.Reason = result.Message;
+                        _nextVmSinkPart.Proceed(failedFeedingVm);
+                        break;
+                    }
+                }
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        });
+    }
+
+    IObservable<IViewModel> INextVmSink.ProceedWith => _nextVmSinkPart.ProceedWith;
+
+    protected override void DisposeCore()
+    {
+        _catFeederService.Dispose();
+        _nextVmSinkPart.Dispose();
+        
+        base.DisposeCore();
+    }
+
+    Func<IConfirmationVm, MessageBoxResult>? IConfirmationSink.Confirm
+    {
+        set => _confirmationSinkPart.Confirm = value;
+    }
+
+    public ICommand About => _aboutCommand;
+    
+    private void AboutCore()
+    {
+        _confirmationSinkPart.AskConfirmation(new ConfirmationVm()
+        {
+            Caption = "Feeder App 4.0",
+            Text = "This is app version 4.0",
+            Icon = MessageBoxImage.Information,
+            Buttons =  MessageBoxButton.OK
+        });
+    }
+}
+```
+Please don't pay attention to `IConfirmationSink` and code related to it for now, we will discuss it later. 
+
+&nbsp;&nbsp;&nbsp;&nbsp;As one can see the contract and implementation is almost the same as for [ICatFeederPresenter](./MVP/MVP.PM/CatFeederComponent/Presenters/ICatFeederPresenter.cs) and [CatFeederPresenter](./MVP/MVP.PM/CatFeederComponent/Presenters/CatFeederPresenter.cs). The biggest difference is that we have removed the `IObservable` and now using plain property with change notification for `IsBusy` contract, as well as `Feed` method become `ICommand Feed` - those primitives are first class citizens for WPF allowing reacting to events and binding user input to methods respectively. ViewModel layer still drives the application state transition. But instead of providing specific `IObservable<IXXXPresenter>` properties it uses common [INextVmSink](./MVVM/MVVM/Engine/AppState/INextVmSink.cs) interface to plug into MVVM engine navigation part:
+```C#
+public interface INextVmSink : IDisposable
+{
+    IObservable<IViewModel> ProceedWith { get; }
+}
+```
+&nbsp;&nbsp;&nbsp;&nbsp;And the navigation part is now incorporated to the ViewModel layer as well, by adding [IMainVm](./MVVM/MVVM/Engine/AppState/IMainVm.cs) and it's [implementation](./MVVM/MVVM/Engine/AppState/MainVm.cs) to the engine:
+```C#
+public interface IMainVm : IViewModel
+{
+    IViewModel? CurrentVm { get; set; }
+}
+
+public class MainVm : ViewModelBase, IMainVm
+{
+    private IViewModel? _currentVm;
+    private IDisposable? _currentSubscription;
+
+    public IViewModel? CurrentVm
+    {
+        get => _currentVm;
+        set
+        {
+            if (Equals(value, _currentVm)) return;
+            
+            StopListeningToTransitions();
+     
+            var old = _currentVm;
+            _currentVm = value;
+            old?.Dispose();
+            
+            StartListeningToTransitions();
+            
+            OnPropertyChanged();
+        }
+    }
+
+    private void StartListeningToTransitions()
+    {
+        if (_currentVm is INextVmSink nextVmSink)
+        {
+            _currentSubscription = nextVmSink
+                .ProceedWith
+                .Subscribe(next => CurrentVm = next);
+        }
+    }
+
+    private void StopListeningToTransitions()
+    {
+        _currentSubscription?.Dispose();
+    }
+
+    protected override void DisposeCore()
+    {
+        var currentSubscription = Interlocked.Exchange(ref _currentSubscription, null);
+        currentSubscription?.Dispose();
+        
+        var currentVm = Interlocked.Exchange(ref _currentVm, null);
+        currentVm?.Dispose();
+        
+        base.DisposeCore();
+    }
+}
+``` 
+
+&nbsp;&nbsp;&nbsp;&nbsp;**Second**, and most interesting part, is how [CatFeederView](./MVVM/MVVM/CatFeederComponent/Views/CatFeederView.xaml) looks like:
+```XML
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:viewModels="clr-namespace:MVVM.CatFeederComponent.ViewModels"
+                    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+                    xmlns:engine="clr-namespace:MVVM.Engine"
+                    xmlns:behaviors="clr-namespace:MVVM.Engine.Behaviors">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary>
+            <DataTemplate DataType="{x:Type viewModels:ICatFeederVm}">
+                <Grid>
+                    <i:Interaction.Behaviors>
+                        <behaviors:ConfirmationBehavior/>
+                    </i:Interaction.Behaviors>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Button 
+                        IsEnabled="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}"
+                        Command="{Binding Feed}" 
+                        Grid.Row="0"
+                        Margin="{StaticResource DefaultMargin}"
+                        Padding="{StaticResource DefaultPadding}"
+                        FontSize="{StaticResource FontSizeBig}">
+                        Feed the cat!
+                    </Button>
+                    <Button
+                        Command="{Binding About}"
+                        Margin="{StaticResource DefaultMargin}"
+                        Padding="{StaticResource DefaultPadding}"
+                        FontSize="{StaticResource FontSizeMedium}"
+                        Grid.Row="1">
+                        About
+                    </Button>
+                </Grid>
+            </DataTemplate>
+        </ResourceDictionary>
+    </ResourceDictionary.MergedDictionaries>
+</ResourceDictionary>
+```
+So yes, **finally** it's fully declarative with no code behind at all. Again this is achieved via  WPF that gives us Binding engine for properties and events. As well as extension points like Template engine: `<DataTemplate DataType="{x:Type viewModels:ICatFeederVm}">` which actually tells that whenever the DataContext is `ICatFeederVm` it should use this template. 
+
+### 6.3 Where is the router?
+&nbsp;&nbsp;&nbsp;&nbsp;Attentive reader can really wonder at this point: ok, we have incorporate `INavigationHost` into ViewModel layer and now it's `IMainVm` - fine; we are providing `<DataTemplate DataType="{x:Type viewModels:IXXXVm}">` declarative templates - great. But how do they glue together? Can we have different datatemplates for the same ViewModel depending on UI requirements? Or, in other words: "Where is the router, Lebowski?"
+
+&nbsp;&nbsp;&nbsp;&nbsp;The truth is that for WPF-based MVVM engine the router is defined with with template selection strategy or `TemplateSelector`. In our case we will use custom [InterfaceTemplateSelector](./MVVM/MVVM/Engine/TemplateSelectors/InterfaceTemplateSelector.cs), so that View will only reference ViewModel contract, not the implementation - further decoupling them from each other:
+```C#
+/// <summary>
+/// Allows WPF DataTemplates to be resolved by interface type,
+/// preferring the most specific interface first.
+/// </summary>
+public sealed class InterfaceTemplateSelector : DataTemplateSelector
+{
+    public override DataTemplate? SelectTemplate(object? item, DependencyObject container)
+    {
+        if (item == null || container is not FrameworkElement element)
+            return base.SelectTemplate(item, container);
+
+        var type = item.GetType();
+
+        // 1. Exact type first (default WPF behavior)
+        var template = FindTemplate(type, element);
+        if (template != null)
+            return template;
+
+        // 2. Cached interfaces ordered from most specific to the least specific
+        foreach (var @interface in type.GetInterfaces())
+        {
+            template = FindTemplate(@interface, element);
+            if (template != null)
+                return template;
+        }
+
+        // 3. Base classes
+        var baseType = type.BaseType;
+        while (baseType != null)
+        {
+            template = FindTemplate(baseType, element);
+            if (template != null)
+                return template;
+
+            baseType = baseType.BaseType;
+        }
+
+        return base.SelectTemplate(item, container);
+    }
+
+    private static DataTemplate? FindTemplate(Type type, FrameworkElement element)
+    {
+        var key = new DataTemplateKey(type);
+
+        return element.TryFindResource(key) as DataTemplate
+               ?? Application.Current.TryFindResource(key) as DataTemplate;
+    }
+}
+```
+This strategy, used in our application, is searching first suitable template registered for particular ViewModel interface starting from UI control it applied to. Thus we only need two things:
+
+a) Define [template](./MVVM/MVVM/Engine/AppState/MainView.xaml) for `IMainVm` which acts as an application state aka active ViewModel provider:
+```XML
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:appState="clr-namespace:MVVM.Engine.AppState">
+    <DataTemplate DataType="{x:Type appState:IMainVm}">
+       <ContentControl Content="{Binding CurrentVm}"
+                       ContentTemplateSelector="{StaticResource InterfaceTemplateSelector}"/>
+    </DataTemplate>
+</ResourceDictionary>
+```
+b) Register our View templates somewhere. As for our case all the templates are always the same for each ViewModel, we can do it once in [App.xaml](./MVVM/MVVM/App.xaml):
+```XML
+<Application x:Class="MVVM.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:system="clr-namespace:System;assembly=System.Runtime">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="DI/TemplateSelectors.xaml"/>
+                <ResourceDictionary Source="DI/Converters.xaml"/>
+                <ResourceDictionary Source="DI/Fonts.xaml"/>
+                <ResourceDictionary Source="DI/Sizes.xaml"/>
+                <ResourceDictionary Source="/Engine/AppState/MainView.xaml"/>
+                <ResourceDictionary Source="CatFeederComponent/Views/ViewTemplates.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>
+```
+But if we ever need to override the template for particular IViewModel we can easily add the template for any View.
+
+&nbsp;&nbsp;&nbsp;&nbsp;**Important** achievement compared to MVP(M) is that there is **no** coupling at all between View, "Router" and ViewModel. ViewModel layer is now completely responsible for the whole application state including active ViewModel. And the View decides how to render it, but has **no** control on state change at all. Thus giving us the form of loose-coupling not achieved in MVP/MVC style frameworks.
+
+### 6.4 How not to fall into `IWindowService` pitfall
+&nbsp;&nbsp;&nbsp;&nbsp; Of course we can't omit our "beloved" pitfall about adding possibility to show MessageBoxes to architectures with sub-system boundaries. In case of MVVM the problem is even more more wide-spread than with MVP(M) like architectures. Just because Views are declarative and there is no dedicated complex Router - it looks really attractive and simple to go with `IWindowService` and inject it to ViewModels. But again, unfortunately, it breaks sub-system boundary as we have shown in [5.5 The sub-system boundary caveat - the notorious `IWindowService`](#55-the-sub-system-boundary-caveat---the-notorious-iwindowservice).
+
+&nbsp;&nbsp;&nbsp;&nbsp;So what to do? First of all, we should create a possibility for ViewModel to state that it will **need** to have a differed result of rendering particular confirmation. We can do it, for example, via [IConfirmationSink](./MVVM/MVVM/Engine/Behaviors/IConfrimationSink.cs) and [IConfirmationVm](./MVVM/MVVM/Engine/Behaviors/IConfirmationVm.cs) interfaces:
+```C#
+public interface IConfirmationSink
+{
+    Func<IConfirmationVm, MessageBoxResult>? Confirm { set; }
+}
+
+public interface IConfirmationVm : IViewModel
+{
+    public string? Caption { get; }
+    
+    public string? Text { get; }
+    
+    public MessageBoxButton Buttons { get; }
+    
+    public MessageBoxImage Icon { get; }
+}
+```
+So now any ViewModel implementing `IConfirmationSink` will state: "I raise IConfirmationVm describing the confirmation and I do expect the result", by expecting consumer to provide `Func<IConfirmationVm, MessageBoxResult>? Confirm` handler.
+
+&nbsp;&nbsp;&nbsp;&nbsp;Next we need to create a generic MVVM engine part that will detect that `IConfirmationSink` ViewModel is now being shown and add the `Confirm` handler. In WPF one way of doing this is implementing the `Behavior`:
+```C#
+public class ConfirmationBehavior : Behavior<FrameworkElement>
+{
+    protected override void OnAttached()
+    {
+        base.OnAttached();
+        
+        if (AssociatedObject.DataContext is IConfirmationSink confirmationSink)
+        {
+            confirmationSink.Confirm = vm => MessageBox.Show(GetWindow(), vm.Text, vm.Caption, vm.Buttons, vm.Icon);
+        }
+    }
+
+    private Window GetWindow()
+    {
+        // Warning won't work before Loaded event as well as for popups and ContextMenus, skipping the implementation for simplicity
+        return Window.GetWindow(AssociatedObject)!;
+    }
+}
+```
+Which can be used in View template as following, see [CatFeederView.xaml](./MVVM/MVVM/CatFeederComponent/Views/CatFeederView.xaml):
+```XML
+<DataTemplate DataType="{x:Type viewModels:ICatFeederVm}">
+    <Grid>
+        <i:Interaction.Behaviors>
+            <confirmation:ConfirmationBehavior/>
+        </i:Interaction.Behaviors>
+        ...
+    </Grid>
+</DataTemplate>
+```
+
+&nbsp;&nbsp;&nbsp;&nbsp;By having this extensibility over MVVM engine we are keeping the sub-system boundary and avoiding `IWindowService` pitfall. Please also note, that there are different approaches to do it - one can use Binding extensions and even keep `IObservable` like contract instead of a bit ugly `Func<IConfirmationVm, MessageBoxResult>? Confirm { set; }`. Here we just showing the most straight-forward and easy to implement way to achieve the task.
+
+### 6.5 The Assessment
+&nbsp;&nbsp;&nbsp;&nbsp;Let's check our architecture against our NFRs:
+| NFR | Level | Comment |
+|-----|--------|---------|
+| Testability | *High* | Mocks are only needed for *downstream* layers |
+| Extensibility | *High* | The application state transition is encapsulated in ViewModel layer, UI representation is totally separated to View layer |
+| Adaptability | *High* | The ViewModels are already in place - do whatever your want in your View layer |
+| Effectiveness | *High* | Consumer layer must know contracts, VM layer knows nothing about consumers |
+| Reusability | *High* | There is no coupling to View from VM layer |
+| Readability | *High* | Both *FE* and *BE* cares only about there own technologies. View is completely declarative  |
+
+&nbsp;&nbsp;&nbsp;&nbsp;Seems like we finally reached the highest marks for our set of NFRs! Flawless victory, isn't it? Kinda. But look at the amount of code in *Engine* layer - it's much bigger and requires much more investments compared to MVC/MVP approaches. Yes it is basically implemented once and then tuned when new features are needed. But still this is the knowledge required for new comer to get used to. Moreover as usually even this Engine is based on already existing features of selected MVVM technology one needs some experts in it even to start. And the learning curve is much steeper compared to other MV-X techniques.
+
+<-- "P/R until here" -->
 ## 7 Conclusion
 
 ### 7.1 Modern State

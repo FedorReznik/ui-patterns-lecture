@@ -1,0 +1,38 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:viewModels="clr-namespace:MVVM.CatFeederComponent.ViewModels"
+                    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+                    xmlns:confirmation="clr-namespace:MVVM.Engine.Behaviors.Confirmation">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary>
+            <DataTemplate DataType="{x:Type viewModels:ICatFeederVm}">
+                <Grid>
+                    <i:Interaction.Behaviors>
+                        <confirmation:ConfirmationBehavior/>
+                    </i:Interaction.Behaviors>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Button 
+                        IsEnabled="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}"
+                        Command="{Binding Feed}" 
+                        Grid.Row="0"
+                        Margin="{StaticResource DefaultMargin}"
+                        Padding="{StaticResource DefaultPadding}"
+                        FontSize="{StaticResource FontSizeBig}">
+                        Feed the cat!
+                    </Button>
+                    <Button
+                        Command="{Binding About}"
+                        Margin="{StaticResource DefaultMargin}"
+                        Padding="{StaticResource DefaultPadding}"
+                        FontSize="{StaticResource FontSizeMedium}"
+                        Grid.Row="1">
+                        About
+                    </Button>
+                </Grid>
+            </DataTemplate>
+        </ResourceDictionary>
+    </ResourceDictionary.MergedDictionaries>
+</ResourceDictionary>

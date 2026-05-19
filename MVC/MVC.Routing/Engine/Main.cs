@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
 using JetBrains.Annotations;
@@ -23,7 +24,11 @@ namespace MVC.Routing.Engine
             // ReSharper disable once ConvertToLocalFunction
             Action uiMutation = () =>
             {
+                var currentView = Controls
+                    .Cast<UserControl>()
+                    .FirstOrDefault();
                 Controls.Clear();
+                currentView?.Dispose();
                 view.Dock = DockStyle.Fill;
                 Controls.Add(view);
             };
