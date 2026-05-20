@@ -283,14 +283,14 @@ In this case one can still maintain the good enough balance between code complex
 
 &nbsp;&nbsp;&nbsp;&nbsp;As we discussed in some conditions code-behind can be good enough option, but there are forces  violating those conditions, from authors perspective they are:
 
-- First was the hardware evolution: computers become thousands time faster in the last 20 years and displays have jumped from SVGA(800x600) up to 4K(3840x2160) - 17x more space, not to speak about multi-displays set-ups. This means that we have more space to use and enough power to make the UI beautiful and interactive. That has introduced the shift to complex UI scenarios, single-page applications, tabbed and docked interfaces and so on - the rise of UX if we can say so. But all of this beauty requires more loosely coupled and cohesive components with UI separated from logic. 
-- Second was the shift of users needs from *just* an automation of part of work to complex interactions and integrations with different systems. For example in the begging it was enough to have billing system that only calculates balance numbers, now users want to integrate those numbers with external financial systems. All this integration flows multiplies the complexity of the code and thus deeming the code-behind approach as really hard to evolve and maintain.
+- First was the hardware evolution: computers have become thousands of times faster in the last 20 years and displays have jumped from SVGA(800x600) up to 4K(3840x2160) - 17x more space, not to speak about multi-display setups. This means that we have more space to use and enough power to make the UI beautiful and interactive. That has introduced the shift to complex UI scenarios, single-page applications, tabbed and docked interfaces and so on - the rise of UX if we can say so. But all of this beauty requires more loosely coupled and cohesive components with UI separated from logic. 
+- Second was the shift in users' needs from *just* an automation of part of work to complex interactions and integrations with different systems. For example in the beginning it was enough to have billing system that only calculates balance numbers, now users want to integrate those numbers with external financial systems. All these integration flows multiply the complexity of the code and thus deeming the code-behind approach as really hard to evolve and maintain.
 
 &nbsp;&nbsp;&nbsp;&nbsp;And thus architects started to think about organizing code differently and creating ways of separating the concerns and responsibilities in UI - they have created patterns.
 
 ### 3.2 A Word About Patterns In This Article
 
-&nbsp;&nbsp;&nbsp;&nbsp;Each pattern has it's own definition that shapes what we consider during discussion between engineers. But also each pattern has it's own variations - here we won't discuss all of the variations. Sometimes we won't discuss even the main variation, but the most relative to the topic - we are considering this justified, because even popular frameworks like Microsoft ASP.Net MVC often aren't using the main variation of pattern. We also won't use any frameworks and mostly stick with WinForms to show that there is no black magic inside.
+&nbsp;&nbsp;&nbsp;&nbsp;Each pattern has its own definition that shapes what we consider during discussion between engineers. But also each pattern has it's own variations - here we won't discuss all of the variations. Sometimes we won't discuss even the main variation, but the most relevant to the topic - we are considering this justified, because even popular frameworks like Microsoft ASP.Net MVC often aren't using the main variation of pattern. We also won't use any frameworks and mostly stick with WinForms to show that there is no black magic inside.
 
 &nbsp;&nbsp;&nbsp;&nbsp;With all this in mind let's proceed with first improvement over code-behind.
 
@@ -304,7 +304,7 @@ In this case one can still maintain the good enough balance between code complex
 <img src="Images/MVC - the State-View-Controller variation.jpg"/>
 
 - The State (Model) represents the data or state in the application in a logical way; it is in charge of carrying the data. It also adapts external services for Controller.
-- The View is the graphical representation of the Model; it is responsible for displaying the Model data in suitable form. Usually the View itself better to be de-coupled from host or canvas that it is shown on - this gives the possibility to use it in different places even combining the Views on one host/canvas.
+- The View is the graphical representation of the model; it is responsible for displaying the Model data in suitable form. Usually the View itself should ideally be decoupled from host or canvas that it is shown on - this gives the possibility to use it in different places even combining the Views on one host/canvas.
 - The Controller is the orchestrator of this pattern; it is in charge of intercepting user input (mouse and keyboard) and interacting with the State (Model) and the View: it calls the Model services, which provides new State, which is propagated to the View by Controller. It also **owns** the operations thus commanding the view about validation errors or operations availability.
 
 ### 4.2 Implementation
@@ -385,7 +385,7 @@ public interface IView<in TController> : IView
 }
 ```
 
-&nbsp;&nbsp;&nbsp;&nbsp;**Finally** we need to implement our `CatFeederController` and `CatFeederView` to actually fullfil our application logic. Let's start with [ICatFeederController](./MVC/MVC/CatFeederComponent/Controllers/ICatFeederController.cs) interface or better to say contract of it's capabilities:
+&nbsp;&nbsp;&nbsp;&nbsp;**Finally** we need to implement our `CatFeederController` and `CatFeederView` to actually fulfill our application logic. Let's start with [ICatFeederController](./MVC/MVC/CatFeederComponent/Controllers/ICatFeederController.cs) interface or better to say contract of its capabilities:
 ```C#
 public interface ICatFeederController : IController
 {
@@ -433,7 +433,7 @@ public class CatFeederController : ICatFeederController
     }
 }
 ```
-As you can see it transforms the nature of *IO* operation over feeder to void method more suitable/consumable for button handler - taking the responsibility of thread management, as well as it controls the lifetime of the services. It also changes the view states by specific, *domain*, methods like `Block(), UnBlock()` and `ProcessFeedingResult(...)`. Which leads us to the [ICatFeederView](./MVC/MVC/CatFeederComponent/Views/ICatFeederView.cs) contract:
+As you can see it transforms the nature of *IO* operation over feeder to void method more suitable and consumable for button handler - taking the responsibility of thread management, as well as it controls the lifetime of the services. It also changes the view states by specific, *domain*, methods like `Block(), UnBlock()` and `ProcessFeedingResult(...)`. This leads us to the [ICatFeederView](./MVC/MVC/CatFeederComponent/Views/ICatFeederView.cs) contract:
 ```C#
 public interface ICatFeederView : IView<ICatFeederController>
 {
@@ -505,7 +505,7 @@ public partial class CatFeederView : UserControl, ICatFeederView
     }
 }
 ```
-As you can see it's actually delegates all the work to Controller and reacts on state changes via **specific** methods stated in it's contract. There is one subtle thing though - as you can recall in code-behind we faced the need to mutate the UI only on UI-thread due to STA nature of WindowsForms. Seems reasonable to put this responsibility to the view, because ideally controller should not be dependent to underlying UI technology. This aspect is achieved via [Guard](./MVC/MVC/Engine/UIExtensions.cs) extension to implement it once and forever for all the views:
+As you can see it actually delegates all the work to Controller and reacts on state changes via **specific** methods stated in it's contract. There is one subtle thing though - as you can recall in code-behind we faced the need to mutate the UI only on UI-thread due to STA nature of WindowsForms. Seems reasonable to put this responsibility to the view, because ideally controller should not be dependent on the underlying UI technology. This aspect is achieved via [Guard](./MVC/MVC/Engine/UIExtensions.cs) extension to implement it once and forever for all the views:
 ```C#
 public static void Guard(this Control control, Action uiMutation)
 {
@@ -516,20 +516,20 @@ public static void Guard(this Control control, Action uiMutation)
 }
 ```
 
-&nbsp;&nbsp;&nbsp;&nbsp;As the result of this actions we have mirrored code-behind solution logic. We also achieved separation of concerns between the layers: Model abstracts/adapts the driver into more useful way; Controller controls the user inputs and provides the state changes to the View, as well as manages the concurrency and shapes the logic; View is only responsible for delegating the user inputs to Controller and for Model (State) graphical representation. We can even implement unit tests for Model and Controller, not without some mocking pain though - especially in case of Controller. But, as we stated, hammering any pattern to such a basic problem can look like overkill, so to showcase the benefits we need more *complex* UI interaction to be solved ... 
+&nbsp;&nbsp;&nbsp;&nbsp;As a result of these actions we have mirrored code-behind solution logic. We also achieved separation of concerns between the layers: Model abstracts/adapts the driver into a more useful way; Controller controls the user inputs and provides the state changes to the View, as well as manages the concurrency and shapes the logic; View is only responsible for delegating the user inputs to Controller and for Model (State) graphical representation. We can even implement unit tests for Model and Controller, although not without some mocking pain - especially in case of Controller. But, as we stated, hammering any pattern to such a basic problem can look like overkill, so to showcase the benefits we need more *complex* UI interaction to be solved ... 
 
 ### 4.3 Second User Story
-&nbsp;&nbsp;&nbsp;&nbsp;Let's imagine our UX designers have come to us and told that using modal dialogs to report progress or errors is a bit weird technique painful for our users. So they are asking development team to embed all the screens into the form itself and navigate between them during the application lifetime.
+&nbsp;&nbsp;&nbsp;&nbsp;Let's imagine our UX designers have come to us and told that using modal dialogs to report progress or errors is a bit a weird and painful technique for our users. So they are asking development team to embed all the screens into the form itself and navigate between them during the application lifetime.
 
 ### 4.4 The Router
-&nbsp;&nbsp;&nbsp;&nbsp;Obviously we could place the logic of view changes inside each View-Controller interaction, but in this case we will quickly violate SRP and made our code very fragile and complex - we can even say that such kind of approach puts us not far away from code-behind.
+&nbsp;&nbsp;&nbsp;&nbsp;Obviously we could place the logic of view changes inside each View-Controller interaction, but in this case we will quickly violate SRP and make our code very fragile and complex - we can even say that such kind of approach puts us not far away from code-behind.
 
 &nbsp;&nbsp;&nbsp;&nbsp;A typical solution for such kind of problems in MVC world is adding a router. Let's take a look on the diagram and describe responsibilities of new elements:
 <img src="Images/MVC + Router.jpg"/>
 
-- Let's first of all speak about URL - we are using term URL here just to mimic practices wide-spread in web development, it basically can be any identifier of the screen we want to show.
-- Router works as an entry-point from basic MVC sample but on steroids - it *knows* which View and Controller to create and attaches them to each other based on URL provided. It also responsible for updating the ViewHost to show new View.
-- ViewHost is only responsible for accepting the View to show and displaying it. It doesn't know any details of application logic or whatsoever.
+- Let's first of all speak about URL - we are using term URL here just to mimic practices widespread in web development, it basically can be any identifier of the screen we want to show.
+- Router works as an entry-point from basic MVC sample but on steroids - it *knows* which View and Controller to create and attaches them to each other based on URL provided. It is also responsible for updating the ViewHost to show new View.
+- ViewHost is only responsible for accepting the View to show and displaying it. It doesn't know any details of application logic or anything whatsoever.
 - Controller uses router to navigate to new URL, causing the View to be updated in the ViewHost.
 
 &nbsp;&nbsp;&nbsp;&nbsp;The whole implementation is presented in [MVC.sln](./MVC/MVC.sln) in [MVC.Routing project](./MVC/MVC.Routing/MVC.Routing.csproj) with the following notable differences to basic MVC project:
@@ -591,7 +591,7 @@ public sealed class Router : IRouter
     }
 }
 ```
-As a result we decoupled navigation logic from our Controllers with quite moderate efforts by off-putting the complexity on the DI engine and by having a bit more complicated registrations in the [CompositionRoot](./MVC/MVC.Routing/DI/CompositionRoot.cs) as a trade-off.
+As a result we decoupled navigation logic from our Controllers with quite moderate efforts by offloading the complexity on the DI engine and by having a bit more complicated registrations in the [CompositionRoot](./MVC/MVC.Routing/DI/CompositionRoot.cs) as a trade-off.
 
 Looks like ASP.Net MVC, isn't it? :wink:
 
@@ -607,10 +607,10 @@ Looks like ASP.Net MVC, isn't it? :wink:
 | Reusability | *Moderate* | Controller and View are bound via interfaces, but still changing a View for Controller requires significant efforts |
 | Readability | *Low* | Controller/View “spaghetti” code - both call each other |
 
-&nbsp;&nbsp;&nbsp;&nbsp;We can say that code become much cleaner and we raised marks almost for each NFR. But we still have a bit of a problem due to the fact that Controller and View should know about each other. If only we could decouple them by making this reference one-directional. Can we do it?
+&nbsp;&nbsp;&nbsp;&nbsp;We can say that the code became much cleaner and we raised marks almost for each NFR. But we still have a bit of a problem due to the fact that Controller and View should know about each other. If only we could decouple them by making this reference one-directional. Can we do it?
 
 ## 5 MVP
-&nbsp;&nbsp;&nbsp;&nbsp;Second step after we have removed the non-UI logic from the View is to eliminate coupling between the View and Controller. Which leads us to Model-View-Presenter pattern, especially it's pinnacle variation: MVP(M) aka Model-View-PresentationModel - where Presenter in the "Presentation Model" doesn't know anything about the view even through interface, while View is a passive **observer** of PM.
+&nbsp;&nbsp;&nbsp;&nbsp;Second step after we have removed the non-UI logic from the View is to eliminate coupling between the View and Controller. This leads us to Model-View-Presenter pattern, especially it's pinnacle variation: MVP(M) aka Model-View-PresentationModel - where Presenter in the "Presentation Model" doesn't know anything about the view even through interface, while View is a passive **observer** of PM.
 
 ### 5.1 Definition
 &nbsp;&nbsp;&nbsp;&nbsp;The MVP(M) variation of the MVP pattern can be described with the following diagram:
@@ -881,7 +881,7 @@ public sealed class Router : IRouter
 ### 5.4 The sub-system boundary
 &nbsp;&nbsp;&nbsp;&nbsp;For a second let's step aside of UI development topic and look at what we reach in more general way, but for this we need to give one definition:
 
-> **The sub-system boundary:** is the set of APIs which forms necessary and sufficient set of endpoints to interact with. So that no complex objects need to cross the boundary for application to be functional - whether directly via method parameters or indirectly via constructor injection or whatsoever. Only the POCOs are passed into the sub-system from consumer layers. The sub-system does not reference anything from consumer layers.
+> **The sub-system boundary:** is the set of APIs which forms necessary and sufficient set of endpoints to interact with. So that no complex objects need to cross the boundary for application to be functional - whether directly via method parameters or indirectly via constructor injection or anything whatsoever. Only the POCOs are passed into the sub-system from consumer layers. The sub-system does not reference anything from consumer layers.
 
 &nbsp;&nbsp;&nbsp;&nbsp;The thing is: when you program in terms of sub-systems with clear boundaries your NFRs naturally raise, because those boundaries are much easier to test and/or re-use: you just change the consumers without changing the sub-systems. 
 
@@ -1285,7 +1285,7 @@ But if we ever need to override the template for particular IViewModel we can ea
 &nbsp;&nbsp;&nbsp;&nbsp;**Important** achievement compared to MVP(M) is that there is **no** coupling at all between View, "Router" and ViewModel. ViewModel layer is now completely responsible for the whole application state including active ViewModel. And the View decides how to render it, but has **no** control on state change at all. Thus giving us the form of loose-coupling not achieved in MVP/MVC style frameworks.
 
 ### 6.4 How not to fall into `IWindowService` pitfall
-&nbsp;&nbsp;&nbsp;&nbsp; Of course we can't omit our "beloved" pitfall about adding possibility to show MessageBoxes to architectures with sub-system boundaries. In case of MVVM the problem is even more more wide-spread than with MVP(M) like architectures. Just because Views are declarative and there is no dedicated complex Router - it looks really attractive and simple to go with `IWindowService` and inject it to ViewModels. But again, unfortunately, it breaks sub-system boundary as we have shown in [5.5 The sub-system boundary caveat - the notorious `IWindowService`](#55-the-sub-system-boundary-caveat---the-notorious-iwindowservice).
+&nbsp;&nbsp;&nbsp;&nbsp; Of course we can't omit our "beloved" pitfall about adding possibility to show MessageBoxes to architectures with sub-system boundaries. In case of MVVM the problem is even more more widespread than with MVP(M) like architectures. Just because Views are declarative and there is no dedicated complex Router - it looks really attractive and simple to go with `IWindowService` and inject it to ViewModels. But again, unfortunately, it breaks sub-system boundary as we have shown in [5.5 The sub-system boundary caveat - the notorious `IWindowService`](#55-the-sub-system-boundary-caveat---the-notorious-iwindowservice).
 
 &nbsp;&nbsp;&nbsp;&nbsp;So what to do? First of all, we should create a possibility for ViewModel to state that it will **need** to have a differed result of rendering particular confirmation. We can do it, for example, via [IConfirmationSink](./MVVM/MVVM/Engine/Behaviors/IConfrimationSink.cs) and [IConfirmationVm](./MVVM/MVVM/Engine/Behaviors/IConfirmationVm.cs) interfaces:
 ```C#
