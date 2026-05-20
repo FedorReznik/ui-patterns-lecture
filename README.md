@@ -61,7 +61,7 @@ And the status of feeding should be provided by modal dialog with success/fail m
 
 ### 2.1 Code-behind "Pattern" Definition
 
-&nbsp;&nbsp;&nbsp;&nbsp;Let's imagine that everything is happening around 2005 and our team has proven expertise in Windows Forms, as well as code-behind approach seems quick and easy to implement: just open the form designer in your IDE, put some controls on it, wire the event handlers with mouse click, put the code into handlers and you are done. So you can hardly call this a pattern, the better word would be a process.
+&nbsp;&nbsp;&nbsp;&nbsp;Let's imagine that everything is happening around 2005 and our team has proven expertise in Windows Forms, as well as code-behind approach seems quick and easy to implement: just open the form designer in your IDE, put some controls on it, wire the event handlers with a mouse click, put the code into handlers and you are done. So you can hardly call this a pattern, the better word would be a process.
 
 ### 2.2 The Implementation
 
@@ -98,7 +98,7 @@ public partial class Main : Form
                         ProcessError(ae);
                     }
                 }, 
-                // 5. Doing so on UI thread, respecting the STA nature of Windows Forms
+                // 5. Doing so on the UI thread, respecting the STA nature of Windows Forms
                 _uiScheduler);
     }
 
@@ -130,17 +130,17 @@ public partial class Main : Form
 2. Calling `Feed` method in button click event handler - `btnFeedCatOnClick`
 3. Handling successful feeding
 4. Handling error during feeding
-5. Notifications should be shown on UI thread to adhere STA nature of desktop apps, so we are using continuation also avoiding `async void` method signature
+5. Notifications should be shown on UI thread to adhere to the STA nature of desktop apps, so we are using continuation also avoiding `async void` method signature
 
 Simple. Effective. Quick. Or...?
 
 ### 2.3 Here Comes The Issues
 
-&nbsp;&nbsp;&nbsp;&nbsp;Let's take a closer look on our code and try to answer is it easy to test? Unfortunately it is not, because to implement a test we need to instantiate our form in the correct environment e.g. in STA. More over we cannot separately test the logic - basically only end to end testing is possible. Now even if we want to create e2e test we will ought to use either reflection to call private `btnFeedCatOnClick` method or use UI-automation tools, which are notorious for their instability. So the only reasonable solution is to have manual QA team which will test it.
+&nbsp;&nbsp;&nbsp;&nbsp;Let's take a closer look on our code and try to answer whether it is easy to test. Unfortunately it is not, because to implement a test we need to instantiate our form in the correct environment e.g. in STA. Moreover we cannot separately test the logic - basically only end-to-end testing is possible. Now even if we want to create e2e test we will ought to use either reflection to call private `btnFeedCatOnClick` method or use UI-automation tools, which are notorious for their instability. So the only reasonable solution is to have manual QA team which will test it.
 </br>
 &nbsp;&nbsp;&nbsp;&nbsp;And QA fortunately did find the issues:
 - First issue - driver throws exception if we are trying to call `Feed` while feeding in progress
-- Second issue - was much more harder to find: it appears, that closing the window w/o proper waiting for feeding to finish causes a memory leak in device. **Note:** This behavior is modeled via logging the correct feeding cancellation, see [CatFeederDriver](./FeederDriver/FeederDriver/CatFeederDriver.cs) - just use your imagination.
+- Second issue - was much harder to find: it appears, that closing the window without properly waiting for feeding to finish causes a memory leak in device. **Note:** This behavior is modeled via logging the correct feeding cancellation, see [CatFeederDriver](./FeederDriver/FeederDriver/CatFeederDriver.cs) - just use your imagination.
 
 &nbsp;&nbsp;&nbsp;&nbsp;Of course our dev-team quickly fixes it, see [MainFixed](./Code-behind/CodeBehind/MainFixed.cs) (Please also change `@fixed` variable to true in [Program](./Code-behind/CodeBehind/Program.cs)):
 ```C#
@@ -243,13 +243,13 @@ public partial class MainFixed : Form
 
 &nbsp;&nbsp;&nbsp;&nbsp;Much more to keep in mind compared to the first implementation! In addition we have the following problems with code-behind approach:
 - Mix of UI and functional code - we can't separate work between "tech-guru" and "UI-guru"
-- Hardly auto-testable code, so one need to have a manual regression test-cycle for each release
+- Hardly auto-testable code, so one needs to have a manual regression test-cycle for each release
 - We also can't re-use this code in other parts of our project
 
-&nbsp;&nbsp;&nbsp;&nbsp;These and other problems can be formalized via NFRs: a non-functional requirements that specifies criteria that can be used to judge the operation of a system, rather than specific behaviors. They are contrasted with functional requirements that define specific behavior or functions. For this article we will select the following subset of NFRs:
+&nbsp;&nbsp;&nbsp;&nbsp;These and other problems can be formalized via NFRs: a set of non-functional requirements that specifies criteria that can be used to judge the operation of a system, rather than specific behaviors. They are contrasted with functional requirements that define specific behavior or functions. For this article we will select the following subset of NFRs:
 - Testability - the ability to implement the pyramid of tests: unit, integration, e2e
 - Extensibility - the ability to bring new features into the project without pain
-- Adaptability - the ability to withstand technology change. Usually we are supposing that technology will stay forever and one won't change your UI framework or database or whatever. But the author was involved in such a projects like adapting WinCE application to IOS and Android, so if your approach gives your possibility to quickly change the framework and not requiring to much effort to do it - it's better
+- Adaptability - the ability to withstand technology change. Usually we assume that the technology stack will remain unchanged forever and one won't change your UI framework or database or whatever. But the author was involved in such projects like adapting WinCE application to IOS and Android, so if your approach gives you the possibility to quickly change the framework and not requiring too much effort to do it - it's better
 - Effectiveness - the ability to bring more developers into the project and split the work between them. This NFR is usually tightly related to Time-to-Market (TTM)
 - Reusability - the ability to move functionality between components.
 - Readability - the ability to minimize cognitive pressure then reading the code - usually it is easier to think about one aim at the time and trust the contracts you have. It also related to the amount of boilerplate one need to get through
@@ -263,7 +263,7 @@ public partial class MainFixed : Form
 | Adaptability | *Low* | UI is mixed with logic, so changing any part of technology is complicated |
 | Effectiveness | *Low* | *Frontend* and *backend* will working with the same set of files, not via contracts |
 | Reusability | *Low* |  One can extract UserControl(s) to improve it a bit |
-| Readability | *Low* | The more features we will add the bigger and dirty will code-behind file become |
+| Readability | *Low* | The more features we will add the bigger and messier the code-behind file becomes |
 
 ### 2.4 The Blasphemy
 
