@@ -1,4 +1,4 @@
-<h1> The history of UI architecture design approaches: from Code-behind to MVVM </h1>
+<h1> The History of UI Architecture Approaches: From Code-Behind to MVVM </h1>
 
 By Fedor Reznik
 
@@ -36,23 +36,23 @@ By Fedor Reznik
 - [7 Conclusion](#7-conclusion)
   - [7.1 Modern State](#71-modern-state)
   - [7.2 Which Approach To Select?](#72-which-approach-to-select)
-  - [7.3 Final word.](#73-final-word)
+  - [7.3 Final word](#73-final-word)
 
 ## 1 Preface
 
 ### 1.1 The Purpose 
 
-&nbsp;&nbsp;&nbsp;&nbsp;The whole purpose of this article is to summarize author's experience with regard to UI development and how it evolved via .Net technologies prism. Thus this point of view is highly opinionated and doesn't pretend to be 100% truth. Neither it is historically correct - in the end the MVC pattern itself is older than .Net! We will try to focus on trade-offs of different approaches and why developers have moved from one to another - trying to reveal the idea(s) behind them.
+&nbsp;&nbsp;&nbsp;&nbsp;The whole purpose of this article is to summarize the author's experience with UI development and how it evolved through the prism of .NET technologies. Thus this point of view is highly opinionated and does not claim to be the absolute truth. Neither it is historically correct - in the end the MVC pattern itself is older than .Net! We will try to focus on trade-offs of different approaches and why developers have moved from one to another - trying to explain the ideas behind them.
 </br>
-&nbsp;&nbsp;&nbsp;&nbsp;To give more examples we will need some kind of "Business/Problem domain" wired through different solutions. The problem is if we select a complex one we will hide the ideas in KLOCs and KLOCs of code not related to the actual topic. If we select a simple one some of our arguments might seem a bit artificial and issues highlighted can look dubious or non-existing at all. Well, we will try to keep the domain as simple as it possible - so prepare your imagination to extend the pros and cons highlighted to more complex areas.
+&nbsp;&nbsp;&nbsp;&nbsp;To give more examples we will need some kind of "Business/Problem domain" wired through different solutions. The problem is if we select a complex one we will hide the ideas in KLOCs and KLOCs of code not related to the actual topic. If we select a simple one some of our arguments might seem a bit artificial and issues highlighted can look dubious or non-existing at all. Well, we will try to keep the domain as simple as possible - so prepare your imagination to extend the pros and cons highlighted to more complex areas.
 
 ### 1.2 Domain
 
-&nbsp;&nbsp;&nbsp;&nbsp;Let's imagine that we are running an automatic cat feeder business. Right now we are only providing hardware configured feeders - with physical buttons on device. Our engineering team has developed and integrated into device the bluetooth adapter, as well as provided corresponding driver, so the idea is to quickly provide application to control cat feeder remotely. 
+&nbsp;&nbsp;&nbsp;&nbsp;Let's imagine that we are running an automatic cat feeder business. Right now we are only providing hardware configured feeders - with physical buttons on device. Our engineering team has developed and integrated a Bluetooth adapter into the device, as well as provided corresponding driver, so the idea is to quickly provide an application to control the cat feeder remotely. 
 
 ### 1.3 First User Story
 
-&nbsp;&nbsp;&nbsp;&nbsp;To quickly conquer the market we as the company must provide the simplest yet use-full desktop application: it should contain only "Feed the cat" button and should provide feedback if the feeding has been successful. So our UX team came-out with the following design:
+&nbsp;&nbsp;&nbsp;&nbsp;To quickly conquer the market we as the company must provide the simplest yet useful desktop application: it should contain only "Feed the cat" button and should provide feedback if the feeding has been successful. So our UX team came upt with the following design:
 <img src="Images/CatFeederAppUX.png"/> 
 
 And the status of feeding should be provided by modal dialog with success/fail message and OK button to close it.
@@ -61,7 +61,7 @@ And the status of feeding should be provided by modal dialog with success/fail m
 
 ### 2.1 Code-behind "Pattern" Definition
 
-&nbsp;&nbsp;&nbsp;&nbsp;Let's imagine that everything is happening around 2005 and our team has proven expertise in Windows Forms, as well as code-behind approach seems quick and easy to implement: just open the form designer in your IDE, put some controls on it, wire the event handlers with mouse click, put the code into handlers and you are done. So you can hardly call this a pattern, the better word would be a process.
+&nbsp;&nbsp;&nbsp;&nbsp;Let's imagine that everything is happening around 2005 and our team has proven expertise in Windows Forms, as well as code-behind approach seems quick and easy to implement: just open the form designer in your IDE, put some controls on it, wire the event handlers with a mouse click, put the code into handlers and you are done. So you can hardly call this a pattern, the better word would be a process.
 
 ### 2.2 The Implementation
 
@@ -98,7 +98,7 @@ public partial class Main : Form
                         ProcessError(ae);
                     }
                 }, 
-                // 5. Doing so on UI thread, respecting the STA nature of Windows Forms
+                // 5. Doing so on the UI thread, respecting the STA nature of Windows Forms
                 _uiScheduler);
     }
 
@@ -130,17 +130,17 @@ public partial class Main : Form
 2. Calling `Feed` method in button click event handler - `btnFeedCatOnClick`
 3. Handling successful feeding
 4. Handling error during feeding
-5. Notifications should be shown on UI thread to adhere STA nature of desktop apps, so we are using continuation also avoiding `async void` method signature
+5. Notifications should be shown on UI thread to adhere to the STA nature of desktop apps, so we are using continuation also avoiding `async void` method signature
 
 Simple. Effective. Quick. Or...?
 
 ### 2.3 Here Comes The Issues
 
-&nbsp;&nbsp;&nbsp;&nbsp;Let's take a closer look on our code and try to answer is it easy to test? Unfortunately it is not, because to implement a test we need to instantiate our form in the correct environment e.g. in STA. More over we cannot separately test the logic - basically only end to end testing is possible. Now even if we want to create e2e test we will ought to use either reflection to call private `btnFeedCatOnClick` method or use UI-automation tools, which are notorious for their instability. So the only reasonable solution is to have manual QA team which will test it.
+&nbsp;&nbsp;&nbsp;&nbsp;Let's take a closer look on our code and try to answer whether it is easy to test. Unfortunately it is not, because to implement a test we need to instantiate our form in the correct environment e.g. in STA. Moreover we cannot separately test the logic - basically only end-to-end testing is possible. Now even if we want to create e2e test we will ought to use either reflection to call private `btnFeedCatOnClick` method or use UI-automation tools, which are notorious for their instability. So the only reasonable solution is to have manual QA team which will test it.
 </br>
 &nbsp;&nbsp;&nbsp;&nbsp;And QA fortunately did find the issues:
 - First issue - driver throws exception if we are trying to call `Feed` while feeding in progress
-- Second issue - was much more harder to find: it appears, that closing the window w/o proper waiting for feeding to finish causes a memory leak in device. **Note:** This behavior is modeled via logging the correct feeding cancellation, see [CatFeederDriver](./FeederDriver/FeederDriver/CatFeederDriver.cs) - just use your imagination.
+- Second issue - was much harder to find: it appears, that closing the window without properly waiting for feeding to finish causes a memory leak in device. **Note:** This behavior is modeled via logging the correct feeding cancellation, see [CatFeederDriver](./FeederDriver/FeederDriver/CatFeederDriver.cs) - just use your imagination.
 
 &nbsp;&nbsp;&nbsp;&nbsp;Of course our dev-team quickly fixes it, see [MainFixed](./Code-behind/CodeBehind/MainFixed.cs) (Please also change `@fixed` variable to true in [Program](./Code-behind/CodeBehind/Program.cs)):
 ```C#
@@ -243,13 +243,13 @@ public partial class MainFixed : Form
 
 &nbsp;&nbsp;&nbsp;&nbsp;Much more to keep in mind compared to the first implementation! In addition we have the following problems with code-behind approach:
 - Mix of UI and functional code - we can't separate work between "tech-guru" and "UI-guru"
-- Hardly auto-testable code, so one need to have a manual regression test-cycle for each release
+- Hardly auto-testable code, so one needs to have a manual regression test-cycle for each release
 - We also can't re-use this code in other parts of our project
 
-&nbsp;&nbsp;&nbsp;&nbsp;These and other problems can be formalized via NFRs: a non-functional requirements that specifies criteria that can be used to judge the operation of a system, rather than specific behaviors. They are contrasted with functional requirements that define specific behavior or functions. For this article we will select the following subset of NFRs:
+&nbsp;&nbsp;&nbsp;&nbsp;These and other problems can be formalized via NFRs: a set of non-functional requirements that specifies criteria that can be used to judge the operation of a system, rather than specific behaviors. They are contrasted with functional requirements that define specific behavior or functions. For this article we will select the following subset of NFRs:
 - Testability - the ability to implement the pyramid of tests: unit, integration, e2e
 - Extensibility - the ability to bring new features into the project without pain
-- Adaptability - the ability to withstand technology change. Usually we are supposing that technology will stay forever and one won't change your UI framework or database or whatever. But the author was involved in such a projects like adapting WinCE application to IOS and Android, so if your approach gives your possibility to quickly change the framework and not requiring to much effort to do it - it's better
+- Adaptability - the ability to withstand technology change. Usually we assume that the technology stack will remain unchanged forever and one won't change your UI framework or database or whatever. But the author was involved in such projects like adapting WinCE application to IOS and Android, so if your approach gives you the possibility to quickly change the framework and not requiring too much effort to do it - it's better
 - Effectiveness - the ability to bring more developers into the project and split the work between them. This NFR is usually tightly related to Time-to-Market (TTM)
 - Reusability - the ability to move functionality between components.
 - Readability - the ability to minimize cognitive pressure then reading the code - usually it is easier to think about one aim at the time and trust the contracts you have. It also related to the amount of boilerplate one need to get through
@@ -263,17 +263,17 @@ public partial class MainFixed : Form
 | Adaptability | *Low* | UI is mixed with logic, so changing any part of technology is complicated |
 | Effectiveness | *Low* | *Frontend* and *backend* will working with the same set of files, not via contracts |
 | Reusability | *Low* |  One can extract UserControl(s) to improve it a bit |
-| Readability | *Low* | The more features we will add the bigger and dirty will code-behind file become |
+| Readability | *Low* | The more features we will add the bigger and messier the code-behind file becomes |
 
 ### 2.4 The Blasphemy
 
 &nbsp;&nbsp;&nbsp;&nbsp;The code-behind approach may work! Indeed if you have:
 
 - Single responsibility windows with almost no validation logic.
-- Multiple-windows UI, e.g. when any new operation is done by opening new window instead of changing the content of the shown one
+- Multiple-window UI, e.g. when any new operation is done by opening new window instead of changing the content of the shown one
 - User interaction is focused around entering data and confirmation dialogs.
 
-In this case one can still maintain the good enough balance between code complexity and TTM. And it was actually working in early days - late 90s, early 00s. When software was quite simple in terms of interaction, but still very useful, because it was automating daily routine. 
+In this case one can still maintain the good enough balance between code complexity and TTM. And it was actually working in early days - late 90s, early 00s. When software was quite simple in terms of interaction, but still very useful, because it automated daily routines. 
 
 &nbsp;&nbsp;&nbsp;&nbsp;But soon everything was about to change...
 
@@ -283,14 +283,14 @@ In this case one can still maintain the good enough balance between code complex
 
 &nbsp;&nbsp;&nbsp;&nbsp;As we discussed in some conditions code-behind can be good enough option, but there are forces  violating those conditions, from authors perspective they are:
 
-- First was the hardware evolution: computers become thousands time faster in the last 20 years and displays have jumped from SVGA(800x600) up to 4K(3840x2160) - 17x more space, not to speak about multi-displays set-ups. This means that we have more space to use and enough power to make the UI beautiful and interactive. That has introduced the shift to complex UI scenarios, single-page applications, tabbed and docked interfaces and so on - the rise of UX if we can say so. But all of this beauty requires more loosely coupled and cohesive components with UI separated from logic. 
-- Second was the shift of users needs from *just* an automation of part of work to complex interactions and integrations with different systems. For example in the begging it was enough to have billing system that only calculates balance numbers, now users want to integrate those numbers with external financial systems. All this integration flows multiplies the complexity of the code and thus deeming the code-behind approach as really hard to evolve and maintain.
+- First was the hardware evolution: computers have become thousands of times faster in the last 20 years and displays have jumped from SVGA(800x600) up to 4K(3840x2160) - 17x more space, not to speak about multi-display setups. This means that we have more space to use and enough power to make the UI beautiful and interactive. That has introduced the shift to complex UI scenarios, single-page applications, tabbed and docked interfaces and so on - the rise of UX if we can say so. But all of this beauty requires more loosely coupled and cohesive components with UI separated from logic. 
+- Second was the shift in users' needs from *just* an automation of part of work to complex interactions and integrations with different systems. For example in the beginning it was enough to have billing system that only calculates balance numbers, now users want to integrate those numbers with external financial systems. All these integration flows multiply the complexity of the code and thus deeming the code-behind approach as really hard to evolve and maintain.
 
 &nbsp;&nbsp;&nbsp;&nbsp;And thus architects started to think about organizing code differently and creating ways of separating the concerns and responsibilities in UI - they have created patterns.
 
 ### 3.2 A Word About Patterns In This Article
 
-&nbsp;&nbsp;&nbsp;&nbsp;Each pattern has it's own definition that shapes what we consider during discussion between engineers. But also each pattern has it's own variations - here we won't discuss all of the variations. Sometimes we won't discuss even the main variation, but the most relative to the topic - we are considering this justified, because even popular frameworks like Microsoft ASP.Net MVC often aren't using the main variation of pattern. We also won't use any frameworks and mostly stick with WinForms to show that there is no black magic inside.
+&nbsp;&nbsp;&nbsp;&nbsp;Each pattern has its own definition that shapes what we consider during discussion between engineers. But also each pattern has it's own variations - here we won't discuss all of the variations. Sometimes we won't discuss even the main variation, but the most relevant to the topic - we are considering this justified, because even popular frameworks like Microsoft ASP.Net MVC often aren't using the main variation of pattern. We also won't use any frameworks and mostly stick with WinForms to show that there is no black magic inside.
 
 &nbsp;&nbsp;&nbsp;&nbsp;With all this in mind let's proceed with first improvement over code-behind.
 
@@ -304,7 +304,7 @@ In this case one can still maintain the good enough balance between code complex
 <img src="Images/MVC - the State-View-Controller variation.jpg"/>
 
 - The State (Model) represents the data or state in the application in a logical way; it is in charge of carrying the data. It also adapts external services for Controller.
-- The View is the graphical representation of the Model; it is responsible for displaying the Model data in suitable form. Usually the View itself better to be de-coupled from host or canvas that it is shown on - this gives the possibility to use it in different places even combining the Views on one host/canvas.
+- The View is the graphical representation of the model; it is responsible for displaying the Model data in suitable form. Usually the View itself should ideally be decoupled from host or canvas that it is shown on - this gives the possibility to use it in different places even combining the Views on one host/canvas.
 - The Controller is the orchestrator of this pattern; it is in charge of intercepting user input (mouse and keyboard) and interacting with the State (Model) and the View: it calls the Model services, which provides new State, which is propagated to the View by Controller. It also **owns** the operations thus commanding the view about validation errors or operations availability.
 
 ### 4.2 Implementation
@@ -385,7 +385,7 @@ public interface IView<in TController> : IView
 }
 ```
 
-&nbsp;&nbsp;&nbsp;&nbsp;**Finally** we need to implement our `CatFeederController` and `CatFeederView` to actually fullfil our application logic. Let's start with [ICatFeederController](./MVC/MVC/CatFeederComponent/Controllers/ICatFeederController.cs) interface or better to say contract of it's capabilities:
+&nbsp;&nbsp;&nbsp;&nbsp;**Finally** we need to implement our `CatFeederController` and `CatFeederView` to actually fulfill our application logic. Let's start with [ICatFeederController](./MVC/MVC/CatFeederComponent/Controllers/ICatFeederController.cs) interface or better to say contract of its capabilities:
 ```C#
 public interface ICatFeederController : IController
 {
@@ -433,7 +433,7 @@ public class CatFeederController : ICatFeederController
     }
 }
 ```
-As you can see it transforms the nature of *IO* operation over feeder to void method more suitable/consumable for button handler - taking the responsibility of thread management, as well as it controls the lifetime of the services. It also changes the view states by specific, *domain*, methods like `Block(), UnBlock()` and `ProcessFeedingResult(...)`. Which leads us to the [ICatFeederView](./MVC/MVC/CatFeederComponent/Views/ICatFeederView.cs) contract:
+As you can see it transforms the nature of *IO* operation over feeder to void method more suitable and consumable for button handler - taking the responsibility of thread management, as well as it controls the lifetime of the services. It also changes the view states by specific, *domain*, methods like `Block(), UnBlock()` and `ProcessFeedingResult(...)`. This leads us to the [ICatFeederView](./MVC/MVC/CatFeederComponent/Views/ICatFeederView.cs) contract:
 ```C#
 public interface ICatFeederView : IView<ICatFeederController>
 {
@@ -505,7 +505,7 @@ public partial class CatFeederView : UserControl, ICatFeederView
     }
 }
 ```
-As you can see it's actually delegates all the work to Controller and reacts on state changes via **specific** methods stated in it's contract. There is one subtle thing though - as you can recall in code-behind we faced the need to mutate the UI only on UI-thread due to STA nature of WindowsForms. Seems reasonable to put this responsibility to the view, because ideally controller should not be dependent to underlying UI technology. This aspect is achieved via [Guard](./MVC/MVC/Engine/UIExtensions.cs) extension to implement it once and forever for all the views:
+As you can see it actually delegates all the work to Controller and reacts on state changes via **specific** methods stated in it's contract. There is one subtle thing though - as you can recall in code-behind we faced the need to mutate the UI only on UI-thread due to STA nature of WindowsForms. Seems reasonable to put this responsibility to the view, because ideally controller should not be dependent on the underlying UI technology. This aspect is achieved via [Guard](./MVC/MVC/Engine/UIExtensions.cs) extension to implement it once and forever for all the views:
 ```C#
 public static void Guard(this Control control, Action uiMutation)
 {
@@ -516,20 +516,20 @@ public static void Guard(this Control control, Action uiMutation)
 }
 ```
 
-&nbsp;&nbsp;&nbsp;&nbsp;As the result of this actions we have mirrored code-behind solution logic. We also achieved separation of concerns between the layers: Model abstracts/adapts the driver into more useful way; Controller controls the user inputs and provides the state changes to the View, as well as manages the concurrency and shapes the logic; View is only responsible for delegating the user inputs to Controller and for Model (State) graphical representation. We can even implement unit tests for Model and Controller, not without some mocking pain though - especially in case of Controller. But, as we stated, hammering any pattern to such a basic problem can look like overkill, so to showcase the benefits we need more *complex* UI interaction to be solved ... 
+&nbsp;&nbsp;&nbsp;&nbsp;As a result of these actions we have mirrored code-behind solution logic. We also achieved separation of concerns between the layers: Model abstracts/adapts the driver into a more useful way; Controller controls the user inputs and provides the state changes to the View, as well as manages the concurrency and shapes the logic; View is only responsible for delegating the user inputs to Controller and for Model (State) graphical representation. We can even implement unit tests for Model and Controller, although not without some mocking pain - especially in case of Controller. But, as we stated, hammering any pattern to such a basic problem can look like overkill, so to showcase the benefits we need more *complex* UI interaction to be solved ... 
 
 ### 4.3 Second User Story
-&nbsp;&nbsp;&nbsp;&nbsp;Let's imagine our UX designers have come to us and told that using modal dialogs to report progress or errors is a bit weird technique painful for our users. So they are asking development team to embed all the screens into the form itself and navigate between them during the application lifetime.
+&nbsp;&nbsp;&nbsp;&nbsp;Let's imagine our UX designers have come to us and told that using modal dialogs to report progress or errors is a bit a weird and painful technique for our users. So they are asking development team to embed all the screens into the form itself and navigate between them during the application lifetime.
 
 ### 4.4 The Router
-&nbsp;&nbsp;&nbsp;&nbsp;Obviously we could place the logic of view changes inside each View-Controller interaction, but in this case we will quickly violate SRP and made our code very fragile and complex - we can even say that such kind of approach puts us not far away from code-behind.
+&nbsp;&nbsp;&nbsp;&nbsp;Obviously we could place the logic of view changes inside each View-Controller interaction, but in this case we will quickly violate SRP and make our code very fragile and complex - we can even say that such kind of approach puts us not far away from code-behind.
 
 &nbsp;&nbsp;&nbsp;&nbsp;A typical solution for such kind of problems in MVC world is adding a router. Let's take a look on the diagram and describe responsibilities of new elements:
 <img src="Images/MVC + Router.jpg"/>
 
-- Let's first of all speak about URL - we are using term URL here just to mimic practices wide-spread in web development, it basically can be any identifier of the screen we want to show.
-- Router works as an entry-point from basic MVC sample but on steroids - it *knows* which View and Controller to create and attaches them to each other based on URL provided. It also responsible for updating the ViewHost to show new View.
-- ViewHost is only responsible for accepting the View to show and displaying it. It doesn't know any details of application logic or whatsoever.
+- Let's first of all speak about URL - we are using term URL here just to mimic practices widespread in web development, it basically can be any identifier of the screen we want to show.
+- Router works as an entry-point from basic MVC sample but on steroids - it *knows* which View and Controller to create and attaches them to each other based on URL provided. It is also responsible for updating the ViewHost to show new View.
+- ViewHost is only responsible for accepting the View to show and displaying it. It doesn't know any details of application logic or anything whatsoever.
 - Controller uses router to navigate to new URL, causing the View to be updated in the ViewHost.
 
 &nbsp;&nbsp;&nbsp;&nbsp;The whole implementation is presented in [MVC.sln](./MVC/MVC.sln) in [MVC.Routing project](./MVC/MVC.Routing/MVC.Routing.csproj) with the following notable differences to basic MVC project:
@@ -591,7 +591,7 @@ public sealed class Router : IRouter
     }
 }
 ```
-As a result we decoupled navigation logic from our Controllers with quite moderate efforts by off-putting the complexity on the DI engine and by having a bit more complicated registrations in the [CompositionRoot](./MVC/MVC.Routing/DI/CompositionRoot.cs) as a trade-off.
+As a result we decoupled navigation logic from our Controllers with quite moderate efforts by offloading the complexity on the DI engine and by having a bit more complicated registrations in the [CompositionRoot](./MVC/MVC.Routing/DI/CompositionRoot.cs) as a trade-off.
 
 Looks like ASP.Net MVC, isn't it? :wink:
 
@@ -607,23 +607,23 @@ Looks like ASP.Net MVC, isn't it? :wink:
 | Reusability | *Moderate* | Controller and View are bound via interfaces, but still changing a View for Controller requires significant efforts |
 | Readability | *Low* | Controller/View “spaghetti” code - both call each other |
 
-&nbsp;&nbsp;&nbsp;&nbsp;We can say that code become much cleaner and we raised marks almost for each NFR. But we still have a bit of a problem due to the fact that Controller and View should know about each other. If only we could decouple them by making this reference one-directional. Can we do it?
+&nbsp;&nbsp;&nbsp;&nbsp;We can say that the code became much cleaner and we raised marks almost for each NFR. But we still have a bit of a problem due to the fact that Controller and View should know about each other. If only we could decouple them by making this reference one-directional. Can we do it?
 
 ## 5 MVP
-&nbsp;&nbsp;&nbsp;&nbsp;Second step after we have removed the non-UI logic from the View is to eliminate coupling between the View and Controller. Which leads us to Model-View-Presenter pattern, especially it's pinnacle variation: MVP(M) aka Model-View-PresentationModel - where Presenter in the "Presentation Model" doesn't know anything about the view even through interface, while View is a passive **observer** of PM.
+&nbsp;&nbsp;&nbsp;&nbsp;Second step after we have removed the non-UI logic from the View is to eliminate coupling between the View and Controller. This leads us to Model-View-Presenter pattern, especially its pinnacle variation: MVP(M) aka Model-View-PresentationModel - where Presenter in the "Presentation Model" doesn't know anything about the view even through interface, while View is a passive **observer** of PM.
 
 ### 5.1 Definition
 &nbsp;&nbsp;&nbsp;&nbsp;The MVP(M) variation of the MVP pattern can be described with the following diagram:
 <img src="Images/MVP(M) + Router.jpg"/>
 
 - The State (Model) holds exactly the same responsibilities as in MVC pattern, e.g. represents the data or state in the application in a logical way; it is in charge of carrying the data. It also adapts external services for Presenter.
-- The View responsibilities is also the same as for MVC, but in addition to State(Model) representation, rendering and delegating user input to Presenter, it also observers the Presenter: directly via results of calling the methods; and indirectly by subscribing to presenter events.
+- The View responsibilities are also the same as for MVC, but in addition to State(Model) representation, rendering and delegating user input to Presenter, it also observes the Presenter: directly via results of calling the methods; and indirectly by subscribing to presenter events.
 - The Presenter role has the biggest changes compared to MVC pattern. It is now responsible for providing **all** possible ways of interaction via methods, as well as **all** possible reactions via events. It knows nothing about View and only *claims* that it has the following input endpoints (methods and properties) and the following output endpoints (events). It's up to View or any other consumer to handle them correctly. Moreover one can easily change the View itself for any particular presenter.    
 
 ### 5.2 Implementation
-&nbsp;&nbsp;&nbsp;&nbsp;The definition might sound a bit confusing and raise questions about the *events* magic, so let' walk-through the implementation. Note that, there are no changes to State (Model) layer at all - which is a good confirmation that our first, MVC, approach to introduce this layer was correct. The whole solution can be found in [MVP.sln](./MVP/MVP.sln). 
+&nbsp;&nbsp;&nbsp;&nbsp;The definition might sound a bit confusing and raise questions about the *events* magic, so let's walk through the implementation. Note that, there are no changes to State (Model) layer at all - which is a good confirmation that our first, MVC, approach to introduce this layer was correct. The whole solution can be found in [MVP.sln](./MVP/MVP.sln). 
 
-&nbsp;&nbsp;&nbsp;&nbsp;**First,** let's change our core interfaces for View and Presenter (ex Controller):
+&nbsp;&nbsp;&nbsp;&nbsp;**First,** let's change our core interfaces for View and Presenter (formerly Controller):
 
 - The Presenter will only require claiming that it can be disposed and can notify about it's property changes. As not every presenter needs actual logic of disposing and we don't want to repeat change notification boilerplate it is wise to have base implementation for presenters in addition to interface:
 ```C#
@@ -664,7 +664,7 @@ public abstract class PresenterBase : IPresenter
     }
 }
 ``` 
-As one can spot it now looks more like marking interface, because it doesn't have any references to View - this is the crucial difference to MVC.
+As one can spot it now looks more like a marker interface, because it doesn't have any references to View - this is the crucial difference to MVC.
 - The View contract is barely the same as in MVC, which is logical because in MVP View is *defined* by the presenter to be shown:
 ```C#
 public interface IView
@@ -881,7 +881,7 @@ public sealed class Router : IRouter
 ### 5.4 The sub-system boundary
 &nbsp;&nbsp;&nbsp;&nbsp;For a second let's step aside of UI development topic and look at what we reach in more general way, but for this we need to give one definition:
 
-> **The sub-system boundary:** is the set of APIs which forms necessary and sufficient set of endpoints to interact with. So that no complex objects need to cross the boundary for application to be functional - whether directly via method parameters or indirectly via constructor injection or whatsoever. Only the POCOs are passed into the sub-system from consumer layers. The sub-system does not reference anything from consumer layers.
+> **The sub-system boundary:** is the set of APIs which forms necessary and sufficient set of endpoints to interact with. So that no complex objects need to cross the boundary for application to be functional - whether directly via method parameters or indirectly via constructor injection or anything whatsoever. Only the POCOs are passed into the sub-system from consumer layers. The sub-system does not reference anything from consumer layers.
 
 &nbsp;&nbsp;&nbsp;&nbsp;The thing is: when you program in terms of sub-systems with clear boundaries your NFRs naturally raise, because those boundaries are much easier to test and/or re-use: you just change the consumers without changing the sub-systems. 
 
@@ -1285,7 +1285,7 @@ But if we ever need to override the template for particular IViewModel we can ea
 &nbsp;&nbsp;&nbsp;&nbsp;**Important** achievement compared to MVP(M) is that there is **no** coupling at all between View, "Router" and ViewModel. ViewModel layer is now completely responsible for the whole application state including active ViewModel. And the View decides how to render it, but has **no** control on state change at all. Thus giving us the form of loose-coupling not achieved in MVP/MVC style frameworks.
 
 ### 6.4 How not to fall into `IWindowService` pitfall
-&nbsp;&nbsp;&nbsp;&nbsp; Of course we can't omit our "beloved" pitfall about adding possibility to show MessageBoxes to architectures with sub-system boundaries. In case of MVVM the problem is even more more wide-spread than with MVP(M) like architectures. Just because Views are declarative and there is no dedicated complex Router - it looks really attractive and simple to go with `IWindowService` and inject it to ViewModels. But again, unfortunately, it breaks sub-system boundary as we have shown in [5.5 The sub-system boundary caveat - the notorious `IWindowService`](#55-the-sub-system-boundary-caveat---the-notorious-iwindowservice).
+&nbsp;&nbsp;&nbsp;&nbsp; Of course we can't omit our "beloved" pitfall about adding possibility to show MessageBoxes to architectures with sub-system boundaries. In case of MVVM the problem is even more more widespread than with MVP(M) like architectures. Just because Views are declarative and there is no dedicated complex Router - it looks really attractive and simple to go with `IWindowService` and inject it to ViewModels. But again, unfortunately, it breaks sub-system boundary as we have shown in [5.5 The sub-system boundary caveat - the notorious `IWindowService`](#55-the-sub-system-boundary-caveat---the-notorious-iwindowservice).
 
 &nbsp;&nbsp;&nbsp;&nbsp;So what to do? First of all, we should create a possibility for ViewModel to state that it will **need** to have a differed result of rendering particular confirmation. We can do it, for example, via [IConfirmationSink](./MVVM/MVVM/Engine/Behaviors/IConfrimationSink.cs) and [IConfirmationVm](./MVVM/MVVM/Engine/Behaviors/IConfirmationVm.cs) interfaces:
 ```C#
@@ -1368,5 +1368,5 @@ Which can be used in View template as following, see [CatFeederView.xaml](./MVVM
 ### 7.2 Which Approach To Select?
 &nbsp;&nbsp;&nbsp;&nbsp;From our point of view if you have knowledge of mature MVVM framework - just stick to it. If you have enough time and resources try to reach at the very least MVP(M) state with clear sub-system boundaries. If you short on time, you have relatively simple domain or you have a good MVC like framework - as we said all approaches can work to some extent and limitations.
 
-### 7.3 Final word.
+### 7.3 Final word
 &nbsp;&nbsp;&nbsp;&nbsp;In this article we have shown the evolution of UI architecture approaches, focusing on simple example and driving forces to seek "new ways of doing the same things" based on selected set of NFRs. We also have introduced the concept of **sub-system boundary**, which can be useful in any architecture: on micro level in backend or frontend; and on macro level when you are designing distributed micro-services. What we haven't touched is paradigm brought us by [React](https://react.dev/) like frameworks. Mostly because we have no great hands-on experience in it. We will be glad if readers provide feedback on how it acts against the selected NFRs.
