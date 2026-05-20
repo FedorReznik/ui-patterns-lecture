@@ -270,10 +270,10 @@ public partial class MainFixed : Form
 &nbsp;&nbsp;&nbsp;&nbsp;The code-behind approach may work! Indeed if you have:
 
 - Single responsibility windows with almost no validation logic.
-- Multiple-windows UI, e.g. when any new operation is done by opening new window instead of changing the content of the shown one
+- Multiple-window UI, e.g. when any new operation is done by opening new window instead of changing the content of the shown one
 - User interaction is focused around entering data and confirmation dialogs.
 
-In this case one can still maintain the good enough balance between code complexity and TTM. And it was actually working in early days - late 90s, early 00s. When software was quite simple in terms of interaction, but still very useful, because it was automating daily routine. 
+In this case one can still maintain the good enough balance between code complexity and TTM. And it was actually working in early days - late 90s, early 00s. When software was quite simple in terms of interaction, but still very useful, because it automated daily routines. 
 
 &nbsp;&nbsp;&nbsp;&nbsp;But soon everything was about to change...
 
