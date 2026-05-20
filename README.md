@@ -610,20 +610,20 @@ Looks like ASP.Net MVC, isn't it? :wink:
 &nbsp;&nbsp;&nbsp;&nbsp;We can say that the code became much cleaner and we raised marks almost for each NFR. But we still have a bit of a problem due to the fact that Controller and View should know about each other. If only we could decouple them by making this reference one-directional. Can we do it?
 
 ## 5 MVP
-&nbsp;&nbsp;&nbsp;&nbsp;Second step after we have removed the non-UI logic from the View is to eliminate coupling between the View and Controller. This leads us to Model-View-Presenter pattern, especially it's pinnacle variation: MVP(M) aka Model-View-PresentationModel - where Presenter in the "Presentation Model" doesn't know anything about the view even through interface, while View is a passive **observer** of PM.
+&nbsp;&nbsp;&nbsp;&nbsp;Second step after we have removed the non-UI logic from the View is to eliminate coupling between the View and Controller. This leads us to Model-View-Presenter pattern, especially its pinnacle variation: MVP(M) aka Model-View-PresentationModel - where Presenter in the "Presentation Model" doesn't know anything about the view even through interface, while View is a passive **observer** of PM.
 
 ### 5.1 Definition
 &nbsp;&nbsp;&nbsp;&nbsp;The MVP(M) variation of the MVP pattern can be described with the following diagram:
 <img src="Images/MVP(M) + Router.jpg"/>
 
 - The State (Model) holds exactly the same responsibilities as in MVC pattern, e.g. represents the data or state in the application in a logical way; it is in charge of carrying the data. It also adapts external services for Presenter.
-- The View responsibilities is also the same as for MVC, but in addition to State(Model) representation, rendering and delegating user input to Presenter, it also observers the Presenter: directly via results of calling the methods; and indirectly by subscribing to presenter events.
+- The View responsibilities are also the same as for MVC, but in addition to State(Model) representation, rendering and delegating user input to Presenter, it also observes the Presenter: directly via results of calling the methods; and indirectly by subscribing to presenter events.
 - The Presenter role has the biggest changes compared to MVC pattern. It is now responsible for providing **all** possible ways of interaction via methods, as well as **all** possible reactions via events. It knows nothing about View and only *claims* that it has the following input endpoints (methods and properties) and the following output endpoints (events). It's up to View or any other consumer to handle them correctly. Moreover one can easily change the View itself for any particular presenter.    
 
 ### 5.2 Implementation
-&nbsp;&nbsp;&nbsp;&nbsp;The definition might sound a bit confusing and raise questions about the *events* magic, so let' walk-through the implementation. Note that, there are no changes to State (Model) layer at all - which is a good confirmation that our first, MVC, approach to introduce this layer was correct. The whole solution can be found in [MVP.sln](./MVP/MVP.sln). 
+&nbsp;&nbsp;&nbsp;&nbsp;The definition might sound a bit confusing and raise questions about the *events* magic, so let's walk through the implementation. Note that, there are no changes to State (Model) layer at all - which is a good confirmation that our first, MVC, approach to introduce this layer was correct. The whole solution can be found in [MVP.sln](./MVP/MVP.sln). 
 
-&nbsp;&nbsp;&nbsp;&nbsp;**First,** let's change our core interfaces for View and Presenter (ex Controller):
+&nbsp;&nbsp;&nbsp;&nbsp;**First,** let's change our core interfaces for View and Presenter (formerly Controller):
 
 - The Presenter will only require claiming that it can be disposed and can notify about it's property changes. As not every presenter needs actual logic of disposing and we don't want to repeat change notification boilerplate it is wise to have base implementation for presenters in addition to interface:
 ```C#
@@ -664,7 +664,7 @@ public abstract class PresenterBase : IPresenter
     }
 }
 ``` 
-As one can spot it now looks more like marking interface, because it doesn't have any references to View - this is the crucial difference to MVC.
+As one can spot it now looks more like a marker interface, because it doesn't have any references to View - this is the crucial difference to MVC.
 - The View contract is barely the same as in MVC, which is logical because in MVP View is *defined* by the presenter to be shown:
 ```C#
 public interface IView
