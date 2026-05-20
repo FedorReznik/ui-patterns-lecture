@@ -36,7 +36,7 @@ By Fedor Reznik
 - [7 Conclusion](#7-conclusion)
   - [7.1 Modern State](#71-modern-state)
   - [7.2 Which Approach To Select?](#72-which-approach-to-select)
-  - [7.3 Final word.](#73-final-word)
+  - [7.3 Final word](#73-final-word)
 
 ## 1 Preface
 
@@ -1368,5 +1368,5 @@ Which can be used in View template as following, see [CatFeederView.xaml](./MVVM
 ### 7.2 Which Approach To Select?
 &nbsp;&nbsp;&nbsp;&nbsp;From our point of view if you have knowledge of mature MVVM framework - just stick to it. If you have enough time and resources try to reach at the very least MVP(M) state with clear sub-system boundaries. If you short on time, you have relatively simple domain or you have a good MVC like framework - as we said all approaches can work to some extent and limitations.
 
-### 7.3 Final word.
+### 7.3 Final word
 &nbsp;&nbsp;&nbsp;&nbsp;In this article we have shown the evolution of UI architecture approaches, focusing on simple example and driving forces to seek "new ways of doing the same things" based on selected set of NFRs. We also have introduced the concept of **sub-system boundary**, which can be useful in any architecture: on micro level in backend or frontend; and on macro level when you are designing distributed micro-services. What we haven't touched is paradigm brought us by [React](https://react.dev/) like frameworks. Mostly because we have no great hands-on experience in it. We will be glad if readers provide feedback on how it acts against the selected NFRs.
